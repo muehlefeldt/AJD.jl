@@ -1,0 +1,7 @@
+name = "AJD"
+uuid = "554d0510-86f8-456b-923c-97159df4572d"
+authors = ["Nicholas Gericke <nicholas.gericke@campus.tu-berlin.de>"]
+version = "1.0.0-DEV"
+
+[compat]
+julia = "1.10"
