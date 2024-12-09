@@ -1,3 +1,4 @@
 [deps]
 Diagonalizations = "9cd687f3-b62d-43f3-8fd3-ffcd9e581047"
+PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
