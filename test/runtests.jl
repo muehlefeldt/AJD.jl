@@ -7,5 +7,5 @@ using Diagonalizations
         @test 1+2 == 1 + 2
     end 
     # Write your tests here.
-    #include("test_python_function.jl")
+    include("test_python_function.jl")
 end
