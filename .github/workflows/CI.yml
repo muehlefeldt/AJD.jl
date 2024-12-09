@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - mm_test_with_python
     tags: ['*']
   pull_request:
   workflow_dispatch:
