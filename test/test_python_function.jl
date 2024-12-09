@@ -2,9 +2,10 @@ using Test
 using PyCall
 
 py"""
-    def add(x, y):
-        return a + y
+def py_add(x, y):
+    return x + y
 """
-@testset begin
-    @test py"add"(1, 2) == 1 + 2
+
+@testset "pythoncomparison" begin
+    @test py"py_add"(1, 2) == 1 + 2
 end 
