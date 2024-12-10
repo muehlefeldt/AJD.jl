@@ -6,4 +6,5 @@ using Diagonalizations
     # Write your tests here.
     include("test_python_function.jl")
     include("test_diagonalizations_against_python.jl")
+    include("test_jdiag_against_python.jl")
 end
