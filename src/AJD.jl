@@ -40,18 +40,39 @@ function Jacobi_Rotation(G::Matrix)
     return R
 
 end
-function JADE(A::AbstractArray;threshhold = 10e-18, max_iter = 1000)
+#function matmul_higher_order(A::AbstractMatrix,B::AbstractMatrix)
+#    
+#    for
+#
+#end
+function JADE(A::AbstractArray;threshold = 10e-18, max_iter = 1000)
     #A concatenate in third dimension by  A =[[1 2; 1 2];;;[2 3; 4 5]]
+    #only works for Real Matrices of A but not complex
     
     rows, columns, k = size(A)
 
     #initialize the apporximate joint eigenvecotrs as described in Cardoso
-    V = (1.0+0.0*im)*I(rows)
+    V = (1.0)*I(rows)
     iteration_step = 0
     #Calculate h first for all the entries in the matrix
     while iteration_step <= max_iter
         for row = 1:rows
             for column = 2:columns
+                h_diag = A[row,row,:] - A[column,column,:] #first entry of h
+                h_non_diag = A[row,column,:] + A[column,row,:] #second entry of h
+                
+                ton = dot(h_diag,h_diag) - dot(h_non_diag,h_non_diag)
+                toff = 2*dot(h_diag,h_non_diag)
+                θ = 0.5*atan(toff, ton + sqrt(ton*ton + toff * toff))
+
+                c = cos(θ)
+                s = sin(θ)
+                R = [ c, s; -s, c]
+                if abs(s) > threshold
+                    
+                    break
+                end
+                iteration_step += 1
             end
         end 
 
