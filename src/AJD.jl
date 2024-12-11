@@ -60,9 +60,6 @@ module
                         V[:,pair] = V[:,pair]*G
 
 
-                        ###########debugging
-                        print("this is matrix G in ",pair,"\n")
-                        print(G)
 
                         
                         # update related two rows, p,q, of Real matrix A by one givens rotation 
