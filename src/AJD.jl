@@ -1,5 +1,7 @@
 module AJD
 
+using LinearAlgebra
+
 """
     multiply(x, y)
 
@@ -13,8 +15,6 @@ end
 
 export multiply
 
-using LinearAlgebra
-# Write your package code here.
 function Is_Commuting(A::AbstractMatrix, B::AbstractMatrix)
     return A*B == B*A
 end
@@ -28,15 +28,15 @@ function Is_Symmetric(A::AbstractMatrix)
 end
 
 function get_non_Diag_elements(A::AbstractMatrix)
-    #Code found under: https://discourse.julialang.org/t/off-diagonal-elements-of-matrix/41169/4
-    #best method regarding compilation time found so far
+    # Source: https://discourse.julialang.org/t/off-diagonal-elements-of-matrix/41169/4
+    # Best method regarding compilation time found so far
         row, column = size(A)
         non_diag_elements_vector = [A[index_row, index_column] for index_row = 1:row, index_column = 1:column if index_row != index_column]
         return non_diag_elements_vector
 end
-function Jacobi_Rotation(G::Matrix)
 
-    Eigenvalues,Eigenvector = eigen(G) #sorted by highest value last
+function Jacobi_Rotation(G::Matrix)
+    Eigenvalues, Eigenvector = eigen(G) #sorted by highest value last
 
     max_eigenvector = Eigenvector[:,end] #get the eigenvector of the corresponding highest eigenvalue
     max_eigenvector = sign(max_eigenvector[1])*max_eigenvector #why is that? i don't know why i need to do that but the code says so?
@@ -109,10 +109,17 @@ function JADE(A::AbstractArray;threshold = 10e-18, max_iter = 1000)
 
 end
 
-export Is_Commuting
-export Is_Same_size
-export Is_Symmetric
-export get_non_Diag_elements
-export Jacobi_Rotation
+function diagonalize(input_matrix, algorithm)
+    if algorithm == "jdiag"
+        return JADE(input_matrix)
+    end
+end
+export diagonalize
+
+#export Is_Commuting
+#export Is_Same_size
+#export Is_Symmetric
+#export get_non_Diag_elements
+#export Jacobi_Rotation
 export JADE
 end
