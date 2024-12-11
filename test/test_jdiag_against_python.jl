@@ -58,6 +58,5 @@ def jade(A, threshold=10e-16):
 @testset "JDiag against Python" begin
     testinput = 1.0 * [I(6), I(6)]
     A, V = py"jade"(testinput)
-    print(A)
     @test A[1, :, :] == I(6)
 end
