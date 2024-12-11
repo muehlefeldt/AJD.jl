@@ -10,10 +10,3 @@ using LinearAlgebra
     include("test_jdiag_against_python.jl")
     include("test_jdiag_jade_algorithm.jl")
 end
-
-
-
-#@testset "Jacobi_Rotation" begin
-#    A = 1.0*I(3)
-#    @test Jacobi_Rotation
-#end
