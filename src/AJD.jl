@@ -48,14 +48,18 @@ end
 function JADE(A::AbstractArray;threshold = 10e-18, max_iter = 1000)
     #A concatenate in third dimension by  A =[[1 2; 1 2];;;[2 3; 4 5]]
     #only works for Real Matrices of A but not complex
-    
+    A = Float64.(A)
     rows, columns, k = size(A)
 
     #initialize the apporximate joint eigenvecotrs as described in Cardoso
-    V = (1.0)*I(rows)
+    V = (1.0)*I(rows)+zeros(rows, columns)
     iteration_step = 0
     #Calculate h first for all the entries in the matrix
-    while iteration_step <= max_iter
+
+    active = true
+    while iteration_step >= max_iter || active == true
+   
+        active = false
         for row = 1:rows
             for column = 2:columns
                 h_diag = A[row,row,:] - A[column,column,:] #first entry of h
@@ -67,21 +71,24 @@ function JADE(A::AbstractArray;threshold = 10e-18, max_iter = 1000)
 
                 c = cos(θ)
                 s = sin(θ)
-                R = [ c, s; -s, c]
+                R = [ c s; -s c]
+                active = active || abs(s) > threshold
                 if abs(s) > threshold
-                    
-                    break
+                    pair = [row, column]
+                
+                    for n = 1:k
+                        A[:,pair,n] = transpose(R*transpose(A[:,pair,n]))
+                        A[pair,:,n] = R*A[pair,:,n]
+                        
+                    end
+                    V[:,pair] = transpose(R*transpose(V[:,pair]))
                 end
                 iteration_step += 1
             end
         end 
 
     end
-
-    
-
-    
-    return  V
+    return  A,V
 end
 
 export Is_Commuting

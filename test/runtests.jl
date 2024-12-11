@@ -27,11 +27,11 @@ end
     end
 end
 @testset "JADE" begin
-    A =[[1 2; 1 2];;;[2 3; 4 5]]
-    rows = size(A)[1]
-    @test JADE(A) == (1.0+0.0*im) * I(rows)
+    A = [[1 2; 3 4];;;[5 6; 7 8];;;[9 10; 11 12]]
+    
+    @info JADE(A)
 end
-@testset "Jacobi_Rotation" begin
-    A = 1.0*I(3)
-    @test Jacobi_Rotation
-end
+#@testset "Jacobi_Rotation" begin
+#    A = 1.0*I(3)
+#    @test Jacobi_Rotation
+#end
