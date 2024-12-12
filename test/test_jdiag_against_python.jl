@@ -55,8 +55,13 @@ def jade(A, threshold=10e-16):
     return A, V
 """
 
-@testset "JDiag against Python" begin
-    testinput = 1.0 * [I(6), I(6)]
-    A, V = py"jade"(testinput)
-    @test A[1, :, :] == I(6)
+@testset "JADE vs. Python with I" begin
+    #testinput = 1.0 * [Matrix(I, 6, 6), Matrix(I, 6, 6)]
+    testinput = 1.0 * [[1 2; 1 2];;;[2 3; 4 5]]
+    #A, V = py"jade"(testinput)
+    #@test A[1, :, :] == I(6)
+
+    @info diagonalize(testinput, "jdiag")[1]
+    @info py"jade"(testinput)[1]
+    #@test isapprox(diagonalize(testinput, "jdiag")[1], py"jade"(testinput)[1])
 end

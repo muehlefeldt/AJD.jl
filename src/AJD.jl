@@ -54,12 +54,8 @@ function Jacobi_Rotation(G::Matrix)
     return R
 
 end
-#function matmul_higher_order(A::AbstractMatrix,B::AbstractMatrix)
-#    
-#    for
-#
-#end
-function JADE(A::AbstractArray;threshold = 10e-18, max_iter = 1000)
+
+function JADE(A::AbstractArray, threshold = 10e-18, max_iter = 1000)
     #A concatenate in third dimension by  A =[[1 2; 1 2];;;[2 3; 4 5]]
     #only works for Real Matrices of A but not complex
     A = Float64.(A) #if the Array isn't already of Float64
@@ -116,10 +112,4 @@ function diagonalize(input_matrix, algorithm)
 end
 export diagonalize
 
-#export Is_Commuting
-#export Is_Same_size
-#export Is_Symmetric
-#export get_non_Diag_elements
-#export Jacobi_Rotation
-export JADE
 end
