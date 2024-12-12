@@ -57,10 +57,12 @@ def jade(A, threshold=10e-16):
 
 
 #testinput = 1.0 * [I(6), I(6)]
-testinput = [1.1* Matrix(I, 4, 4),Matrix(I, 4, 4)]
-A = py"jade"(testinput)
+testinput = AbstractArray.[1.1* Matrix(I, 4, 4),Matrix(I, 4, 4)]
+#A = py"jade"(testinput)
 #print(typeof(A))
-print(A)
+#print(A)
 #print(I(6)*1.0)
 #print(I(6)
-print(A[1, :, :])
+#print(A[1, :, :])
+
+diagonalize(testinput)
