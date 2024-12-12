@@ -1,5 +1,4 @@
-module AJD
-
+module AJD 
 using LinearAlgebra
 
 """
@@ -112,4 +111,7 @@ function diagonalize(input_matrix, algorithm)
 end
 export diagonalize
 
+
 end
+
+
