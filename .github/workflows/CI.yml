@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - master
-      - mm_test_with_python
+      - mm_first_jdiag_implementation_tests_structure
     tags: ['*']
   pull_request:
   workflow_dispatch:
