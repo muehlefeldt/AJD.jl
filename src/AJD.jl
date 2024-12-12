@@ -41,15 +41,19 @@ function Jacobi_Rotation(G::Matrix)
     return R
 
 end
+
+
 function convert_Hermitian(A)
     elements = size(A)[1]
-    row, columns = size(A[1])
-    Array = zeros(row,columns,elements)
-    for element in elements
-        Array[:,:,element] = A[element]
+    
+    Array = A[1]
+    for element  = 1:elements
+        Array = [Array;;;A[element]]
     end
     return Array
 end
+
+
 function JADE(A::AbstractArray;threshold = 10e-18, max_iter = 1000)
     #ToDo: Make A an Hermitian Matrix from LinearAlgebra.jl
     
