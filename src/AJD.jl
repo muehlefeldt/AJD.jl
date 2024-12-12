@@ -1,5 +1,6 @@
 module AJD 
 using LinearAlgebra
+include("jdiag_cardoso.jl")
 
 """
     multiply(x, y)
@@ -108,7 +109,11 @@ function diagonalize(input_matrix, algorithm)
     if algorithm == "jdiag"
         return JADE(input_matrix)
     end
+    if algorithm =="jdiag_cardoso"
+        return testAJD(input_matrix, 10e-8)
+    end
 end
+
 export diagonalize
 
 
