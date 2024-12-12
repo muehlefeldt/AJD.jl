@@ -1,5 +1,6 @@
 module AJD
 using LinearAlgebra
+using PosDefManifold
 # Write your package code here.
 function Is_Commuting(A::AbstractMatrix, B::AbstractMatrix)
     return A*B == B*A
@@ -40,12 +41,18 @@ function Jacobi_Rotation(G::Matrix)
     return R
 
 end
-#function matmul_higher_order(A::AbstractMatrix,B::AbstractMatrix)
-#    
-#    for
-#
-#end
+function convert_Hermitian(A)
+    elements = size(A)[1]
+    row, columns = size(A[1])
+    Array = zeros(row,columns,elements)
+    for element in elements
+        Array[:,:,element] = A[element]
+    end
+    return Array
+end
 function JADE(A::AbstractArray;threshold = 10e-18, max_iter = 1000)
+    #ToDo: Make A an Hermitian Matrix from LinearAlgebra.jl
+    
     #A concatenate in third dimension by  A =[[1 2; 1 2];;;[2 3; 4 5]]
     #only works for Real Matrices of A but not complex
     A = Float64.(A) #if the Array isn't already of Float64
@@ -81,7 +88,6 @@ function JADE(A::AbstractArray;threshold = 10e-18, max_iter = 1000)
                     for n = 1:k
                         A[:,pair,n] = transpose(R*transpose(A[:,pair,n]))
                         A[pair,:,n] = R*A[pair,:,n]
-                        
                     end
                     V[:,pair] = transpose(R*transpose(V[:,pair]))
                 end
@@ -101,4 +107,5 @@ export Is_Symmetric
 export get_non_Diag_elements
 export Jacobi_Rotation
 export JADE
+export convert_Hermitian
 end
