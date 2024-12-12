@@ -22,7 +22,7 @@ end
 
     test_input = generate_stacked_psd_matrices(2, 4)
     test_input = 1.0*hcat(I(6), I(6))
-    @info diagonalize(test_input, "jdiag_cardoso")
+    @info "Matlab",diagonalize(test_input, "jdiag_cardoso")
     #@info diagonalize(test_input, "jdiag")
 
 

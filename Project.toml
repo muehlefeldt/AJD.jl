@@ -5,15 +5,17 @@ version = "1.0.0-DEV"
 
 [deps]
 Diagonalizations = "9cd687f3-b62d-43f3-8fd3-ffcd9e581047"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+PosDefManifold = "f45a3650-5c51-11e9-1e9a-133aa5e309cf"
 PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
 ScikitLearn = "3646fa90-6ef7-5e7e-9f22-8aca16db6324"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
-LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
 [compat]
 Diagonalizations = "0.2.3"
+LinearAlgebra = ">=1.10.7"
+PosDefManifold = "0.5.1"
 PyCall = "1.96.4"
 ScikitLearn = "0.7.0"
 Test = ">=1.10.7"
-LinearAlgebra = ">=1.10.7"
 julia = "1.10"

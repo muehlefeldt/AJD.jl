@@ -1,12 +1,12 @@
-function JADE(A::AbstractArray, threshold = 10e-18, max_iter = 1000)
+function JADE(A::Vector{Matrix{Float64}}; threshold = 10e-18, max_iter = 1000)
     #A concatenate in third dimension by  A =[[1 2; 1 2];;;[2 3; 4 5]]
     #only works for Real Matrices of A but not complex
-    A = Float64.(A) #if the Array isn't already of Float64
-    
+    #A = Float64.(A) #if the Array isn't already of Float64
+    A = cat(A...,dims = 3)
     rows, columns, k = size(A)
 
     #initialize the apporximate joint eigenvecotrs as described in Cardoso
-    V = (1.0)*I(rows)+zeros(rows, columns) #needs to be added otherwise we cannot manipulate the non diag. elements of V
+    V = Matrix((1.0)*I(rows)) #needs to be added otherwise we cannot manipulate the non diag. elements of V
     
     iteration_step = 0
 
@@ -47,3 +47,7 @@ function JADE(A::AbstractArray, threshold = 10e-18, max_iter = 1000)
     return  A,V
 
 end
+# function JADE(A::Vector{Matrix{ComplexF64}}; threshold = 10e-18, max_iter = 1000)
+#     A = cat(A...,dims = 3)
+    
+# end

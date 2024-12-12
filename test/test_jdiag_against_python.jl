@@ -28,6 +28,7 @@ def jade(A, threshold=10e-16):
     #        Matrix of shape (m x m) that contains the approximate joint eigenvectors
     #
     A = np.copy(A)
+    print(A)
     m = A.shape[1]
     V = np.eye(m)
     active = 1
@@ -56,12 +57,12 @@ def jade(A, threshold=10e-16):
 """
 
 @testset "JADE vs. Python with I" begin
-    #testinput = 1.0 * [Matrix(I, 6, 6), Matrix(I, 6, 6)]
-    testinput = 1.0 * [[1 2; 1 2];;;[2 3; 4 5]]
+    testinput = 1.0 * [Matrix(I, 6, 6), Matrix(I, 6, 6)]
+    #testinput = 1.0 * [[1 2; 1 5];;;[10 3; 4 5]]
     #A, V = py"jade"(testinput)
     #@test A[1, :, :] == I(6)
-
-    @info diagonalize(testinput, "jdiag")[1]
-    @info py"jade"(testinput)[1]
+    #testinput_python_script = []
+    @info "JDiag", diagonalize(testinput, "jdiag")[1]
+    @info "Python", py"jade"(testinput)[1]
     #@test isapprox(diagonalize(testinput, "jdiag")[1], py"jade"(testinput)[1])
 end
