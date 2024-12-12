@@ -9,4 +9,5 @@ using LinearAlgebra
     include("test_diagonalizations_against_python.jl")
     include("test_jdiag_against_python.jl")
     include("test_jdiag_jade_algorithm.jl")
+    include("test_jdiag_cardoso.jl")
 end
