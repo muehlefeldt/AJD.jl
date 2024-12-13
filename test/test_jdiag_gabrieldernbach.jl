@@ -56,7 +56,7 @@ def jade(A, threshold=10e-16):
     return A, V
 """
 
-@testset "JADE vs. Python with I" begin
+@testset "JDiag Gabrieldernbach vs. Python with I" begin
     testinput = 1.0 * [Matrix(I, 6, 6), Matrix(I, 6, 6)]
     #testinput = 1.0 * [[1 2; 1 5];;;[10 3; 4 5]]
     #A, V = py"jade"(testinput)
