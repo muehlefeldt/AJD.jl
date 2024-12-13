@@ -1,4 +1,12 @@
-function JADE(A::Vector{Matrix{Float64}}; threshold = 10e-18, max_iter = 1000)
+"""
+    jdiag_gabrieldernbach(A::Vector{Matrix{Float64}}; threshold = 10e-18, max_iter = 1000)
+
+JDiag algorithm based on the implementation by Gabrieldernbach in Python.
+
+Source: https://github.com/gabrieldernbach/approximate_joint_diagonalization/blob/master/jade/jade_cpu.py
+"""
+
+function jdiag_gabrieldernbach(A::Vector{Matrix{Float64}}; threshold = 10e-18, max_iter = 1000)
     #A concatenate in third dimension by  A =[[1 2; 1 2];;;[2 3; 4 5]]
     #only works for Real Matrices of A but not complex
     #A = Float64.(A) #if the Array isn't already of Float64
@@ -47,7 +55,15 @@ function JADE(A::Vector{Matrix{Float64}}; threshold = 10e-18, max_iter = 1000)
     return  A,V
 
 end
-# function JADE(A::Vector{Matrix{ComplexF64}}; threshold = 10e-18, max_iter = 1000)
-#     A = cat(A...,dims = 3)
-    
-# end
+
+function Is_Commuting(A::AbstractMatrix, B::AbstractMatrix)
+    return A*B == B*A
+end
+
+function Is_Same_size(A::AbstractMatrix, B::AbstractMatrix)
+    return size(A) == size(B)
+end
+
+function Is_Symmetric(A::AbstractMatrix)
+    return size(A,1) == size(A,2)
+end

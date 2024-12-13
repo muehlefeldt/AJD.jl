@@ -3,30 +3,7 @@ using LinearAlgebra
 include("jdiag_cardoso.jl")
 include("jdiag_gabrieldernbach.jl")
 
-"""
-    multiply(x, y)
 
-Multiply inputs `x` and `y`.
-
-Function only introduced to test module function against Python implementation.
-"""
-function multiply(x, y)
-    return x * y
-end
-
-export multiply
-
-function Is_Commuting(A::AbstractMatrix, B::AbstractMatrix)
-    return A*B == B*A
-end
-
-function Is_Same_size(A::AbstractMatrix, B::AbstractMatrix)
-    return size(A) == size(B)
-end
-
-function Is_Symmetric(A::AbstractMatrix)
-    return size(A,1) == size(A,2)
-end
 
 function get_non_Diag_elements(A::AbstractMatrix)
     # Source: https://discourse.julialang.org/t/off-diagonal-elements-of-matrix/41169/4
@@ -56,12 +33,19 @@ function Jacobi_Rotation(G::Matrix)
 
 end
 
+"""
+    diagonalize(input_matrix, algorithm)
+
+Diagonalize input matrix using requested algorithm.
+
+Implemented algorithms are limited to JDiag in different versions.
+"""
 function diagonalize(input_matrix, algorithm)
     if algorithm == "jdiag"
-        return JADE(input_matrix)
+        return jdiag_gabrieldernbach(input_matrix)
     end
     if algorithm =="jdiag_cardoso"
-        return testAJD(input_matrix, 10e-8)
+        return jdiag_cardoso(input_matrix, 10e-8)
     end
 end
 
