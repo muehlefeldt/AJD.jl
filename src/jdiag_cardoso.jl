@@ -1,4 +1,4 @@
-function testAJD(M,jthresh)
+function jdiag_cardoso(M,jthresh)
     # Version02, 11.Dec.2024
     # This version only works for matrix with real valued entries
     # Input:
