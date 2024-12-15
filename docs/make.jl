@@ -8,7 +8,7 @@ makedocs(;
     authors="Nicholas Gericke <nicholas.gericke@campus.tu-berlin.de>",
     sitename="AJD.jl",
     format=Documenter.HTML(;
-        canonical="https://gericke-n.github.io/AJD.jl",
+        canonical="https://muehlefeldt.github.io/AJD.jl",
         edit_link="master",
         assets=String[],
     ),
@@ -19,6 +19,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/gericke-n/AJD.jl",
+    repo="github.com/muehlefeldt/AJD.jl",
     devbranch="master",
 )
