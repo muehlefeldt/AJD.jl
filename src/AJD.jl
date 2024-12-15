@@ -17,7 +17,7 @@ function Jacobi_Rotation(G::Matrix)
     Eigenvalues, Eigenvector = eigen(G) #sorted by highest value last
 
     max_eigenvector = Eigenvector[:,end] #get the eigenvector of the corresponding highest eigenvalue
-    max_eigenvector = sign(max_eigenvector[1])*max_eigenvector #why is that? i don't know why i need to do that but the code says so?
+    #max_eigenvector = sign(max_eigenvector[1])*max_eigenvector #why is that? i don't know why i need to do that but the code says so?
     
     x = max_eigenvector[1]
     y = max_eigenvector[2]
@@ -27,7 +27,7 @@ function Jacobi_Rotation(G::Matrix)
 
     c = sqrt((x+r)/2*r)
 
-    s = (y - z*im)/(sqrt(2*r(x+r)))
+    s = (y - z*im)/(sqrt(2*r*(x+r)))
     R = [c conj(s); -s conj(c)]
     return R
 
