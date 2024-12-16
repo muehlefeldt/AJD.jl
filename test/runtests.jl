@@ -7,4 +7,5 @@ using LinearAlgebra
     include("test_jdiag_gabrieldernbach.jl")
     include("test_jdiag_gabrieldernbach_utils.jl")
     include("test_jdiag_cardoso.jl")
+    include("test_jdiag_eduardpineau.jl")
 end

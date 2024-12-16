@@ -2,6 +2,7 @@ module AJD
 using LinearAlgebra
 include("jdiag_cardoso.jl")
 include("jdiag_gabrieldernbach.jl")
+include("jdiag_edourdpineau.jl")
 
 
 
@@ -34,19 +35,26 @@ function Jacobi_Rotation(G::Matrix)
 end
 
 """
-    diagonalize(input_matrix, algorithm)
+    diagonalize(A::Vector{Matrix}; algorithm::String)
 
 Diagonalize input matrix using requested algorithm.
 
-Implemented algorithms are limited to JDiag in different versions.
+Main function of the AJD package.
+Implemented algorithms at this point in time are limited to the algorithm in different versions.
+Input of matrices to be diagonalized need to be a vector of matrices.
+The matrices can be Float64 or complex.
 """
-function diagonalize(input_matrix, algorithm)
+function diagonalize(A::Vector{Matrix}; algorithm::String)
     if algorithm == "jdiag"
-        return jdiag_gabrieldernbach(input_matrix)
+        return jdiag_gabrieldernbach(A)
     end
     if algorithm =="jdiag_cardoso"
-        return jdiag_cardoso(input_matrix, 10e-8)
+        return jdiag_cardoso(A, 10e-8)
     end
+    if algorithm == "jdiag_edourdpineau"
+        return jdiag_edourdpineau(A)
+    end
+    return error
 end
 
 export diagonalize
