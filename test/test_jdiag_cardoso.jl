@@ -19,11 +19,8 @@ function generate_psd_matrix(n::Int)
 end
 
 @testset "JDiag Cardoso" begin
-
     test_input = generate_stacked_psd_matrices(2, 4)
-    test_input = 1.0*hcat(I(6), I(6))
-    @info "Matlab",diagonalize(test_input, "jdiag_cardoso")
+    test_input = (1.0) * [Matrix(I, 6, 6) , Matrix(I, 6, 6)]
+    @info "Matlab",diagonalize(test_input, algorithm="jdiag_cardoso")
     #@info diagonalize(test_input, "jdiag")
-
-
 end
