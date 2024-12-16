@@ -40,7 +40,7 @@ The third code is based on the code found here: [Python Code edouardpineau](http
 
 ```julia 
 function jdiag_edourdpineau(X::Vector{M}; iter=100, eps=1e-3) where {T<:Union{Real,Complex},M<:AbstractMatrix{T}}
-return A,V
+return V, A, Error
 ```
 
 A minimal working example can be found below, which uses the function `diagonalize(A::Vector{Matrix}; algorithm::String)`, which is the **only** function exported from the module (for now).
@@ -64,16 +64,28 @@ Minimal working example:
 
 ```julia
 using AJD
-
+using LinearAlgebra
 testinput = (1.0)* [Matrix(I, 6, 6) , Matrix(I, 6, 6)]
 
-diagonalize(testinput; algorithm = "jdiag")
-diagonalize(testinput; algorithm = "jdiag_edourdpineau")
-diagonalize(hcat(testinput...); algorithm = "jdiag_cardoso")
+@info "Jdiag",diagonalize(testinput; algorithm = "jdiag")
+@info "jdiag_edourdpineau",diagonalize(testinput; algorithm = "jdiag_edourdpineau")
+@info "jdiag_cardoso",diagonalize(testinput; algorithm = "jdiag_cardoso")
 
 testinput_imag = [[ 1.0 0.0 1.0*im; 0.0 2.0 0.0; 1.0*im 0.0 1.0],[ 1.0 0.0 1.0*im; 0.0 2.0 0.0; 1.0*im 0.0 1.0]]
-diagonalize(testinput_imag; algorithm = "jdiag")
-diagonalize(testinput_imag; algorithm = "jdiag_edourdpineau")
 
+@info "jdiag",diagonalize(testinput_imag; algorithm = "jdiag")
+@info "jdiag_edourdpineau",diagonalize(testinput_imag; algorithm = "jdiag_edourdpineau")
 
 ```
+For generating further testdata of real matrices the following function can be used (though the function might only work for `diagonalize(input; algorithm = "jdiag_edourdpineau")`):
+
+```julia
+using LinearAlgebra
+function random_normal_commuting_matrices(n::Int, m::Int)
+    Q, _ = qr(rand(n,n))
+    Q = Matrix(Q)
+    return [Q*Diagonal(rand(n))*Q' for _ in 1:m]
+end
+
+```
+**Known "issue"**: due to the different implementations the algorithm = "jdiag" and algorithm = "jdiag_edourdpineau" give different results in order of approx. 10^-1. However due to machine precision it is unclear how reliable those values really are.

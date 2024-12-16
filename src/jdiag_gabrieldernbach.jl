@@ -4,6 +4,12 @@
 JDiag algorithm based on the implementation by Gabrieldernbach in Python.
 
 Source: https://github.com/gabrieldernbach/approximate_joint_diagonalization/blob/master/jade/jade_cpu.py
+
+    (2) jdiag_gabrieldernbach(A::Vector{Matrix{ComplexF64}}; threshold = eps(), max_iter = 1000)
+
+JDiag algorithm for complex matrices based on the implementation by Gabrieldernbach in Python, the Cardoso Paper and the code 
+    of https://github.com/edouardpineau/Time-Series-ICA-with-SOBI-Jacobi.
+
 """
 function jdiag_gabrieldernbach(A::Vector{Matrix{Float64}}; threshold = eps(), max_iter = 1000)
     #A concatenate in third dimension by  A =[[1 2; 1 2];;;[2 3; 4 5]]
@@ -54,6 +60,13 @@ function jdiag_gabrieldernbach(A::Vector{Matrix{Float64}}; threshold = eps(), ma
     return  A,V
 
 end
+"""
+    off_diag_normation(A::Array)
+    **input**
+    A: Vector of communting matrices with index k
+Takes an array namely the Array of matrices A_k and gets the offdiagonal elements, norms them and adds them up to return normation. 
+Used for the `jdiag_gabrieldernbach` algorithm
+"""
 function off_diag_normation(A::Array)
     row, column,k = size(A)
     non_diag_elements_vector = [A[index_row, index_column,index_k] for index_row = 1:row, index_column = 1:column, index_k = 1:k if index_row != index_column]
@@ -61,7 +74,6 @@ function off_diag_normation(A::Array)
 
     return normation
 end
-
 function jdiag_gabrieldernbach(A::Vector{Matrix{ComplexF64}}; threshold = eps(), max_iter = 1000)
 
     A = cat(A...,dims = 3)
