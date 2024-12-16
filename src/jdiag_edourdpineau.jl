@@ -83,6 +83,7 @@ function jdiag_edourdpineau(X::Vector{M}; iter=100, eps=1e-3) where {T<:Union{Re
 
         new_diag_err = off_diag_norm(Xm)
         push!(err_array, new_diag_err)
+        # TODO: this is relative error, should also add an absolute error
         diff = abs(new_diag_err - diag_err) / diag_err
         diag_err = new_diag_err
     end
