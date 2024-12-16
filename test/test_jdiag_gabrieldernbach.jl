@@ -27,7 +27,6 @@ def jade(A, threshold=10e-16):
     #        Matrix of shape (m x m) that contains the approximate joint eigenvectors
     #
     A = np.copy(A)
-    print(A)
     m = A.shape[1]
     V = np.eye(m)
     active = 1
@@ -72,12 +71,13 @@ def jade(A, threshold=10e-16):
             end
         end
         # @info Converted_Output
-        @test diagonalize(testinput, "jdiag")[1] == Converted_Output
-        @info "Julia code from python Repo", diagonalize(testinput, "jdiag")[1]
+        @test diagonalize(testinput, algorithm = "jdiag")[1] == Converted_Output
+        @info "Julia code from python Repo", diagonalize(testinput, algorithm = "jdiag")[1]
         # @info "Python Code", py"jade"(testinput)[1]
         #@test isapprox(diagonalize(testinput, "jdiag")[1], py"jade"(testinput)[1])
 end
 @testset "Jdiag Complex Matrices" begin
     testinput = [[ 1.0 0.0 1.0*im; 0.0 2.0 0.0; 1.0*im 0.0 1.0],[ 1.0 0.0 1.0*im; 0.0 2.0 0.0; 1.0*im 0.0 1.0]]
-    @info "Julia code from python Repo", diagonalize(testinput, "jdiag")
+    @info "Julia code from python Repo A ", diagonalize(testinput, algorithm = "jdiag")[1]
+    @info "Julia code from python Repo V", diagonalize(testinput, algorithm = "jdiag")[2]
 end
