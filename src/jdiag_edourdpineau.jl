@@ -8,7 +8,7 @@ function off_diag_norm(Xm::AbstractArray{T,3})::Real where {T<:Union{Real,Comple
 end
 
 function rotation(aii::Array{T}, ajj::Array{T}, aij::Array{T}, aji::Array{T})::Matrix{T} where {T<:Complex}
-    h = hcat(aii .- ajj, aij .* aji, (aji .- aij) .* 1im)
+    h = hcat(aii .- ajj, aij .+ aji, (aji .- aij) .* 1im)
     G = real(h' * h)
     _, vecs = eigen(G)
     x, y, z = vecs[:, end]
@@ -83,7 +83,7 @@ function jdiag_edourdpineau(X::Vector{M}; iter=100, eps=1e-3) where {T<:Union{Re
 
         new_diag_err = off_diag_norm(Xm)
         push!(err_array, new_diag_err)
-        diff = abs(new_diag_err - diag_err)
+        diff = abs(new_diag_err - diag_err) / diag_err
         diag_err = new_diag_err
     end
     V, Xm, err_array
