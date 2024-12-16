@@ -2,20 +2,18 @@ module JDiag
 using LinearAlgebra
 export testJDiag
 
-function off_diag_norm(Xm::AbstractArray{T,3})::Real where {T}
+function off_diag_norm(Xm::AbstractArray{T,3})::Real where {T<:Union{Real,Complex}}
   sum = zero(real(T))
-  for k in axes(Xm, 1), i in axes(Xm, 2), j in axes(Xm, 3)
+  for i in axes(Xm, 1), j in axes(Xm, 2), k in axes(Xm, 3)
     i == j && continue
-    sum += abs2(Xm[k, i, j])
+    sum += abs2(Xm[i, j, k])
   end
   return sum
 end
 
-function rotation(aii::Array{T}, ajj::Array{T}, aij::Array{T}, aji::Array{T})::Matrix{Complex{T}} where {T<:Union{Real,Complex}}
-  # println("Matrix rotation")
-
-  h = hcat(aii .- ajj, aij .* aji, (aji .- aij) .* im)
-  G = real(transpose(h) * h)
+function rotation(aii::Array{T}, ajj::Array{T}, aij::Array{T}, aji::Array{T})::Matrix{T} where {T<:Complex}
+  h = hcat(aii .- ajj, aij .* aji, (aji .- aij) .* 1im)
+  G = real(h' * h)
   _, vecs = eigen(G)
   x, y, z = vecs[:, end]
   if x < 0.0
@@ -29,10 +27,8 @@ function rotation(aii::Array{T}, ajj::Array{T}, aij::Array{T}, aji::Array{T})::M
 end
 
 function rotation_symmetric(aii::Array{T}, ajj::Array{T}, aij::Array{T})::Matrix{T} where {T<:Union{Real,Complex}}
-  # println("Symmetric rotation")
-
   h = hcat(aii .- ajj, 2.0 .* aij)
-  G = real(transpose(h) * h)
+  G = real(h' * h)
   _, vecs = eigen(G)
   x, y = vecs[:, end]
   if x < 0.0
@@ -47,15 +43,18 @@ end
 
 function testJDiag(X::Vector{M}; iter=100, eps=1e-3) where {T<:Union{Real,Complex},M<:AbstractMatrix{T}}
 
-  Xm = cat(X..., dims=3)
-
+  Xm = cat(X..., dims=3) .+ 0.0im
   m = length(X)
   n = size(X[1], 1)
   k = size(X[1], 2)
   @assert n == k
 
-  V = Matrix{T}(I, n, n)
-  println(V)
+  if !(M <: Symmetric) && (T <: Real)
+    Xm .+= 0.0im
+    V = Matrix{Complex{T}}(I, n, n)
+  else
+    V = Matrix{T}(I, n, n)
+  end
 
   diag_err = off_diag_norm(Xm)
   err_array = [diag_err]
@@ -65,21 +64,26 @@ function testJDiag(X::Vector{M}; iter=100, eps=1e-3) where {T<:Union{Real,Comple
     current_iter += 1
     println("Current iteration: ", current_iter, " with error: ", diag_err)
     for i in Base.OneTo(n - 1), j in (i+1):n
-      R = M <: Symmetric ? rotation_symmetric(Xm[i, i, :], Xm[j, j, :], Xm[i, j, :]) :
-          rotation(Xm[i, i, :], Xm[j, j, :], Xm[i, j, :], Xm[j, i, :])
-      Xm[[i, j], :, :] = reshape(R * reshape(Xm[[i, j], :, :], 2, :), 2, n, m)
-      Xm[:, [i, j], :] = permutedims(reshape(reshape(permutedims(Xm[:, [i, j], :], (1, 3, 2)), :, 2) * R', n, m, 2), (1, 3, 2))
+
+      if M <: Symmetric || M <: Hermitian
+        R = rotation_symmetric(Xm[i, i, :], Xm[j, j, :], Xm[i, j, :])
+      else
+        R = rotation(Xm[i, i, :], Xm[j, j, :], Xm[i, j, :], Xm[j, i, :])
+      end
+
+      for k in Base.OneTo(m)
+        Xm[[i, j], :, k] = R * Xm[[i, j], :, k]
+        Xm[:, [i, j], k] = Xm[:, [i, j], k] * R'
+      end
       V[:, [i, j]] = V[:, [i, j]] * R'
     end
+
     new_diag_err = off_diag_norm(Xm)
     push!(err_array, new_diag_err)
     diff = abs(new_diag_err - diag_err)
     diag_err = new_diag_err
   end
-
   V, Xm, err_array
 end
-end
 
-Xsset = [Symmetric(rand(Float64, 3, 3)) for _ in 1:3]
-Xset = [rand(Float64, 5, 5) for _ in 1:3]
+end
