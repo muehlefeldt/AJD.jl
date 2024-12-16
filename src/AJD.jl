@@ -99,7 +99,7 @@ module AJD
 
 
 
-    function concatenate_to_one_matrix(M::Vector{Matrix})
+    function concatenate_to_one_matrix(M)
 		return hcat(M)
 	end
 
