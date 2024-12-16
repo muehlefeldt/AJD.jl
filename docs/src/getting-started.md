@@ -59,3 +59,21 @@ function diagonalize(A::Vector{Matrix}; algorithm::String)
     return error
 end
 ```
+
+Minimal working example:
+
+```julia
+using AJD
+
+testinput = (1.0)* [Matrix(I, 6, 6) , Matrix(I, 6, 6)]
+
+diagonalize(testinput; algorithm = "jdiag")
+diagonalize(testinput; algorithm = "jdiag_edourdpineau")
+diagonalize(hcat(testinput...); algorithm = "jdiag_cardoso")
+
+testinput_imag = [[ 1.0 0.0 1.0*im; 0.0 2.0 0.0; 1.0*im 0.0 1.0],[ 1.0 0.0 1.0*im; 0.0 2.0 0.0; 1.0*im 0.0 1.0]]
+diagonalize(testinput_imag; algorithm = "jdiag")
+diagonalize(testinput_imag; algorithm = "jdiag_edourdpineau")
+
+
+```
