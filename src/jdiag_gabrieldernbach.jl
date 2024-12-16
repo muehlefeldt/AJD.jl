@@ -1,5 +1,5 @@
 """
-    jdiag_gabrieldernbach(A::Vector{Matrix{Float64}}; threshold = 10e-18, max_iter = 1000)
+    (1) jdiag_gabrieldernbach(A::Vector{Matrix{Float64}}; threshold = eps(), max_iter = 1000)
 
 JDiag algorithm based on the implementation by Gabrieldernbach in Python.
 
@@ -67,7 +67,8 @@ function jdiag_gabrieldernbach(A::Vector{Matrix{ComplexF64}}; threshold = eps(),
     A = cat(A...,dims = 3)
     rows, columns, k = size(A)
     #initialize the apporximate joint eigenvecotrs as described in Cardoso
-    V = Matrix((1.0)*I(rows)+im*zeros(rows,rows)) #needs to be added otherwise we cannot manipulate the non diag. elements of V
+    V = Matrix((1.0)*I(rows)) #needs to be added otherwise we cannot manipulate the non diag. elements of V
+    #should always be real?
 
     objective_function = off_diag_normation(A)
    
@@ -102,6 +103,7 @@ function jdiag_gabrieldernbach(A::Vector{Matrix{ComplexF64}}; threshold = eps(),
                 for k_index = 1:k
                     A[[row,column],[row,column],k_index] = R*A[[row,column],[row,column],k_index]*adjoint(R) #might not be correct, maybe use the matrix and multiply like in the python code
                 end
+                V[:,[row,column]] = transpose(R*transpose(V[:,[row,column]]))
             end
         
         end
@@ -115,7 +117,7 @@ function jdiag_gabrieldernbach(A::Vector{Matrix{ComplexF64}}; threshold = eps(),
         objective_function = objective_function_new
         iteration_step += 1
     end
-    return A
+    return A,V
     #TODO: Return Eigenvectors V as well
 end
 
