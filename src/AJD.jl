@@ -1,17 +1,27 @@
 module AJD
 
 
-    function testAJD(M,jthresh)
-        # Version02, 11.Dec.2024
+    """
+        jdiag_cardoso(A::Vector{Matrix{Float64}}; threshold = 10e-8)
+
+    JDiag algorithm based on the implementation by Jean-Fran\c{c}ois Cardoso in Matlab.
+
+    Source: https://www2.iap.fr/users/cardoso/code/Joint_Diag/joint_diag.m
+    """
+
+    function jdiag_cardoso(M::Vector{Matrix},jthresh=10e-8)
         # This version only works for matrix with real valued entries
         # Input:
-        # A is a mxnm matrix,(A1,...,An),each with dimension mxm
-        # thresh is a threshold for approximation stop, normally = 10e-8
+        # M is a vector with n mxm matrices [M1,...,Mn]
+        # thresh is a threshold for approximation stop, default = 10e-8
         # Output:
         # V : is a  mxm matrix, which accumulates givens rotations G in each iteration
-        # A : is a mxnm matrix, which contains [VA1V',...,VAnV']
+        # A : is a mxnm matrix, which contains [VM1V',...,VMnV']
         # iter: accumulates the iteration numbers
-        A = copy(M)
+
+
+		
+        A = concatenate_to_one_matrix(M)
         m,nm = size(A)
         iter = 0
 
@@ -47,6 +57,7 @@ module AJD
                     if angles[1] < 0
                         angles =-angles
                     end
+                    @assert angles[3] ==0
                     # calculate the parameters for givens rotation
                     c = sqrt(0.5+angles[1]/2)
                     s = 0.5*(angles[2])/c
@@ -88,33 +99,9 @@ module AJD
 
 
 
-    # generating test matrices which are positive definite and symmetric
-	function generate_psd_matrix(n::Int)
-	    """
-	    生成一个 n x n 的随机正定对称矩阵
-        generate one nxn positive symmetric matrix
-	    """
-	    A = randn(n, n)  # 随机矩阵 a random matrix
-	    return A * A'    # 保证对称性和正定性 return A*A^T to garentee symmetric and positive definite
+    function concatenate_to_one_matrix(M::Vector{Matrix})
+		return hcat(M)
 	end
-	
-	function generate_stacked_psd_matrices(n::Int, count::Int)
-	    """
-	    生成 count 个 n x n 的随机正定对称矩阵，并将它们拼接成一个 n x (n * count) 的大矩阵
-        generate count-mal n x n positive definite matrices by casting them together
-	    """
-	    psd_matrices = [generate_psd_matrix(n) for _ in 1:count]  # 生成矩阵列表
-	    return hcat(psd_matrices...)  # 按列拼接
-	end
-	
-	# # 生成 100 个 4x4 正定对称矩阵
-    # # test generate 100 matrices which with dimension 4x4
-	# n = 4
-	# count = 100
-	# result_matrix = generate_stacked_psd_matrices(n, count)
-	
-	# # 检查结果
-	# println("Resulting matrix size: ", size(result_matrix))  # 应输出 (4, 400)
 
 
 
