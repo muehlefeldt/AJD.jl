@@ -2,6 +2,7 @@ module AJD
 using LinearAlgebra
 include("jdiag_cardoso.jl")
 include("jdiag_gabrieldernbach.jl")
+include("jdiag_edourdpineau.jl")
 
 
 
@@ -49,6 +50,9 @@ function diagonalize(A::Vector{Matrix}; algorithm::String)
     end
     if algorithm =="jdiag_cardoso"
         return jdiag_cardoso(A, 10e-8)
+    end
+    if algorithm == "jdiag_edourdpineau"
+        return jdiag_edourdpineau(A)
     end
     return error
 end
