@@ -41,10 +41,16 @@ Diagonalize input matrix using requested algorithm.
 Main function of the AJD package.
 Implemented algorithms at this point in time are limited to the algorithm in different versions.
 Input of matrices to be diagonalized need to be a vector of matrices.
-The matrices can be Float64 or complex.
+The matrices can be Float64 or complex. Limitations of the different algorithms apply.
+
+Supported algorithms are "jdiag_gabrieldernbach", "jdiag_cardoso" and "jdiag_edourdpineau".
+See the Getting Started Guide for information on the algorithms.
 """
-function diagonalize(A::Vector{<:AbstractMatrix{<:Union{Float64, ComplexF64}}}; algorithm::String)
-    if algorithm == "jdiag"
+function diagonalize(
+    A::Vector{<:AbstractMatrix{<:Union{Float64, ComplexF64}}};
+    algorithm::String
+    )
+    if algorithm in ["jdiag", "jdiag_gabrieldernbach"]
         return jdiag_gabrieldernbach(A)
     end
     if algorithm =="jdiag_cardoso"
