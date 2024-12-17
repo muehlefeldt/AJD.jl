@@ -62,10 +62,10 @@ function jdiag_gabrieldernbach(A::Vector{Matrix{Float64}}; threshold = eps(), ma
 end
 """
     off_diag_normation(A::Array)
-    **input**
-    A: Vector of communting matrices with index k
+Input
+* A: Vector of communting matrices with index k
 Takes an array namely the Array of matrices A_k and gets the offdiagonal elements, norms them and adds them up to return normation. 
-Used for the `jdiag_gabrieldernbach` algorithm
+Used for the `jdiag_gabrieldernbach` algorithm.
 """
 function off_diag_normation(A::Array)
     row, column,k = size(A)
