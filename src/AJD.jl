@@ -34,16 +34,18 @@ function Jacobi_Rotation(G::Matrix)
 end
 
 """
-    diagonalize(A::Vector{<:AbstractMatrix{<:Union{Float64, ComplexF64}}}; algorithm::String)
+    diagonalize(
+        A::Vector{<:AbstractMatrix{<:Union{Float64, ComplexF64}}};
+        algorithm::String)
 
-Diagonalize input matrix using requested algorithm.
+Diagonalize input matrices using the requested algorithm.
 
 Main function of the AJD package.
-Implemented algorithms at this point in time are limited to the algorithm in different versions.
+Implemented algorithms at this point in time are limited to the [JDiag algorithm](https://doi.org/10.1137/S0895479893259546)  in different versions.
 Input of matrices to be diagonalized need to be a vector of matrices.
-The matrices can be Float64 or complex. Limitations of the different algorithms apply.
+The matrices can be of types Float64 or Complex. Limitations of the different implementations apply.
 
-Supported algorithms are "jdiag_gabrieldernbach", "jdiag_cardoso" and "jdiag_edourdpineau".
+Supported algorithms are `jdiag_gabrieldernbach`, `jdiag_cardoso` and `jdiag_edourdpineau`.
 See the Getting Started Guide for information on the algorithms.
 """
 function diagonalize(
