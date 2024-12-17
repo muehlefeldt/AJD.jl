@@ -1,13 +1,18 @@
+"""
+    jdiag_cardoso(M,jthresh)
+
+Only works for matrix with real valued entries. Based on [Matlab Code by Cardoso](https://www2.iap.fr/users/cardoso/jointdiag.html).
+
+Input:
+* A is a mxnm matrix,(A1,...,An), each with dimension mxm
+* thresh is a threshold for approximation stop, normally = 10e-8.
+
+Output:
+* V : is a  mxm matrix, which accumulates givens rotations G in each iteration.
+* A : is a mxnm matrix, which contains [VA1V',...,VAnV']
+* iter: accumulates the iteration numbers
+"""
 function jdiag_cardoso(M,jthresh)
-    # Version02, 11.Dec.2024
-    # This version only works for matrix with real valued entries
-    # Input:
-    # A is a mxnm matrix,(A1,...,An),each with dimension mxm
-    # thresh is a threshold for approximation stop, normally = 10e-8
-    # Output:
-    # V : is a  mxm matrix, which accumulates givens rotations G in each iteration
-    # A : is a mxnm matrix, which contains [VA1V',...,VAnV']
-    # iter: accumulates the iteration numbers
     A = copy(M)
     m,nm = size(A)
     iter = 0

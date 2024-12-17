@@ -97,6 +97,6 @@ end
 
 ```
 
-## Limitations
+## Limitations and Known issue
 
-**Known "issue"**: due to the different implementations the `algorithm = "jdiag"` and `algorithm = "jdiag_edourdpineau"` give different results in order of approx. 10^-1. However due to machine precision it is unclear how reliable those values really are.
+Due to the different implementations the `algorithm = "jdiag"` and `algorithm = "jdiag_edourdpineau"` give different results in order of approx. 10^-1. However due to machine precision it is unclear how reliable those values really are.
