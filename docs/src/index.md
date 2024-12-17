@@ -2,9 +2,9 @@
 CurrentModule = AJD
 ```
 
-# AJD
+# AJD.jl Documentation
 
-Documentation for [AJD](https://github.com/gericke-n/AJD.jl).
+Documentation for the [AJD.jl](https://github.com/gericke-n/AJD.jl) Package to perform Approximate Joint Diagonalization (AJD) on multiple matrices.
 
 ```@index
 ```
