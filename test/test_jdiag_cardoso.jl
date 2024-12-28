@@ -1,5 +1,3 @@
-using AJD
-
 function generate_stacked_psd_matrices(n::Int, count::Int)
     """
     生成 count 个 n x n 的随机正定对称矩阵，并将它们拼接成一个 n x (n * count) 的大矩阵
@@ -22,5 +20,6 @@ end
     test_input = generate_stacked_psd_matrices(2, 4)
     test_input = (1.0) * [Matrix(I, 6, 6) ,Matrix(I, 6, 6)]
     @info "Matlab",diagonalize(test_input, algorithm="jdiag_cardoso")
+    @test_throws ErrorException diagonalize(test_input*im, algorithm = "jdiag_cardoso")
     #@info diagonalize(test_input, "jdiag")
 end

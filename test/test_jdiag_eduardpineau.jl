@@ -1,5 +1,3 @@
-using AJD
-
 include("test_utils.jl")
 
 @testset "jdiag_exact" begin
@@ -14,5 +12,8 @@ include("test_utils.jl")
         @assert V*Xnew[:,:,k]*V' ≈ X[k]
     end
 end
-
+@testset "jdiag_edourdpineau" begin
+    testinput = [[ 1.0 0.0 1.0*im; 0.0 2.0 0.0; 1.0*im 0.0 1.0],[ 1.0 0.0 1.0*im; 0.0 2.0 0.0; 1.0*im 0.0 1.0]]
+    @info diagonalize(testinput, algorithm = "jdiag_edourdpineau")
+end
 
