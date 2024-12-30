@@ -11,97 +11,104 @@ JDiag algorithm for complex matrices based on the implementation by Gabrieldernb
     of https://github.com/edouardpineau/Time-Series-ICA-with-SOBI-Jacobi.
 
 """
-function jdiag_gabrieldernbach(A::Vector{Matrix{Float64}}; threshold = eps(), max_iter = 1000)
-    #A concatenate in third dimension by  A =[[1 2; 1 2];;;[2 3; 4 5]]
-    #only works for Real Matrices of A but not complex
-    #A = Float64.(A) #if the Array isn't already of Float64
-    A = cat(A...,dims = 3)
+function jdiag_gabrieldernbach!(A::Vector{M}; threshold = eps(), max_iter = 1000) where {T<:Real, M<:AbstractMatrix{T}}
+
+    if typeof(A) == Array{Int,ndims(A)}
+        
+    end
+
+
+    A = cat(A...,dims = 3) #convert to 3 dimensional matrix and concatenate in the third dimension
     rows, columns, k = size(A)
 
-    #initialize the apporximate joint eigenvecotrs as described in Cardoso
-    V = Matrix((1.0)*I(rows)) #needs to be added otherwise we cannot manipulate the non diag. elements of V
+    #initialize the approximate joint eigenvecotrs as described in Cardoso
+    V = Matrix((1.0)*I(rows)) 
     
     iteration_step = 0
 
     active = true #flag if threshold is reached
+
     while iteration_step <= max_iter && active == true
    
         active = false
 
         for row = 1:rows
             for column = row+1:columns #row_index != column_index
-                h_diag = A[row,row,:] - A[column,column,:] #first entry of h
-                h_non_diag = A[row,column,:] + A[column,row,:] #second entry of h
+                h_diag = A[row,row,:] - A[column,column,:] #first entry of h in Cardoso paper
+                h_non_diag = A[row,column,:] + A[column,row,:] #second entry of h in Cardoso paper
                 
+                #rotational computations
                 ton = dot(h_diag,h_diag) - dot(h_non_diag,h_non_diag)
                 toff = 2*dot(h_diag,h_non_diag)
                 θ = 0.5*atan(toff, ton + sqrt(ton*ton + toff * toff))
 
+                #rotational arguments for real matrices
                 c = cos(θ)
                 s = sin(θ)
                 R = [ c s; -s c]
+
+                # if threshold for minimize function is reached abort calculations 
+                #(or max iter is reached)
+                # otherwise rotation is applied to matrix
                 active = active || abs(s) > threshold
+
                 if abs(s) > threshold
+
                     pair = [row, column]
                 
                     for n = 1:k
                         A[:,pair,n] = transpose(R*transpose(A[:,pair,n]))
                         A[pair,:,n] = R*A[pair,:,n]
-                        
                     end
+
                     V[:,pair] = transpose(R*transpose(V[:,pair]))
+
                 end
                 
             end
         end 
+
         iteration_step += 1
+    
     end
     
     return  A,V
 
 end
-"""
-    off_diag_normation(A::Array)
-Input
-* A: Vector of communting matrices with index k
-Takes an array namely the Array of matrices A_k and gets the offdiagonal elements, norms them and adds them up to return normation. 
-Used for the `jdiag_gabrieldernbach` algorithm.
-"""
-function off_diag_normation(A::Array)
-    row, column,k = size(A)
-    non_diag_elements_vector = [A[index_row, index_column,index_k] for index_row = 1:row, index_column = 1:column, index_k = 1:k if index_row != index_column]
-    normation = sum(abs.(non_diag_elements_vector).^2)
 
-    return normation
-end
-function jdiag_gabrieldernbach(A::Vector{Matrix{ComplexF64}}; threshold = eps(), max_iter = 1000)
+function jdiag_gabrieldernbach!(A::Vector{M}; threshold = eps(), max_iter = 1000) where {T<:Complex, M<:AbstractMatrix{T}}
 
     A = cat(A...,dims = 3)
     rows, columns, k = size(A)
     #initialize the apporximate joint eigenvecotrs as described in Cardoso
     V = Matrix((1.0)*I(rows)) #needs to be added otherwise we cannot manipulate the non diag. elements of V
-    #should always be real?
-
+    
+    #objective_function to be minimized by algorithm
     objective_function = off_diag_normation(A)
    
+    #conditions for abortion initialized
     iteration_step = 0
     active = true
-    
-
 
     while iteration_step <= max_iter && active == true
+        
         active = false
+
         for row = 1:rows
+        
             for column = row+1:columns
-                #TODO: throws a NaN for the last values in the Matrix A, unclear why it does that, works well with normal indexing!
+               
                 h_diag = A[row,row,:] - A[column, column,:]
                 h_non_diag = A[row,column,:] + A[column,row,:]
-                h_imag = A[column,row,:] - A[row,column,:]
+                h_imag = im*(A[column,row,:] - A[row,column,:])
+                #changed the h_imag to be imaginary
             
                 h = [h_diag h_non_diag h_imag]
                 
-                #TODO: Make h_diag elements the transposed vecotrs!
+                #TODO: Make h_diag elements the transposed vectors!
+                #initialize the matrix G consisting of h as mentioned in Cardoso [1]
                 G = Matrix{Number}[]
+               
                 for k_index = 1:k
                     if isempty(G) == false
                         G = G + real(adjoint(transpose(h[k,:]))*transpose(h[k,:]))
@@ -126,21 +133,46 @@ function jdiag_gabrieldernbach(A::Vector{Matrix{ComplexF64}}; threshold = eps(),
         if abs(diff) <= threshold
             active = true
         end
+
         objective_function = objective_function_new
         iteration_step += 1
     end
+
     return A,V
-    #TODO: Return Eigenvectors V as well
+
+end
+"""
+    off_diag_normation(A::Array)
+Input
+* A: Vector of communting matrices with index k
+Takes an array namely the Array of matrices A_k and gets the offdiagonal elements and applies the frobenius norm (∑ |a_{i,j}|^{2}). 
+Used for the `jdiag_gabrieldernbach` algorithm.
+"""
+function off_diag_normation(A::Array)
+    row, column,k = size(A)
+    
+    non_diag_elements_vector = [A[index_row, index_column,index_k] for index_row = 1:row, index_column = 1:column, index_k = 1:k if index_row != index_column]
+    
+
+    return sum(abs.(non_diag_elements_vector).^2) #frobenius norm is applied
 end
 
-function Is_Commuting(A::AbstractMatrix, B::AbstractMatrix)
-    return A*B == B*A
-end
+function Jacobi_Rotation(G::Matrix)
+    Eigenvalues, Eigenvector = eigen(G) #sorted by highest value last
 
-function Is_Same_size(A::AbstractMatrix, B::AbstractMatrix)
-    return size(A) == size(B)
-end
+    max_eigenvector = Eigenvector[:,end] #get the eigenvector of the corresponding highest eigenvalue
+    #max_eigenvector = sign(max_eigenvector[1])*max_eigenvector #why is that? i don't know why i need to do that but the code says so?
+    
+    x = max_eigenvector[1]
+    y = max_eigenvector[2]
+    z = max_eigenvector[3]
 
-function Is_Symmetric(A::AbstractMatrix)
-    return size(A,1) == size(A,2)
+    r = sqrt(x^2+y^2+z^2)
+
+    c = sqrt((x+r)/2*r)
+
+    s = (y - z*im)/(sqrt(2*r*(x+r)))
+    R = [c conj(s); -s conj(c)]
+    return R
+
 end

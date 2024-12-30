@@ -1,3 +1,5 @@
+using Base:OneTo
+
 function off_diag_norm(Xm::AbstractArray{T,3})::Real where {T<:Union{Real,Complex}}
     sum = zero(real(T))
     for i in axes(Xm, 1), j in axes(Xm, 2), k in axes(Xm, 3)
@@ -21,7 +23,7 @@ function rotation(aii::Array{T}, ajj::Array{T}, aij::Array{T}, aji::Array{T})::M
     s = (y - z * im) / sqrt(2.0 * (x + 1.0))
     return [c conj(s); -s conj(c)]
 end
-
+#shouldn't rotation_symmetric only apply to matrices of type real?
 function rotation_symmetric(aii::Array{T}, ajj::Array{T}, aij::Array{T})::Matrix{T} where {T<:Union{Real,Complex}}
     h = hcat(aii .- ajj, 2.0 .* aij)
     G = real(h' * h)
@@ -44,7 +46,7 @@ end
 Diagonalize a set of matrices using the Jacobi method ("Jacobi Angles for Simultaneous Diagonalization").
 Code adapted from [Edouardpineaus Python implementation](https://github.com/edouardpineau/Time-Series-ICA-with-SOBI-Jacobi)
 """
-function jdiag_edourdpineau(X::Vector{M}; iter=100, eps=1e-3) where {T<:Union{Real,Complex},M<:AbstractMatrix{T}}
+function jdiag_edourdpineau(X::Vector{M}; iter=100, eps=1e-3) where {T<:Number,M<:AbstractMatrix{T}}
 
     Xm = cat(X..., dims=3) .+ 0.0im
     m = length(X)
@@ -65,7 +67,7 @@ function jdiag_edourdpineau(X::Vector{M}; iter=100, eps=1e-3) where {T<:Union{Re
     while (diff > eps) && (current_iter < iter)
         current_iter += 1
         # println("Current iteration: ", current_iter, " with error: ", diag_err)
-        for i in Base.OneTo(n - 1), j in (i+1):n
+        for i in OneTo(n - 1), j in (i+1):n
 
             if M <: Symmetric || M <: Hermitian
                 R = rotation_symmetric(Xm[i, i, :], Xm[j, j, :], Xm[i, j, :])
@@ -73,7 +75,7 @@ function jdiag_edourdpineau(X::Vector{M}; iter=100, eps=1e-3) where {T<:Union{Re
                 R = rotation(Xm[i, i, :], Xm[j, j, :], Xm[i, j, :], Xm[j, i, :])
             end
 
-            for k in Base.OneTo(m)
+            for k in OneTo(m)
                 Xm[[i, j], :, k] = R * Xm[[i, j], :, k]
                 Xm[:, [i, j], k] = Xm[:, [i, j], k] * R'
             end
