@@ -3,6 +3,7 @@ using LinearAlgebra
 include("jdiag_cardoso.jl")
 include("jdiag_gabrieldernbach.jl")
 include("jdiag_edourdpineau.jl")
+include("CheckRequirements.jl")
 """
     diagonalize(
         A::Vector{<:AbstractMatrix{<:Union{Float64, ComplexF64}}};
@@ -27,10 +28,10 @@ function diagonalize(
         return jdiag_gabrieldernbach!(A)
     end
     if algorithm =="jdiag_cardoso"
-        if typeof(A) != Array{Real, ndims(A)} 
-            throw(ErrorException("Not supported for set of Matrices containing imaginary values!"))
-        else
+        if typeof(A) <: AbstractArray{<:AbstractArray{<:Real}} 
             return jdiag_cardoso(hcat(A...), 10e-8)
+        else
+            throw(ArgumentError("Not supported for set of Matrices containing imaginary values!"))
         end
     end
     if algorithm == "jdiag_edourdpineau"
