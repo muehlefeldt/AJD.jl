@@ -1,9 +1,13 @@
 module AJD 
 using LinearAlgebra
-include("jdiag_cardoso.jl")
-include("jdiag_gabrieldernbach.jl")
-include("jdiag_edourdpineau.jl")
+
+# Import different JDiag algorithms.
+include("jdiag_algorithms/jdiag_cardoso.jl")
+include("jdiag_algorithms/jdiag_gabrieldernbach.jl")
+include("jdiag_algorithms/jdiag_edourdpineau.jl")
+
 include("check_requirements.jl")
+include("utils.jl")
 """
     diagonalize(
         A::Vector{<:AbstractMatrix{<:Union{Float64, ComplexF64}}};
