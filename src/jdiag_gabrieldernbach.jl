@@ -13,10 +13,9 @@ JDiag algorithm for complex matrices based on the implementation by Gabrieldernb
 """
 function jdiag_gabrieldernbach!(A::Vector{M}; threshold = eps(), max_iter = 1000) where {T<:Real, M<:AbstractMatrix{T}}
 
-    if typeof(A) == Array{Int,ndims(A)}
-        
+    if typeof(A) <:AbstractArray{<:Int}
+        A = float.(A)
     end
-
 
     A = cat(A...,dims = 3) #convert to 3 dimensional matrix and concatenate in the third dimension
     rows, columns, k = size(A)
@@ -153,7 +152,6 @@ function off_diag_normation(A::Array)
     
     non_diag_elements_vector = [A[index_row, index_column,index_k] for index_row = 1:row, index_column = 1:column, index_k = 1:k if index_row != index_column]
     
-
     return sum(abs.(non_diag_elements_vector).^2) #frobenius norm is applied
 end
 
@@ -163,9 +161,9 @@ function Jacobi_Rotation(G::Matrix)
     max_eigenvector = Eigenvector[:,end] #get the eigenvector of the corresponding highest eigenvalue
     #max_eigenvector = sign(max_eigenvector[1])*max_eigenvector #why is that? i don't know why i need to do that but the code says so?
     
-    x = max_eigenvector[1]
-    y = max_eigenvector[2]
-    z = max_eigenvector[3]
+    x,y,z = max_eigenvector
+    #y = max_eigenvector[2]
+    #z = max_eigenvector[3]
 
     r = sqrt(x^2+y^2+z^2)
 

@@ -3,7 +3,7 @@ using LinearAlgebra
 include("jdiag_cardoso.jl")
 include("jdiag_gabrieldernbach.jl")
 include("jdiag_edourdpineau.jl")
-include("CheckRequirements.jl")
+include("check_requirements.jl")
 """
     diagonalize(
         A::Vector{<:AbstractMatrix{<:Union{Float64, ComplexF64}}};

@@ -48,13 +48,13 @@ Code adapted from [Edouardpineaus Python implementation](https://github.com/edou
 """
 function jdiag_edourdpineau(X::Vector{M}; iter=100, eps=1e-3) where {T<:Number,M<:AbstractMatrix{T}}
 
-    Xm = cat(X..., dims=3) .+ 0.0im
+    Xm = cat(X..., dims=3) .+ 0.0im # change to Xm = complex.(cat(X..., dims = 3))?
     m = length(X)
     n = size(X[1], 1)
     @assert n == size(X[1], 2)
 
     if !(M <: Symmetric) && (T <: Real)
-        Xm .+= 0.0im
+        Xm .+= 0.0im # is this necessary? we already did that in line 51 no?
         V = Matrix{Complex{T}}(I, n, n)
     else
         V = Matrix{T}(I, n, n)

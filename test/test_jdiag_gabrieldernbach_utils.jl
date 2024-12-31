@@ -1,5 +1,7 @@
 using PosDefManifold
-using AJD.CheckRequirements
+using LinearAlgebra
+using AJD: iscommuting, issamesize, isstrictly_diagonally_dominant
+
 @testset "iscommuting" begin
     A = [1 1; 1 1]
     C = [0 2; 1 2]
@@ -12,6 +14,10 @@ end
     B = ones(1,2)
     @test issamesize(A,A) == true
     @test issamesize(A,B) == false
+end
+@testset "strictly_dominant" begin
+    A = 1.0*Matrix(I,3,3)
+    @test isstrictly_diagonally_dominant(A) == true
 end
 
 # @testset "issymmetric" begin
