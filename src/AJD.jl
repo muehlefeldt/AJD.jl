@@ -31,17 +31,22 @@ function diagonalize(
     threshold::AbstractFloat = eps()
     )
     if algorithm in ["jdiag", "jdiag_gabrieldernbach"]
-        return jdiag_gabrieldernbach!(A, max_iter = max_iter,threshold = threshold)
+        _, F = jdiag_gabrieldernbach!(A, max_iter = max_iter, threshold = threshold)
+        return AJD.create_linear_filter(F)
     end
-    if algorithm =="jdiag_cardoso"
+
+    if algorithm == "jdiag_cardoso"
         if typeof(A) <: AbstractArray{<:AbstractArray{<:Real}} 
-            return jdiag_cardoso(hcat(A...), 10e-8)
+            _, F ,_ = jdiag_cardoso(hcat(A...), threshold)
+            return AJD.create_linear_filter(F)
         else
             throw(ArgumentError("Not supported for set of Matrices containing imaginary values!"))
         end
     end
+
     if algorithm == "jdiag_edourdpineau"
-        return jdiag_edourdpineau(A)
+        F, _, _ = jdiag_edourdpineau(A)
+        return AJD.create_linear_filter(F)
     end
     return error
 end
