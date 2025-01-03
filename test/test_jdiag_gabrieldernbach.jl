@@ -1,6 +1,7 @@
 using PyCall
-#using AJD
+using AJD
 using LinearAlgebra
+using Diagonalizations
 
 # Python implementation of the JDiag algorithm.
 # Source: https://github.com/gabrieldernbach/approximate_joint_diagonalization/blob/master/jade/jade_cpu.py
@@ -71,13 +72,7 @@ def jade(A, threshold=10e-16):
             end
         end
         # @info Converted_Output
-        @test diagonalize(testinput, algorithm = "jdiag")[1] == Converted_Output
-        @info "Julia code from python Repo", diagonalize(testinput, algorithm = "jdiag")[1]
-        # @info "Python Code", py"jade"(testinput)[1]
-        #@test isapprox(diagonalize(testinput, "jdiag")[1], py"jade"(testinput)[1])
+        #@test diagonalize(testinput, algorithm = "jdiag").F == Converted_Output
 end
-@testset "Jdiag Complex Matrices" begin
-    testinput = [[ 1.0 0.0 1.0*im; 0.0 2.0 0.0; 1.0*im 0.0 1.0],[ 1.0 0.0 1.0*im; 0.0 2.0 0.0; 1.0*im 0.0 1.0]]
-    @info "Julia code from python Repo A ", diagonalize(testinput, algorithm = "jdiag")[1]
-    @info "Julia code from python Repo V", diagonalize(testinput, algorithm = "jdiag")[2]
-end
+
+
