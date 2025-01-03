@@ -9,10 +9,10 @@ end
 function isstrictly_diagonally_dominant(A::AbstractMatrix)
     for i in eachindex(A[1:end, 1])
          
-        if abs(sum(A[i,:]) - A[i,i]) > abs(A[i,i]) ? true : false
+        if abs(sum(A[i,:])) - abs(A[i,i]) > abs(A[i,i]) ? true : false
             
             return false
-            @info i
+
         end
     end
 

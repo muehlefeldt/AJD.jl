@@ -1,3 +1,5 @@
+# utils_path = pkgdir(AJD,"src","utils.jl" )
+# include(utils_path)
 """
     (1) jdiag_gabrieldernbach(A::Vector{Matrix{Float64}}; threshold = eps(), max_iter = 1000)
 
@@ -12,8 +14,8 @@ JDiag algorithm for complex matrices based on the implementation by Gabrieldernb
 
 """
 function jdiag_gabrieldernbach!(A::Vector{M}; threshold = eps(), max_iter = 1000) where {T<:Real, M<:AbstractMatrix{T}}
-
-    if typeof(A) <:AbstractArray{<:Int}
+    
+    if typeof(A) <: AbstractArray{<:AbstractArray{<:Int}}
         A = float.(A)
     end
 
@@ -50,7 +52,7 @@ function jdiag_gabrieldernbach!(A::Vector{M}; threshold = eps(), max_iter = 1000
                 #(or max iter is reached)
                 # otherwise rotation is applied to matrix
                 active = active || abs(s) > threshold
-
+                
                 if abs(s) > threshold
 
                     pair = [row, column]
@@ -76,14 +78,15 @@ function jdiag_gabrieldernbach!(A::Vector{M}; threshold = eps(), max_iter = 1000
 end
 
 function jdiag_gabrieldernbach!(A::Vector{M}; threshold = eps(), max_iter = 1000) where {T<:Complex, M<:AbstractMatrix{T}}
-
+    
     A = cat(A...,dims = 3)
     rows, columns, k = size(A)
     #initialize the apporximate joint eigenvecotrs as described in Cardoso
-    V = Matrix((1.0)*I(rows)) #needs to be added otherwise we cannot manipulate the non diag. elements of V
+    V = (Matrix((1.0)*I(rows))) 
+    #needs to be added otherwise we cannot manipulate the non diag. elements of V
     
     #objective_function to be minimized by algorithm
-    objective_function = off_diag_normation(A)
+    objective_function = frobenius_offdiag_normation(A)
    
     #conditions for abortion initialized
     iteration_step = 0
@@ -126,44 +129,26 @@ function jdiag_gabrieldernbach!(A::Vector{M}; threshold = eps(), max_iter = 1000
         
         end
     
-        objective_function_new = off_diag_normation(A)
+        objective_function_new = frobenius_offdiag_normation(A)
         diff = objective_function_new - objective_function
-
-        if abs(diff) <= threshold
+        
+        if abs(diff) > threshold
             active = true
         end
 
         objective_function = objective_function_new
         iteration_step += 1
     end
-
     return A,V
 
-end
-"""
-    off_diag_normation(A::Array)
-Input
-* A: Vector of communting matrices with index k
-Takes an array namely the Array of matrices A_k and gets the offdiagonal elements and applies the frobenius norm (∑ |a_{i,j}|^{2}). 
-Used for the `jdiag_gabrieldernbach` algorithm.
-"""
-function off_diag_normation(A::Array)
-    row, column,k = size(A)
-    
-    non_diag_elements_vector = [A[index_row, index_column,index_k] for index_row = 1:row, index_column = 1:column, index_k = 1:k if index_row != index_column]
-    
-    return sum(abs.(non_diag_elements_vector).^2) #frobenius norm is applied
 end
 
 function Jacobi_Rotation(G::Matrix)
     Eigenvalues, Eigenvector = eigen(G) #sorted by highest value last
 
     max_eigenvector = Eigenvector[:,end] #get the eigenvector of the corresponding highest eigenvalue
-    #max_eigenvector = sign(max_eigenvector[1])*max_eigenvector #why is that? i don't know why i need to do that but the code says so?
     
     x,y,z = max_eigenvector
-    #y = max_eigenvector[2]
-    #z = max_eigenvector[3]
 
     r = sqrt(x^2+y^2+z^2)
 

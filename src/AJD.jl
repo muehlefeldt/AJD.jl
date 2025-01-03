@@ -25,11 +25,13 @@ See the Getting Started Guide for information on the algorithms.
 """
 
 function diagonalize(
-    A::Vector{<:AbstractMatrix{<:Union{Real, Complex}}};
-    algorithm::String
+    A::Vector{<:AbstractMatrix{<:Number}};
+    algorithm::String,
+    max_iter::Int = 1000,
+    threshold::AbstractFloat = eps()
     )
     if algorithm in ["jdiag", "jdiag_gabrieldernbach"]
-        return jdiag_gabrieldernbach!(A)
+        return jdiag_gabrieldernbach!(A, max_iter = max_iter,threshold = threshold)
     end
     if algorithm =="jdiag_cardoso"
         if typeof(A) <: AbstractArray{<:AbstractArray{<:Real}} 
@@ -45,7 +47,6 @@ function diagonalize(
 end
 
 export diagonalize
-
 
 end
 

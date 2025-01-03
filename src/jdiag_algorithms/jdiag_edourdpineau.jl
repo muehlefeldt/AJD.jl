@@ -47,14 +47,14 @@ Diagonalize a set of matrices using the Jacobi method ("Jacobi Angles for Simult
 Code adapted from [Edouardpineaus Python implementation](https://github.com/edouardpineau/Time-Series-ICA-with-SOBI-Jacobi)
 """
 function jdiag_edourdpineau(X::Vector{M}; iter=100, eps=1e-3) where {T<:Number,M<:AbstractMatrix{T}}
-
-    Xm = cat(X..., dims=3) .+ 0.0im # change to Xm = complex.(cat(X..., dims = 3))?
+    
+    Xm = cat(X..., dims=3) .+ 0.0im # change to Xm = complex.(cat(X..., dims = 3))? -NG
     m = length(X)
     n = size(X[1], 1)
     @assert n == size(X[1], 2)
 
     if !(M <: Symmetric) && (T <: Real)
-        Xm .+= 0.0im # is this necessary? we already did that in line 51 no?
+        Xm .+= 0.0im # is this necessary? we already did that in line 51 no? - NG
         V = Matrix{Complex{T}}(I, n, n)
     else
         V = Matrix{T}(I, n, n)
@@ -88,5 +88,5 @@ function jdiag_edourdpineau(X::Vector{M}; iter=100, eps=1e-3) where {T<:Number,M
         diff = abs(new_diag_err - diag_err) / diag_err
         diag_err = new_diag_err
     end
-    V, Xm, err_array
+    return V, Xm, err_array #added return statement for clearer code-NG
 end
