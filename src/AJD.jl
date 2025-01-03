@@ -6,7 +6,7 @@ include("jdiag_algorithms/jdiag_cardoso.jl")
 include("jdiag_algorithms/jdiag_gabrieldernbach.jl")
 include("jdiag_algorithms/jdiag_edourdpineau.jl")
 
-include("CheckRequirements.jl")
+include("check_requirements.jl")
 include("utils.jl")
 """
     diagonalize(
@@ -26,12 +26,15 @@ See the Getting Started Guide for information on the algorithms.
 
 function diagonalize(
     A::Vector{<:AbstractMatrix{<:Number}};
-    algorithm::String
+    algorithm::String,
+    max_iter::Int = 1000,
+    threshold::AbstractFloat = eps()
     )
     if algorithm in ["jdiag", "jdiag_gabrieldernbach"]
-        _, F = jdiag_gabrieldernbach!(A)
+        _, F = jdiag_gabrieldernbach!(A, max_iter = max_iter, threshold = threshold)
         return AJD.create_linear_filter(F)
     end
+
     if algorithm =="jdiag_cardoso"
         if typeof(A) <: AbstractArray{<:AbstractArray{<:Real}} 
             _, F ,_ = jdiag_cardoso(hcat(A...), 10e-8)
@@ -40,6 +43,7 @@ function diagonalize(
             throw(ArgumentError("Not supported for set of Matrices containing imaginary values!"))
         end
     end
+    
     if algorithm == "jdiag_edourdpineau"
         F, _, _ = jdiag_edourdpineau(A)
         return AJD.create_linear_filter(F)
@@ -48,7 +52,6 @@ function diagonalize(
 end
 
 export diagonalize
-
 
 end
 

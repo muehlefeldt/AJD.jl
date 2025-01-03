@@ -10,4 +10,5 @@ using LinearAlgebra
     include("test_linearfilter.jl")
     include("test_nondiagonality.jl")
     include("test_utils.jl")
+    include("test_benchmark.jl")
 end
