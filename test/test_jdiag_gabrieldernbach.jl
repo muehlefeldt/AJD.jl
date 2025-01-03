@@ -55,6 +55,7 @@ def jade(A, threshold=10e-16):
     return A, V
 """
 
+# TODO replace with meaningful test!
 @testset "JDiag Gabrieldernbach vs Python with I" begin
        
     testinput = (1.0)* [Matrix(I, 6, 6) , Matrix(I, 6, 6)]
