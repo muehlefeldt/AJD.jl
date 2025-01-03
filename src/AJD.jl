@@ -37,7 +37,7 @@ function diagonalize(
 
     if algorithm == "jdiag_cardoso"
         if typeof(A) <: AbstractArray{<:AbstractArray{<:Real}} 
-            _, F ,_ = jdiag_cardoso(hcat(A...), 10e-8)
+            _, F ,_ = jdiag_cardoso(hcat(A...), threshold)
             return AJD.create_linear_filter(F)
         else
             throw(ArgumentError("Not supported for set of Matrices containing imaginary values!"))
