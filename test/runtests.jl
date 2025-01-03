@@ -7,4 +7,7 @@ using LinearAlgebra
     include("test_jdiag_gabrieldernbach_utils.jl")
     include("test_jdiag_cardoso.jl")
     include("test_jdiag_eduardpineau.jl")
+    include("test_linearfilter.jl")
+    include("test_nondiagonality.jl")
+    include("test_utils.jl")
 end
