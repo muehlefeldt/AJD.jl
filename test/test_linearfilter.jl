@@ -1,4 +1,4 @@
-"Test the output of all algorithms for LinearFilter."
+# Test the output of all algorithms for LinearFilter.
 
 @testset "LinearFilter" begin
     # Iterate over all implemented algorithms.
