@@ -140,3 +140,25 @@ end
 #     return objective
 # end
 
+# Check if two matrices A, B are commuting.
+# A * B = B * A must hold.
+function is_commuting(A::AbstractMatrix, B::AbstractMatrix)
+    return isapprox(A*B, B*A)
+end
+
+function is_same_size(A::AbstractMatrix, B::AbstractMatrix)
+    return size(A) == size(B)
+end
+
+function isstrictly_diagonally_dominant(A::AbstractMatrix)
+    for i in eachindex(A[1:end, 1])
+         
+        if abs(sum(A[i,:])) - abs(A[i,i]) > abs(A[i,i]) ? true : false
+            
+            return false
+
+        end
+    end
+
+    return true
+end
