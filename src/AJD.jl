@@ -6,14 +6,18 @@ include("jdiag_algorithms/jdiag_cardoso.jl")
 include("jdiag_algorithms/jdiag_gabrieldernbach.jl")
 include("jdiag_algorithms/jdiag_edourdpineau.jl")
 
-include("check_requirements.jl")
+# Utility function import.
 include("utils.jl")
+
 """
     diagonalize(
-        A::Vector{<:AbstractMatrix{<:Union{Float64, ComplexF64}}};
-        algorithm::String)
+        A::Vector{<:AbstractMatrix{<:Number}};
+        algorithm::String = "jdiag_gabrieldernbach",
+        max_iter::Int = 1000,
+        threshold::AbstractFloat = eps()
+        )
 
-Diagonalize input matrices using the requested algorithm.
+Calculate joint diagonalization of multiple input matrices using the requested algorithms.
 
 Main function of the AJD package.
 Implemented algorithms at this point in time are limited to the [JDiag algorithm](https://doi.org/10.1137/S0895479893259546)  in different versions.
@@ -23,29 +27,34 @@ The matrices can be of types Float64 or Complex. Limitations of the different im
 Supported algorithms are `jdiag_gabrieldernbach`, `jdiag_cardoso` and `jdiag_edourdpineau`.
 See the Getting Started Guide for information on the algorithms.
 """
-
 function diagonalize(
     A::Vector{<:AbstractMatrix{<:Number}};
-    algorithm::String,
+    algorithm::String = "jdiag_gabrieldernbach",
     max_iter::Int = 1000,
     threshold::AbstractFloat = eps()
     )
     if algorithm in ["jdiag", "jdiag_gabrieldernbach"]
-        return jdiag_gabrieldernbach!(A, max_iter = max_iter,threshold = threshold)
+        _, F = jdiag_gabrieldernbach!(A, max_iter = max_iter, threshold = threshold)
+        return AJD.create_linear_filter(F)
     end
-    if algorithm =="jdiag_cardoso"
+
+    if algorithm == "jdiag_cardoso"
         if typeof(A) <: AbstractArray{<:AbstractArray{<:Real}} 
-            return jdiag_cardoso(hcat(A...), 10e-8)
+            _, F ,_ = jdiag_cardoso(hcat(A...), threshold)
+            return AJD.create_linear_filter(F)
         else
             throw(ArgumentError("Not supported for set of Matrices containing imaginary values!"))
         end
     end
+
     if algorithm == "jdiag_edourdpineau"
-        return jdiag_edourdpineau(A)
+        F, _, _ = jdiag_edourdpineau(A)
+        return AJD.create_linear_filter(F)
     end
-    return error
 end
 
+# Only export diagonalize().
+# All provided functionality is available through the function.
 export diagonalize
 
 end

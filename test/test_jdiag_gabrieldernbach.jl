@@ -1,8 +1,11 @@
 using PyCall
-#using AJD
+using AJD
 using LinearAlgebra
+using Diagonalizations
 
 # Python implementation of the JDiag algorithm.
+# The Python code is used to compare implementations.
+# PyCall used to execute the Python code.
 # Source: https://github.com/gabrieldernbach/approximate_joint_diagonalization/blob/master/jade/jade_cpu.py
 py"""
 import numpy as np
@@ -53,31 +56,34 @@ def jade(A, threshold=10e-16):
                     V[:, pair] = np.einsum('ij,kj->ki', J, V[:, pair])
     return A, V
 """
+# End of the Python code.
 
 @testset "JDiag Gabrieldernbach vs Python with I" begin
-       
-        testinput = (1.0)* [Matrix(I, 6, 6) , Matrix(I, 6, 6)]
-       
-        A, V = py"jade"(testinput)
-        #@test A[1, :, :] == I(6)
-        #testinput_python_script = []
-        Python_Output = py"jade"(testinput)[1]
-        Converted_Output = Vector{Matrix}[]
-        for i = 1:size(Python_Output)[1]
-            if isempty(Converted_Output)
-                Converted_Output = Python_Output[1,:,:]
-            else
-                Converted_Output = cat(Converted_Output, Python_Output[i,:,:],dims = 3)
-            end
-        end
-        # @info Converted_Output
-        @test diagonalize(testinput, algorithm = "jdiag")[1] == Converted_Output
-        @info "Julia code from python Repo", diagonalize(testinput, algorithm = "jdiag")
-        # @info "Python Code", py"jade"(testinput)[1]
-        #@test isapprox(diagonalize(testinput, "jdiag")[1], py"jade"(testinput)[1])
+    # Get basic identity matrix input.
+    testinput = (1.0)* [Matrix(I, 6, 6) , Matrix(I, 6, 6)]
+    
+    # # Get the result of the Julia implementation.
+    result = diagonalize(testinput, algorithm = "jdiag")
+
+    # Get the result of Python implementation.
+    _, V = py"jade"(testinput)
+
+    @test isapprox(result.F, V)
+    @test isapprox(result.F, I)
 end
-@testset "Jdiag Complex Matrices" begin
-    testinput = [[ 1.0 0.0 1.0*im; 0.0 2.0 0.0; 1.0*im 0.0 1.0],[ 1.0 0.0 1.0*im; 0.0 2.0 0.0; 1.0*im 0.0 1.0]]
-    @info "Julia code from python Repo A ", diagonalize(testinput, algorithm = "jdiag")
-    #@info "Julia code from python Repo V", diagonalize(testinput, algorithm = "jdiag")[2]
+
+@testset "JDiag Gabrieldernbach vs Python" begin
+    for _ in 1:20
+        # Get random input matrices.
+        test_input = AJD.random_normal_commuting_matrices(10, 6)
+
+        # Get the result of the Julia implementation.
+        result = diagonalize(test_input, algorithm="jdiag_gabrieldernbach")
+
+        # Get the result of Python implementation. Only the calculated filter is needed.
+        _, V = py"jade"(test_input)
+
+        @test isapprox(V, result.F)
+    end
 end
+

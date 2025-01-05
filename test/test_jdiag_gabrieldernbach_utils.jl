@@ -1,20 +1,8 @@
 using PosDefManifold
 using LinearAlgebra
-using AJD: iscommuting, issamesize, isstrictly_diagonally_dominant, get_offdiag_elements, get_diag_elements,frobenius_offdiag_normation, sort_offdiag_elements
+using AJD: isstrictly_diagonally_dominant, get_offdiag_elements, get_diag_elements,frobenius_offdiag_normation, sort_offdiag_elements
 
-@testset "iscommuting" begin
-    A = [1 1; 1 1]
-    C = [0 2; 1 2]
-    @test iscommuting(A,A) == true
-    @test iscommuting(A,C) == false
-end
 
-@testset "issamesize" begin
-    A = ones(2,2)
-    B = ones(1,2)
-    @test issamesize(A,A) == true
-    @test issamesize(A,B) == false
-end
 @testset "strictly_dominant" begin
     A = 1.0*Matrix(I,3,3)
     @test isstrictly_diagonally_dominant(A) == true

@@ -12,7 +12,7 @@ Output:
 * A : is a mxnm matrix, which contains [VA1V',...,VAnV']
 * iter: accumulates the iteration numbers
 """
-function jdiag_cardoso(M,jthresh)
+function jdiag_cardoso(M, jthresh::Real)
     A = copy(M)
     m,nm = size(A)
     iter = 0
