@@ -31,6 +31,7 @@ end
     end
 end
 
+# Test nonDiagonality of complex inputs.
 @testset "Nondiagonality Complex" begin
     # Select algorithms supporting complex matrices.
     for name in ["jdiag_edourdpineau", "jdiag_gabrieldernbach"]
