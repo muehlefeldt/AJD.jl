@@ -17,10 +17,9 @@ function generate_psd_matrix(n::Int)
     return A * A'    # 保证对称性和正定性 return A*A^T to garentee symmetric and positive definite
 end
 
-@testset "JDiag Cardoso" begin
-    test_input = generate_stacked_psd_matrices(2, 4)
-    test_input = (1.0) * [Matrix(I, 6, 6) ,Matrix(I, 6, 6)]
-    @info "Matlab",diagonalize(test_input, algorithm="jdiag_cardoso")
+# Verify an ArgumentError is thrown when algorithm = "jdiag_cardoso" is used with
+# complex matrices.
+@testset "AJD.jdiag_cardoso() No Complex" begin
+    test_input = (1.0) * [Matrix(I, 6, 6), Matrix(I, 6, 6)]
     @test_throws ArgumentError diagonalize(test_input*im, algorithm = "jdiag_cardoso")
-    #@info diagonalize(test_input, "jdiag")
 end
