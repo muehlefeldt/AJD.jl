@@ -162,3 +162,10 @@ function isstrictly_diagonally_dominant(A::AbstractMatrix)
 
     return true
 end
+
+function get_z_fdiag(D::AbstractArray{<:Number}, i::Int, j::Int)
+    return sum(D[i,i,:].*D[j,j,:])
+end
+function get_y_fdiag(D::AbstractArray{<:Number}, E::AbstractArray{<:Number}, i::Int,j::Int)
+    return sum(D[j,j,:].*E[i,j,:])
+end
