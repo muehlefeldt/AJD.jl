@@ -120,10 +120,15 @@ function jdiag_gabrieldernbach!(A::Vector{M}; threshold = eps(), max_iter = 1000
                 end
                 #@info typeof(G)
                 R = Jacobi_Rotation(G)
-                
+                pair = [row,column]
+                #A[:,pair,n] = transpose(R*transpose(A[:,pair,n]))
+                #A[pair,:,n] = R*A[pair,:,n]
                 for k_index = 1:k
                     #might not be correct, maybe use the matrix and multiply like in the python code
-                    A[[row,column],[row,column],k_index] = R*A[[row,column],[row,column],k_index]*adjoint(R) 
+                    #A[[row,column],[row,column],k_index] = R*A[[row,column],[row,column],k_index]*adjoint(R) 
+                    
+                    A[:,pair,k_index] = transpose(R*transpose(A[:,pair,k_index]))
+                    A[pair,:,k_index] = R*A[pair,:,k_index]
                 end
                 V[:,[row,column]] = transpose(R*transpose(V[:,[row,column]]))
                 #V[:,[row,column]] = V[:,[row,column]]*R'
