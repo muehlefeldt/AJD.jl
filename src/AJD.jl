@@ -1,5 +1,6 @@
 module AJD 
 using LinearAlgebra
+using BenchmarkTools
 
 # Import different JDiag algorithms.
 include("jdiag_algorithms/jdiag_cardoso.jl")
@@ -58,9 +59,41 @@ function diagonalize(
     end
 end
 
+"""
+    ajd_benchmark(n_dims::Int, n_matrices::Int)
+
+Run benchmark of implemented algorithms with random inputs.
+Prints basic overview of median execution times.
+Returns BenchmarkGroup containing detailed results.
+"""
+function ajd_benchmark(n_dims::Int, n_matrices::Int)
+    # Define a parent BenchmarkGroup to contain our suite
+    suite = BenchmarkGroup()
+    for name in ["jdiag_gabrieldernbach", "jdiag_cardoso", "jdiag_edourdpineau"]
+        suite[name] = BenchmarkGroup(["jdiag"])
+        # Set the function to be benchmarked.
+        suite[name]["real"] = begin
+            @benchmarkable diagonalize(data, algorithm=$name) setup=(data=AJD.random_normal_commuting_matrices($n_dims, $n_matrices)) 
+        end
+    end
+
+    # Run the actual benchmark.
+    tune!(suite)
+    results = run(suite, verbose = true)
+
+    # Print basic overview.
+    for name in ["jdiag_gabrieldernbach", "jdiag_cardoso", "jdiag_edourdpineau"]
+        print(name)
+        print(median(results[name]["real"]))
+    end
+
+    # Return BenchmarkGroup for further evaluation.
+    return results
+end
+
 # Only export diagonalize().
 # All provided functionality is available through the function.
-export diagonalize
+export diagonalize, ajd_benchmark
 
 end
 
