@@ -82,7 +82,7 @@ function jdiag_gabrieldernbach!(A::Vector{M}; threshold = eps(), max_iter = 1000
     A = cat(A...,dims = 3)
     rows, columns, k = size(A)
     #initialize the apporximate joint eigenvecotrs as described in Cardoso
-    V = (Matrix((1.0)*I(rows))) 
+    V = complex.(Matrix((1.0)*I(rows))) 
     #needs to be added otherwise we cannot manipulate the non diag. elements of V
     
     #objective_function to be minimized by algorithm
@@ -120,11 +120,18 @@ function jdiag_gabrieldernbach!(A::Vector{M}; threshold = eps(), max_iter = 1000
                 end
                 #@info typeof(G)
                 R = Jacobi_Rotation(G)
-                
+                pair = [row,column]
+                #A[:,pair,n] = transpose(R*transpose(A[:,pair,n]))
+                #A[pair,:,n] = R*A[pair,:,n]
                 for k_index = 1:k
-                    A[[row,column],[row,column],k_index] = R*A[[row,column],[row,column],k_index]*adjoint(R) #might not be correct, maybe use the matrix and multiply like in the python code
+                    #might not be correct, maybe use the matrix and multiply like in the python code
+                    #A[[row,column],[row,column],k_index] = R*A[[row,column],[row,column],k_index]*adjoint(R) 
+                    
+                    A[:,pair,k_index] = transpose(R*transpose(A[:,pair,k_index]))
+                    A[pair,:,k_index] = R*A[pair,:,k_index]
                 end
                 V[:,[row,column]] = transpose(R*transpose(V[:,[row,column]]))
+                #V[:,[row,column]] = V[:,[row,column]]*R'
             end
         
         end
@@ -149,7 +156,9 @@ function Jacobi_Rotation(G::Matrix)
     max_eigenvector = Eigenvector[:,end] #get the eigenvector of the corresponding highest eigenvalue
     
     x,y,z = max_eigenvector
-
+    if x < 0.0
+        x, y, z = -x, -y, -z
+    end
     r = sqrt(x^2+y^2+z^2)
 
     c = sqrt((x+r)/2*r)

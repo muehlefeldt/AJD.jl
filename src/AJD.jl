@@ -5,7 +5,7 @@ using LinearAlgebra
 include("jdiag_algorithms/jdiag_cardoso.jl")
 include("jdiag_algorithms/jdiag_gabrieldernbach.jl")
 include("jdiag_algorithms/jdiag_edourdpineau.jl")
-
+include("jdiag_algorithms/FFDiag.jl")
 # Utility function import.
 include("utils.jl")
 
@@ -34,13 +34,13 @@ function diagonalize(
     threshold::AbstractFloat = eps()
     )
     if algorithm in ["jdiag", "jdiag_gabrieldernbach"]
-        _, F = jdiag_gabrieldernbach!(A, max_iter = max_iter, threshold = threshold)
+        _,F = jdiag_gabrieldernbach!(A, max_iter = max_iter, threshold = threshold)
         return AJD.create_linear_filter(F)
     end
 
     if algorithm == "jdiag_cardoso"
         if typeof(A) <: AbstractArray{<:AbstractArray{<:Real}} 
-            _, F ,_ = jdiag_cardoso(hcat(A...), threshold)
+            _,F ,_ = jdiag_cardoso(hcat(A...), threshold)
             return AJD.create_linear_filter(F)
         else
             throw(ArgumentError("Not supported for set of Matrices containing imaginary values!"))
@@ -50,6 +50,11 @@ function diagonalize(
     if algorithm == "jdiag_edourdpineau"
         F, _, _ = jdiag_edourdpineau(A)
         return AJD.create_linear_filter(F)
+    end
+
+    if algorithm == "FFD"
+        A,F = FFD!(A)
+        return A,F
     end
 end
 

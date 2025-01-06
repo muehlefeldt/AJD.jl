@@ -11,4 +11,5 @@ using LinearAlgebra
     include("test_nondiagonality.jl")
     include("test_utils.jl")
     include("test_benchmark.jl")
+    include("test_ffdiag.jl")
 end
