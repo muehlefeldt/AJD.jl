@@ -3,7 +3,7 @@
 using Diagonalizations: nonDiagonality
 
 "Accepted error level."
-const accepted_error = 1e-15
+accepted_error = 1e-15
 
 @testset "AJD.jdiag_edourdpineau() Basic" begin
     n = 10
