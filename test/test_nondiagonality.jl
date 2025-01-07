@@ -51,13 +51,14 @@ end
 
     # Tests to check combination of real and complex matrices.
     for name in ["jdiag_edourdpineau", "jdiag_gabrieldernbach"]
-        A = AJD.random_normal_commuting_matrices(10, 6)
-        B = AJD.random_normal_commuting_matrices(10, 1; complex=true)
-        test_input = [A..., B...]
+        #A = AJD.random_normal_commuting_matrices(10, 6)
+        #B = AJD.random_normal_commuting_matrices(10, 1; complex=true)
+        #test_input = [A..., B...]
+        test_input = AJD.get_test_data_complex_real(10, 10)
         result = diagonalize(test_input, algorithm=name)
         
         # TODO: Error level very high with both implementations.
         # Surprisingly was jdiag_edourdpineau few days ago.
-        @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < 0.1
+        @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < accepted_error
     end
 end
