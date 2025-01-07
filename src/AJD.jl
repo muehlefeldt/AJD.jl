@@ -34,6 +34,11 @@ function diagonalize(
     max_iter::Int = 1000,
     threshold::AbstractFloat = eps()
     )
+
+    if !check_input(A)
+        throw(ArgumentError("Invalid input."))
+    end
+
     if algorithm in ["jdiag", "jdiag_gabrieldernbach"]
         _,F = jdiag_gabrieldernbach!(A, max_iter = max_iter, threshold = threshold)
         return AJD.create_linear_filter(F)

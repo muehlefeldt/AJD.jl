@@ -31,3 +31,28 @@ end
     @test AJD.is_same_size(A,A) == true
     @test AJD.is_same_size(A,B) == false
 end
+
+# Input verification.
+@testset "AJD.check_input()" begin
+    # Input of communting and same size matrices.
+    A = AJD.random_normal_commuting_matrices(10, 10)
+    @test AJD.check_input(A)
+
+    # Not commuting matrices.
+    B = AJD.random_normal_commuting_matrices(10, 10)
+    @test !AJD.check_input([A..., B...])
+    @test_throws ArgumentError diagonalize([A..., B...])
+
+    # Diffrent size of the matrices.
+    B = AJD.random_normal_commuting_matrices(9, 10)
+    @test !AJD.check_input([A..., B...])
+    @test_throws ArgumentError diagonalize([A..., B...])
+
+    # Not acceptable inputs should throw error.
+    B = Vector{Matrix}()
+    @test_throws MethodError diagonalize(B)
+    B = Vector{Matrix}(undef,3)
+    @test_throws MethodError diagonalize(B)
+    B = Vector{Matrix{Number}}
+    @test_throws MethodError diagonalize(B)
+end
