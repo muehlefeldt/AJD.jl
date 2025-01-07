@@ -48,8 +48,11 @@ end
     @test !AJD.check_input([A..., B...])
     @test_throws ArgumentError diagonalize([A..., B...])
 
-    # Empty input.
+    # Not acceptable inputs should throw error.
     B = Vector{Matrix}()
-    @test !AJD.check_input(B)
+    @test_throws MethodError diagonalize(B)
+    B = Vector{Matrix}(undef,3)
+    @test_throws MethodError diagonalize(B)
+    B = Vector{Matrix{Number}}
     @test_throws MethodError diagonalize(B)
 end
