@@ -54,7 +54,7 @@ function diagonalize(
 
     if algorithm == "FFD"
         A,F = FFD!(A)
-        return A,F
+        return AJD.create_linear_filter(F),A
     end
 end
 

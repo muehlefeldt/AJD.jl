@@ -31,3 +31,17 @@ end
     @test AJD.is_same_size(A,A) == true
     @test AJD.is_same_size(A,B) == false
 end
+
+@testset "AJD.get_z_fdiag" begin
+    A = reshape(repeat(Matrix(1.0I(3)),outer = (1,2)),3,3,2)
+    m,n,_ = size(A)
+    for i = 1:m, j = 1:n
+        @test AJD.get_z_fdiag(A,i,j) == 2
+    end
+end
+
+@testset "AJD.get_y_fdiag" begin
+    D = reshape(repeat(Matrix(1.0I(3)),outer = (1,2)),3,3,2)
+    E = (-1.0).*(reshape(repeat(Matrix(1.0I(3)),outer = (1,2)),3,3,2) .-ones(3,3))
+    @test AJD.get_y_fdiag(D,E,1,2) == 2
+end
