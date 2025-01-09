@@ -46,6 +46,15 @@ function random_normal_commuting_matrices(n::Int, m::Int; complex::Bool=false)
     return [Q*Diagonal(rand(n))*Q' for _ in 1:m]
 end
 
+function get_test_data_complex_real(n::Int, m::Int)
+    Q, _ = qr(rand(n,n))
+    Q = Matrix(Q)
+    
+    C = [Q * Diagonal(rand(ComplexF64, n)) * Q' for _ in 1:m]
+    R = [Q * Diagonal(rand(n)) * Q' for _ in 1:m]
+    return [C..., R...]
+end
+
 """
 Create LinearFilter object as introduced by Diagonalizations.jl.
 Output of AJD.jl follows convention of Diagonalizations.jl and produces a LinearFilter.
@@ -140,8 +149,8 @@ end
 #     return objective
 # end
 
-# Check if two matrices A, B are commuting.
-# A * B = B * A must hold.
+" Check if two matrices A, B are commuting.
+ A * B = B * A must hold. "
 function is_commuting(A::AbstractMatrix, B::AbstractMatrix)
     return isapprox(A*B, B*A)
 end
@@ -168,4 +177,19 @@ function get_z_fdiag(D::AbstractArray{<:Number}, i::Int, j::Int)
 end
 function get_y_fdiag(D::AbstractArray{<:Number}, E::AbstractArray{<:Number}, i::Int,j::Int)
     return sum(D[j,j,:].*E[i,j,:])
+end
+
+"Check for valid input of diagonalize()."
+function check_input(A::Vector{<:AbstractMatrix{<:Number}})
+    # Input may be empty.
+    if length(A) <= 0
+        return false
+    end
+    # All matrices must be commuting and of same size.
+    for index in 1:length(A)-1
+        if !is_same_size(A[index], A[index+1]) || !is_commuting(A[index], A[index+1])
+            return false
+        end
+    end
+    return true
 end

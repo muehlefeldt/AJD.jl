@@ -25,7 +25,7 @@ function FFD!(A::Vector{M}; threshold = eps(), max_iter = 1000, norm_ = "frobeni
     
     w = sort_offdiag_elements(W)
     e = sort_offdiag_elements(E)
-    objective = frobenius_offdiag_normation(A)
+    objective = frobenius_offdiag_normation(W.*D+D.*W'+E)
     
     #while active == true && iteration_step <= max_iter
     while iteration_step <= max_iter
@@ -37,20 +37,20 @@ function FFD!(A::Vector{M}; threshold = eps(), max_iter = 1000, norm_ = "frobeni
             y_ij = get_y_fdiag(D,E,i,j)
             y_ji = get_y_fdiag(D,E,j,i)
             W[i,j] = (z_ij*y_ji - z_i*y_ij)/(z_j*z_i-z_ij^2)
-            W[j,i] = (z_ij*y_ij - z_j*y_ji)/(z_j*z_i-z_ij^2)
+            W[j,i] = (z_ij*y_ij - z_i*y_ji)/(z_j*z_i-z_ij^2)
         end
         
         if normation(W) > θ
             W = θ/normation(W)*W
         end
 
-        A = D + W.*D + D.*W'+E
+        #A = D + W.*D + D.*W'+E
         V = (I+W)*V
-        #A = (I+W).*A.*(I+W)'      
+        A = (I+W).*A.*(I+W)'      
         
-        objective_new = frobenius_offdiag_normation(A)
+        objective_new = frobenius_offdiag_normation(W.*D+D.*W'+E)
         diff = objective - objective_new
-        objective = copy(objective_new) #what about pointer?
+        objective = objective_new #what about pointer?
         E = get_offdiag_elements(A)
         D = get_diag_elements(A)
         if abs(diff) > threshold
@@ -60,6 +60,5 @@ function FFD!(A::Vector{M}; threshold = eps(), max_iter = 1000, norm_ = "frobeni
         end
         iteration_step += 1
     end
-    @info iteration_step
     return A,V
 end
