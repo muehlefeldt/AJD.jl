@@ -59,8 +59,8 @@ function diagonalize(
     end
 
     if algorithm == "FFD"
-        A,F = FFD!(A)
-        return A,F
+        _,F = FFD!(copy(A))
+        return AJD.create_linear_filter(Matrix(F'))
     end
 end
 
