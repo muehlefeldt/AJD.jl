@@ -71,13 +71,14 @@ Input
 Takes an array namely the Array of matrices A_k and gets the offdiagonal elements and applies the frobenius norm (∑ |a_{i,j}|^{2}). 
 Used for the `jdiag_gabrieldernbach` and `FFD` algorithm.
 """
-#TODO: Might be better to put back into jdiag_gabrieldernbach since it is only used there? - NG
-function frobenius_offdiag_normation(A::Array{<:Number,3})
-    #slower method instead of using get_off_diag_elements
-    # row,column,k = size(A)
-    # non_diag_elements_vector = [A[index_row, index_column,index_k] for index_row = 1:row, index_column = 1:column, index_k = 1:k if index_row != index_column]
-    #new method -NG
-    return sum(abs.(get_offdiag_elements(A)).^2) #frobenius norm is applied
+
+function frobenius_offdiag_norm(Xm::AbstractArray{T,3})::Real where {T<:Number}
+    sum = zero(real(T))
+    for i in axes(Xm, 1), j in axes(Xm, 2), k in axes(Xm, 3)
+        i == j && continue
+        sum += abs2(Xm[i, j, k])
+    end
+    return sum
 end
 #TODO: Find out if needed
 # function frobenius_off_diag_normation(A::AbstractArray{<:Number,2})
