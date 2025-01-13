@@ -41,7 +41,7 @@ function FFD!(A::Vector{M}; threshold = eps(), max_iter = 100, norm_ = "frobeniu
             #W[i,j] = (z_ij*y_ji - z_i*y_ij)/(z_j*z_i-z_ij^2)
             #W[j,i] = (z_ij*y_ij - z_j*y_ji)/(z_j*z_i-z_ij^2)
         end
-        @info W
+        
         if normation(W) > θ
             W = θ/normation(W)*W
         end
