@@ -27,11 +27,19 @@ end
 function rotation_symmetric(aii::Array{T}, ajj::Array{T}, aij::Array{T})::Matrix{T} where {T<:Union{Real,Complex}}
     h = hcat(aii .- ajj, 2.0 .* aij)
     G = real(h' * h)
-    _, vecs = eigen(G)
-    x, y = vecs[:, end]
+    # G is now a 2x2 symmetric matrix
+    a, b = G[1, 1], G[1, 2]
+    # Since G is symmetric, G[2,1] = G[1,2] and G[2,2] = c
+    c = G[2, 2]
+
+    # Calculate theta for the largest eigenvector
+    theta = 0.5 * atan(2b, a - c)
+    x, y = cos(theta), sin(theta)
+
     if x < 0.0
         x, y = -x, -y
     end
+
     r = sqrt(x^2 + y^2)  # julia's eigen returns normalized eigenvectors
     @assert isapprox(r, 1.0)
     c = sqrt((x + 1.0) / 2.0)
