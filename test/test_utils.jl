@@ -37,6 +37,12 @@ end
     for i = 1:m, j = 1:n
         @test AJD.get_z_fdiag(A,i,j) == 2
     end
+    A = ones(3,3,2)
+    m,n,_ = size(A)
+    for i = 1:m, j = 1:n
+        @test AJD.get_z_fdiag(A,i,j) == 2
+    end
+
 end
 
 @testset "AJD.get_y_fdiag" begin

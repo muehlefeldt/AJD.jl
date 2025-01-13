@@ -65,40 +65,91 @@ function create_linear_filter(A::Matrix{T} where {T<:Number})
 end
 
 """
-    frobenius_off_diag_normation(A::Array)
+    frobenius_off_diag_normation(A::Array{<:Number,3})
 Input
-* A: Vector of communting matrices with index k
+* A: Vector of matrices
+
 Takes an array namely the Array of matrices A_k and gets the offdiagonal elements and applies the frobenius norm (∑ |a_{i,j}|^{2}). 
 Used for the `jdiag_gabrieldernbach` and `FFD` algorithm.
 """
-#TODO: Might be better to put back into jdiag_gabrieldernbach since it is only used there? - NG
 function frobenius_offdiag_normation(A::Array{<:Number,3})
-    #slower method instead of using get_off_diag_elements
-    # row,column,k = size(A)
-    # non_diag_elements_vector = [A[index_row, index_column,index_k] for index_row = 1:row, index_column = 1:column, index_k = 1:k if index_row != index_column]
-    #new method -NG
-    return sum(abs.(get_offdiag_elements(A)).^2) #frobenius norm is applied
+    return sum(abs.(get_offdiag_elements(A)).^2) #frobenius norm is applied to offdiagonal elements
 end
-#TODO: Find out if needed
-# function frobenius_off_diag_normation(A::AbstractArray{<:Number,2})
-#     row,column = size(A)
-#     non_diag_elements_vector = [A[index_row, index_column] for index_row = 1:row, index_column = 1:column if index_row != index_column]
-#     return sum(abs.(non_diag_elements_vector).^2) #frobenius norm is applied
-# end
+"""
+    get_offdiag_elements(A::Array{<:Number,3})
+Input
+* A: Vector of matrices
 
+Takes an array of matrices, copies it and sets the diagonal to zero to get the matrix E with only the offdiagonal elements of A.
+
+# Examples
+```jldoctest
+julia> A = ones(3,3,3);
+
+julia> AJD.get_offdiag_elements(A)
+3×3×3 Array{Float64, 3}:
+[:, :, 1] =
+ 0.0  1.0  1.0
+ 1.0  0.0  1.0
+ 1.0  1.0  0.0
+
+[:, :, 2] =
+ 0.0  1.0  1.0
+ 1.0  0.0  1.0
+ 1.0  1.0  0.0
+
+[:, :, 3] =
+ 0.0  1.0  1.0
+ 1.0  0.0  1.0
+ 1.0  1.0  0.0```
+"""
 function get_offdiag_elements(A::Array{<:Number,3})
     rows,_ = size(A)
+    #copy matrix A to not overwrite it with zeros
     E = copy(A)
     for row in 1:rows # maybe eachindex better - NG
         E[row,row,:] .= 0 
     end
     return E
 end
+"""
+    get_diag_elements(A::Array)
+Input
+* A: Vector of matrices
 
+Takes an array of matrices, takes the diagonal elements and returns the diagonal elements as a diagonal matrix D.
+
+# Examples
+
+```jldoctest
+julia> A = ones(3,3,3);
+
+julia> AJD.get_diag_elements(A)
+3×3×3 Array{Float64, 3}:
+[:, :, 1] =
+ 1.0  0.0  0.0
+ 0.0  1.0  0.0
+ 0.0  0.0  1.0
+
+[:, :, 2] =
+ 1.0  0.0  0.0
+ 0.0  1.0  0.0
+ 0.0  0.0  1.0
+
+[:, :, 3] =
+ 1.0  0.0  0.0
+ 0.0  1.0  0.0
+ 0.0  0.0  1.0```
+"""
 function get_diag_elements(A::Array)
 
     rows, columns, k = size(A)
-    D = zeros(rows, columns, k)
+
+    if typeof(A) <: AbstractArray{<:Complex}
+        D = complex.(zeros(rows, columns, k))
+    else
+        D = zeros(rows, columns, k)
+    end
 
     for row in 1:rows
         D[row,row,:] = A[row,row,:]
@@ -110,7 +161,11 @@ end
 function sort_offdiag_elements(A::AbstractArray{<:Number,3})
     rows,_,k = size(A)
     no_el = rows*rows-rows #number of offdiagonal elements
-    sorted_array = zeros((no_el)*k)
+    if typeof(A) <: AbstractArray{<:Complex}
+        sorted_array = complex.(zeros(no_el*k))
+    else
+        sorted_array = zeros(no_el*k)
+    end
 
     for matrices in 1:k
         sorted_array[1+(matrices-1)*(no_el):matrices*(no_el)] = sort_offdiag_elements(A[:,:,matrices])
@@ -120,7 +175,13 @@ end
 
 function sort_offdiag_elements(A::AbstractArray{<:Number,2})
     rows,_ = size(A)
-    sorted_array = zeros(rows*rows-rows)
+
+    if typeof(A) <: AbstractArray{<:Complex}
+        sorted_array = complex.(zeros(rows*rows-rows))
+    else
+        sorted_array = zeros(rows*rows-rows)
+    end
+   
     i = 1
     for row in 1:rows-1,column in row+1:rows
         #TODO: Benchmark if append! or push! is faster
@@ -133,32 +194,37 @@ function sort_offdiag_elements(A::AbstractArray{<:Number,2})
     return sorted_array
 end
 
-#TODO: Unclear if needed for FFDiag
-# function inf_off_diag_normation(W::Array{<:Number})
-#     row,column = size(W)
-#     objective = 0
-#     i = 1
-#     for row in eachrow(W)
-#         objective_new = sum(abs.(row)) - abs(W[i,i])
-#         i += 1
-#         if objective_new > objective
-#             objective = objective_new
-#         end
-        
-#     end
-#     return objective
-# end
+"""
+    is_commuting(A::AbstractMatrix, B::AbstractMatrix) 
+Input:
+* A: AbstractMatrix of dimension nxn
+* B: AbstractMatrix of dimension nxn
 
-" Check if two matrices A, B are commuting.
- A * B = B * A must hold. "
+Check if two matrices A, B are commuting.
+ A * B = B * A must hold. 
+ """
 function is_commuting(A::AbstractMatrix, B::AbstractMatrix)
     return isapprox(A*B, B*A)
 end
+"""
+    is_same_size(A::AbstractMatrix, B::AbstractMatrix)
+Input:
+* A: AbstractMatrix of variable size
+* B: AbstractMatrix of variable size
 
+Will return true if dimension of A and B is matching otherwise false.
+"""
 function is_same_size(A::AbstractMatrix, B::AbstractMatrix)
     return size(A) == size(B)
 end
+"""
+    isstrictly_diagonally_dominant(A::AbstractMatrix)
+Input:
+* A: AbstractMatrix
 
+Used for the FFDiag Algorithm to define whether the Matrix A is strictly diagonally dominant and therefore has an Inverse or not.
+A matrix is strictly dominant if:```|a_{ii}| > \\sum |a_{ij}|, i ≠ j```
+"""
 function isstrictly_diagonally_dominant(A::AbstractMatrix)
     for i in eachindex(A[1:end, 1])
          
@@ -171,10 +237,28 @@ function isstrictly_diagonally_dominant(A::AbstractMatrix)
 
     return true
 end
+"""
+    get_z_fdiag(D::AbstractArray{<:Number}, i::Int, j::Int)
+Input
+* D: Diagonal Matrix with offdiagonal elements set to zero
+* i,j: Denotes the indexes the matrix D
 
+Calculates the factor ```z_ij``` which is defined by:
+``` ∑_{k} D_{i,i}^{k}D_{j,j}^{k} ```
+"""
 function get_z_fdiag(D::AbstractArray{<:Number}, i::Int, j::Int)
     return sum(D[i,i,:].*D[j,j,:])
 end
+"""
+    get_y_fdiag(D::AbstractArray{<:Number}, E::AbstractArray{<:Number}, i::Int, j::Int)
+Input
+* D: Diagonal Matrix with offdiagonal elements set to zero
+* E: Diagonal Matrix with diagonal elements set to zero
+* i,j: Denotes the indexes of the matrices D and E
+
+Calculates the factor ```y_ij``` which is defined by:
+```math ∑_{k} D_{j,j}^{k}E_{j,i}^{k} ```
+"""
 function get_y_fdiag(D::AbstractArray{<:Number}, E::AbstractArray{<:Number}, i::Int,j::Int)
     return sum(D[j,j,:].*E[i,j,:])
 end
@@ -192,4 +276,37 @@ function check_input(A::Vector{<:AbstractMatrix{<:Number}})
         end
     end
     return true
+end
+
+function addrandomnoise(A::Vector{M};σ = 0.5,same_noise = true) where {T<:Number, M<:AbstractMatrix{T}}
+    k = length(A)
+    rows,columns = size(A[1])
+    if same_noise == true
+        R = randn(rows,columns)
+        for index_k = 1:k
+            A[index_k] = A[index_k] + σ*R*R'
+        end
+    else
+        for index_k = 1:k
+            R = randn(rows,columns)
+            A[k] = A[k] + σ*R*R'
+        end
+    end
+    return A
+end
+function addrandomnoise!(A::Vector{M};σ = 0.5,same_noise = true) where {T<:Number, M<:AbstractMatrix{T}}
+    k = length(A)
+    rows,columns = size(A[1])
+    if same_noise == true
+        R = randn(rows,columns)
+        for index_k = 1:k
+            A[index_k] = A[index_k] + σ*R*R'
+        end
+    else
+        for index_k = 1:k
+            R = randn(rows,columns)
+            A[k] = A[k] + σ*R*R'
+        end
+    end
+    return A
 end

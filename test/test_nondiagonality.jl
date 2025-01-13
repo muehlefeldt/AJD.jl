@@ -42,7 +42,7 @@ end
 # Test nonDiagonality of complex inputs.
 @testset "Nondiagonality Complex" begin
     # Select algorithms supporting complex matrices.
-    for name in ["jdiag_edourdpineau", "jdiag_gabrieldernbach"]
+    for name in ["jdiag_edourdpineau", "jdiag_gabrieldernbach","FFD"]
         # Generate complex test input and calculate filter.
         test_input = AJD.random_normal_commuting_matrices(6, 6; complex=true)
         result = diagonalize(test_input, algorithm=name)
