@@ -47,20 +47,20 @@ Diagonalize a set of matrices using the Jacobi method ("Jacobi Angles for Simult
 Code adapted from [Edouardpineaus Python implementation](https://github.com/edouardpineau/Time-Series-ICA-with-SOBI-Jacobi)
 """
 function jdiag_edourdpineau(X::Vector{M}; iter=100, eps=1e-3) where {T<:Number,M<:AbstractMatrix{T}}
-    
-    Xm = cat(X..., dims=3) .+ 0.0im # change to Xm = complex.(cat(X..., dims = 3))? -NG
+
+    Xm = cat(X..., dims=3)
     m = length(X)
     n = size(X[1], 1)
     @assert n == size(X[1], 2)
 
     if !(M <: Symmetric) && (T <: Real)
-        Xm .+= 0.0im # is this necessary? we already did that in line 51 no? - NG
+        Xm = complex.(Xm)
         V = Matrix{Complex{T}}(I, n, n)
     else
         V = Matrix{T}(I, n, n)
     end
 
-    diag_err = off_diag_norm(Xm)
+    diag_err = frobenius_offdiag_norm(Xm)
     err_array = [diag_err]
     diff = Inf
     current_iter = 0
@@ -82,7 +82,7 @@ function jdiag_edourdpineau(X::Vector{M}; iter=100, eps=1e-3) where {T<:Number,M
             V[:, [i, j]] = V[:, [i, j]] * R'
         end
 
-        new_diag_err = off_diag_norm(Xm)
+        new_diag_err = frobenius_offdiag_norm(Xm)
         push!(err_array, new_diag_err)
         # TODO: this is relative error, should also add an absolute error
         diff = abs(new_diag_err - diag_err) / diag_err
