@@ -1,6 +1,7 @@
 module AJD 
 using LinearAlgebra
 using BenchmarkTools
+using Plots
 
 # Import different JDiag algorithms.
 include("jdiag_algorithms/jdiag_cardoso.jl")
@@ -40,7 +41,10 @@ function diagonalize(
     end
 
     if algorithm in ["jdiag", "jdiag_gabrieldernbach"]
-        _,F = jdiag_gabrieldernbach!(A, max_iter = max_iter, threshold = threshold)
+        B, F = jdiag_gabrieldernbach!(A, max_iter = max_iter, threshold = threshold)
+        plotting(B)
+        plotting(Matrix(F))
+        #@info A
         return AJD.create_linear_filter(F)
     end
 
@@ -55,6 +59,7 @@ function diagonalize(
 
     if algorithm == "jdiag_edourdpineau"
         F, _, _ = jdiag_edourdpineau(A)
+        plotting(F)
         return AJD.create_linear_filter(F)
     end
 
@@ -95,10 +100,15 @@ function ajd_benchmark(n_dims::Int, n_matrices::Int)
     # Return BenchmarkGroup for further evaluation.
     return results
 end
+"""
+What are we trying here? Plot a heatmap of a matrix.
+"""
+function plotting(F) 
+    plot = heatmap(F)
+    display(plot)
+end
 
-# Only export diagonalize().
-# All provided functionality is available through the function.
-export diagonalize, ajd_benchmark
+export diagonalize, ajd_benchmark, plotting
 
 end
 
