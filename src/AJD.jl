@@ -40,8 +40,7 @@ function diagonalize(
     end
 
     if algorithm in ["jdiag", "jdiag_gabrieldernbach"]
-        A,F = jdiag_gabrieldernbach!(A, max_iter = max_iter, threshold = threshold)
-        @info "Jdiag", A
+        _,F = jdiag_gabrieldernbach!(A, max_iter = max_iter, threshold = threshold)
         return AJD.create_linear_filter(F)
     end
 
