@@ -16,7 +16,6 @@ function FFD!(A::Vector{M}; threshold = eps(), max_iter = 1000, norm_ = "frobeni
     rows,columns,k = size(A)
     #initialization
     iteration_step = 0
-    active = true
     V = 1.0*Matrix(I, rows,columns)
     W = zeros(rows,columns)
     
@@ -43,10 +42,11 @@ function FFD!(A::Vector{M}; threshold = eps(), max_iter = 1000, norm_ = "frobeni
         if normation(W) > θ
             W = θ/normation(W)*W
         end
-
         #A = D + W.*D + D.*W'+E
         V = (I+W)*V
-        A = (I+W).*A.*(I+W)'      
+        for m = 1:k
+            A[:,:,m] = (I+W)*A[:,:,m]*(I+W)'
+        end
         
         objective_new = frobenius_offdiag_normation(A)
         diff = objective - objective_new
@@ -54,11 +54,7 @@ function FFD!(A::Vector{M}; threshold = eps(), max_iter = 1000, norm_ = "frobeni
         
         E = get_offdiag_elements(A)
         D = get_diag_elements(A)
-        if abs(diff) > threshold
-            active = true
-        else
-            active = false
-        end
+        abs(diff) < threshold && break
         iteration_step += 1
     end
     return A,V
