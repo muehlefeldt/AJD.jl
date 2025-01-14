@@ -12,4 +12,5 @@ using LinearAlgebra
     include("test_utils.jl")
     include("test_benchmark.jl")
     include("test_ffdiag.jl")
+    include("test_plotting.jl")
 end
