@@ -76,7 +76,8 @@ function diagonalize(
         return AJD.create_linear_filter(Matrix(F'))
     end
 
-    return throw(ArgumentError("No valid algorithm selected from available"))
+    # If no vaild algorithm selected throw an error.
+    throw(ArgumentError("No valid algorithm selected from available"))
 end
 
 """
