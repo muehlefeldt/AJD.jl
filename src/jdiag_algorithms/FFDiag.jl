@@ -24,7 +24,7 @@ function FFD!(A::Vector{M}; threshold = eps(), max_iter = 100, norm_ = "frobeniu
     
     w = sort_offdiag_elements(W)
     e = sort_offdiag_elements(E)
-    objective = frobenius_offdiag_normation(A)
+    objective = frobenius_offdiag_norm(A)
     
     #while active == true && iteration_step <= max_iter
     while iteration_step <= max_iter
@@ -51,7 +51,7 @@ function FFD!(A::Vector{M}; threshold = eps(), max_iter = 100, norm_ = "frobeniu
             A[:,:,m] = (I+W)*A[:,:,m]*(I+W)'
         end
         
-        objective_new = frobenius_offdiag_normation(A)
+        objective_new = frobenius_offdiag_norm(A)
         diff = objective - objective_new
         objective = objective_new 
         

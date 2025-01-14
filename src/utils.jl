@@ -65,15 +65,20 @@ function create_linear_filter(A::Matrix{T} where {T<:Number})
 end
 
 """
-    frobenius_off_diag_normation(A::Array{<:Number,3})
+    function frobenius_offdiag_norm(A::AbstractArray{T,3})::Real where {T<:Number}
 Input
 * A: Vector of matrices
 
 Takes an array namely the Array of matrices A_k and gets the offdiagonal elements and applies the frobenius norm (∑ |a_{i,j}|^{2}). 
-Used for the `jdiag_gabrieldernbach` and `FFD` algorithm.
 """
-function frobenius_offdiag_normation(A::Array{<:Number,3})
-    return sum(abs.(get_offdiag_elements(A)).^2) #frobenius norm is applied to offdiagonal elements
+function frobenius_offdiag_norm(A::AbstractArray{T,3})::Real where {T<:Number}
+    
+    norm = zero(real(T))
+    for row in axes(A, 1), column in axes(A, 2), k in axes(A, 3)
+        row == column && continue
+        norm += abs2(A[row, column, k])
+    end
+    return norm
 end
 """
     get_offdiag_elements(A::Array{<:Number,3})

@@ -1,14 +1,5 @@
 using Base:OneTo
 
-function off_diag_norm(Xm::AbstractArray{T,3})::Real where {T<:Union{Real,Complex}}
-    sum = zero(real(T))
-    for i in axes(Xm, 1), j in axes(Xm, 2), k in axes(Xm, 3)
-        i == j && continue
-        sum += abs2(Xm[i, j, k])
-    end
-    return sum
-end
-
 function rotation(aii::Array{T}, ajj::Array{T}, aij::Array{T}, aji::Array{T})::Matrix{T} where {T<:Complex}
     h = hcat(aii .- ajj, aij .+ aji, (aji .- aij) .* 1im)
     G = real(h' * h)
@@ -60,7 +51,7 @@ function jdiag_edourdpineau(X::Vector{M}; iter=100, eps=1e-3) where {T<:Number,M
         V = Matrix{T}(I, n, n)
     end
 
-    diag_err = off_diag_norm(Xm)
+    diag_err = frobenius_offdiag_norm(Xm)
     err_array = [diag_err]
     diff = Inf
     current_iter = 0
@@ -82,7 +73,7 @@ function jdiag_edourdpineau(X::Vector{M}; iter=100, eps=1e-3) where {T<:Number,M
             V[:, [i, j]] = V[:, [i, j]] * R'
         end
 
-        new_diag_err = off_diag_norm(Xm)
+        new_diag_err = frobenius_offdiag_norm(Xm)
         push!(err_array, new_diag_err)
         # TODO: this is relative error, should also add an absolute error
         diff = abs(new_diag_err - diag_err) / diag_err
