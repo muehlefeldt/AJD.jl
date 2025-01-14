@@ -26,12 +26,9 @@ function jdiag_gabrieldernbach!(
     A = cat(A...,dims = 3) #convert to 3 dimensional matrix and concatenate in the third dimension
     rows, columns, k = size(A)
 
-    error_array = []
-    diag_error = 0.0
-    
+    error_array = [] 
     if plot_convergence
-        diag_error = off_diag_norm(A)
-        push!(error_array, diag_error)
+        push!(error_array, off_diag_norm(A))
     end
 
     #initialize the approximate joint eigenvecotrs as described in Cardoso
@@ -82,19 +79,22 @@ function jdiag_gabrieldernbach!(
         end 
 
         if plot_convergence
-            diag_error = off_diag_norm(A)
-            push!(error_array, diag_error)
+            push!(error_array, off_diag_norm(A))
         end
 
         iteration_step += 1
-    
     end
     
+    # Return of the filter, diagonalized matrices and the convergence error (optional).
     return V, A, error_array
 
 end
 
-function jdiag_gabrieldernbach!(A::Vector{M}; threshold = eps(), max_iter = 1000) where {T<:Complex, M<:AbstractMatrix{T}}
+function jdiag_gabrieldernbach!(
+    A::Vector{M};
+    threshold = eps(),
+    max_iter = 1000,
+    plot_convergence::Bool = false) where {T<:Complex, M<:AbstractMatrix{T}}
     
     A = cat(A...,dims = 3)
     rows, columns, k = size(A)
@@ -108,6 +108,13 @@ function jdiag_gabrieldernbach!(A::Vector{M}; threshold = eps(), max_iter = 1000
     #conditions for abortion initialized
     iteration_step = 0
     active = true
+
+    # Make sure empty error array exists even if not tracked.
+    # Track error if plot_convergence is selected.
+    error_array = [] 
+    if plot_convergence
+        push!(error_array, off_diag_norm(A))
+    end
 
     while iteration_step <= max_iter && active == true
         
@@ -162,8 +169,16 @@ function jdiag_gabrieldernbach!(A::Vector{M}; threshold = eps(), max_iter = 1000
 
         objective_function = objective_function_new
         iteration_step += 1
+
+        # Add error at the end of the iteration to track error convergence.
+        if plot_convergence
+            push!(error_array, off_diag_norm(A))
+        end
+
     end
-    return V, A
+
+    # Return of the filter, diagonalized matrices and the convergence error (optional).
+    return V, A, error_array
 
 end
 
