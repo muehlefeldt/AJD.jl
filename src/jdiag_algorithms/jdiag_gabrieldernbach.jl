@@ -86,7 +86,7 @@ function jdiag_gabrieldernbach!(A::Vector{M}; threshold = eps(), max_iter = 1000
     #needs to be added otherwise we cannot manipulate the non diag. elements of V
     
     #objective_function to be minimized by algorithm
-    objective_function = frobenius_offdiag_normation(A)
+    objective_function = frobenius_offdiag_norm(A)
    
     #conditions for abortion initialized
     iteration_step = 0
@@ -136,7 +136,7 @@ function jdiag_gabrieldernbach!(A::Vector{M}; threshold = eps(), max_iter = 1000
         
         end
     
-        objective_function_new = frobenius_offdiag_normation(A)
+        objective_function_new = frobenius_offdiag_norm(A)
         diff = objective_function_new - objective_function
         
         if abs(diff) > threshold
