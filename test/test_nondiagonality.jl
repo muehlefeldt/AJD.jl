@@ -25,6 +25,19 @@ accepted_error = 1e-6
     end
 end
 
+@testset "Nondiagonality Symmetric" begin
+    # jdiag_edourdpineau has a function that is overloaded for symmetric and hermitian matrices.
+    test_input = AJD.random_normal_commuting_symmetric_matrices(10, 6)
+    result = diagonalize(test_input, algorithm="jdiag_edourdpineau")
+    @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < accepted_error
+end
+
+@testset "Nondiagonality Hermitian" begin
+    test_input = AJD.random_normal_commuting_symmetric_matrices(10, 6; complex=true)
+    result = diagonalize(test_input, algorithm="jdiag_edourdpineau")
+    @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < accepted_error
+end
+
 # Test the algorithms with a single matrix as input.
 @testset "Nondiagonality Single Matrix" begin
     for name in ["jdiag_gabrieldernbach", "jdiag_cardoso", "jdiag_edourdpineau"]

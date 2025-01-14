@@ -1,4 +1,4 @@
-using Base:OneTo
+using Base: OneTo
 
 function rotation(aii::Array{T}, ajj::Array{T}, aij::Array{T}, aji::Array{T})::Matrix{T} where {T<:Complex}
     h = hcat(aii .- ajj, aij .+ aji, (aji .- aij) .* 1im)
@@ -31,21 +31,21 @@ function rotation_symmetric(aii::Array{T}, ajj::Array{T}, aij::Array{T})::Matrix
 end
 
 """
-    jdiag_edourdpineau(X::Vector{M}; iter=100, eps=1e-3) 
+    jdiag_edourdpineau(X::Vector{M}; iter=100, eps=1e-3)
         where {T<:Union{Real,Complex},M<:AbstractMatrix{T}}
 
 Diagonalize a set of matrices using the Jacobi method ("Jacobi Angles for Simultaneous Diagonalization").
 Code adapted from [Edouardpineaus Python implementation](https://github.com/edouardpineau/Time-Series-ICA-with-SOBI-Jacobi)
 """
 function jdiag_edourdpineau(X::Vector{M}; iter=100, eps=1e-3) where {T<:Number,M<:AbstractMatrix{T}}
-    
-    Xm = cat(X..., dims=3) .+ 0.0im # change to Xm = complex.(cat(X..., dims = 3))? -NG
+
+    Xm = cat(X..., dims=3)
     m = length(X)
     n = size(X[1], 1)
     @assert n == size(X[1], 2)
 
     if !(M <: Symmetric) && (T <: Real)
-        Xm .+= 0.0im # is this necessary? we already did that in line 51 no? - NG
+        Xm = complex.(Xm)
         V = Matrix{Complex{T}}(I, n, n)
     else
         V = Matrix{T}(I, n, n)
@@ -60,7 +60,7 @@ function jdiag_edourdpineau(X::Vector{M}; iter=100, eps=1e-3) where {T<:Number,M
         # println("Current iteration: ", current_iter, " with error: ", diag_err)
         for i in OneTo(n - 1), j in (i+1):n
 
-            if M <: Symmetric || M <: Hermitian
+            if M <: Symmetric
                 R = rotation_symmetric(Xm[i, i, :], Xm[j, j, :], Xm[i, j, :])
             else
                 R = rotation(Xm[i, i, :], Xm[j, j, :], Xm[i, j, :], Xm[j, i, :])
