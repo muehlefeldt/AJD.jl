@@ -33,7 +33,8 @@ function diagonalize(
     A::Vector{<:AbstractMatrix{<:Number}};
     algorithm::String = "jdiag_gabrieldernbach",
     max_iter::Int = 1000,
-    threshold::AbstractFloat = eps()
+    threshold::AbstractFloat = eps(),
+    plot_matrix::Bool = false
     )
 
     if !check_input(A)
@@ -45,7 +46,9 @@ function diagonalize(
         #plotting(mean(B, dims=3)[:, :, 1])
         #plotting(Matrix(F))
         #@info A
-        plot_matrix_heatmap(F, B)
+        if plot_matrix
+            plot_matrix_heatmap(F, B)
+        end
         return B, AJD.create_linear_filter(F)
     end
 
@@ -88,6 +91,12 @@ function ajd_benchmark(n_dims::Int, n_matrices::Int)
         end
     end
 
+    name = "ffdiag"
+    suite[name] = BenchmarkGroup([name])
+    suite[name]["real"] = begin
+        @benchmarkable diagonalize(data, algorithm=$name) setup=(data=AJD.random_normal_commuting_matrices($n_dims, $n_matrices)) 
+    end
+
     # Run the actual benchmark.
     tune!(suite)
     results = run(suite, verbose = true)
@@ -101,8 +110,11 @@ function ajd_benchmark(n_dims::Int, n_matrices::Int)
     # Return BenchmarkGroup for further evaluation.
     return results
 end
+
 """
-What are we trying here? Plot a heatmap of a matrix.
+    plot_matrix_heatmap(filter::AbstractMatrix, diag_matrices)
+
+Plot a heatmap of the calculated filter matrix and the mean of the diagonlized matrices.
 """
 function plot_matrix_heatmap(filter::AbstractMatrix, diag_matrices) 
     theme(:dark)
