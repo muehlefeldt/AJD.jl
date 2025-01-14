@@ -34,7 +34,8 @@ function diagonalize(
     algorithm::String = "jdiag_gabrieldernbach",
     max_iter::Int = 1000,
     threshold::AbstractFloat = eps(),
-    plot_matrix::Bool = false
+    plot_matrix::Bool = false,
+    plot_convergence::Bool = false
     )
 
     if !check_input(A)
@@ -42,14 +43,17 @@ function diagonalize(
     end
 
     if algorithm in ["jdiag", "jdiag_gabrieldernbach"]
-        B, F = jdiag_gabrieldernbach!(A, max_iter = max_iter, threshold = threshold)
+        F, B, error_array = jdiag_gabrieldernbach!(A, max_iter = max_iter, threshold = threshold, plot_convergence = plot_convergence)
         #plotting(mean(B, dims=3)[:, :, 1])
         #plotting(Matrix(F))
         #@info A
         if plot_matrix
             plot_matrix_heatmap(F, B)
         end
-        return B, AJD.create_linear_filter(F)
+        if plot_convergence
+            plot_convergence_lineplot(error_array, algorithm)
+        end
+        return error_array, AJD.create_linear_filter(F)
     end
 
     if algorithm == "jdiag_cardoso"
@@ -67,7 +71,7 @@ function diagonalize(
         return AJD.create_linear_filter(F)
     end
 
-    if algorithm == "FFD"
+    if algorithm in ["FFD", "ffd", "ffdiag"]
         _,F = FFD!(copy(A))
         return AJD.create_linear_filter(Matrix(F'))
     end
@@ -122,6 +126,12 @@ function plot_matrix_heatmap(filter::AbstractMatrix, diag_matrices)
     mean_diag_plot = heatmap(mean(diag_matrices, dims=3)[:, :, 1], yflip=true, title="Mean Diagonalized Matrices")
     combined_plot = plot(filter_plot, mean_diag_plot, layout=(2, 1), legend=false, size=(400, 800))
     display(combined_plot)
+end
+
+function plot_convergence_lineplot(error_array::AbstractArray, name::String)
+    theme(:dark)
+    line_plot = plot(error_array, w=3, title="Error Convergence", label=name)
+    display(line_plot)
 end
 
 export diagonalize, ajd_benchmark
