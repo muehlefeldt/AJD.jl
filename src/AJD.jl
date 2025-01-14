@@ -58,7 +58,7 @@ function diagonalize(
 
     elseif algorithm in ["FFD", "ffd", "ffdiag"]
         F, B, error_array = FFD!(A)
-        F = F' # F' Due to some FFDiag properties.
+        F = Matrix(F') # F' Due to some FFDiag properties.
 
     else
         # If no vaild algorithm selected throw an error.
