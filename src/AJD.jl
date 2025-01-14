@@ -44,22 +44,19 @@ function diagonalize(
 
     if algorithm in ["jdiag", "jdiag_gabrieldernbach"]
         F, B, error_array = jdiag_gabrieldernbach!(A, max_iter = max_iter, threshold = threshold, plot_convergence = plot_convergence)
-        #plotting(mean(B, dims=3)[:, :, 1])
-        #plotting(Matrix(F))
-        #@info A
         if plot_matrix
             plot_matrix_heatmap(F, B)
         end
         if plot_convergence
             plot_convergence_lineplot(error_array, algorithm)
         end
-        return error_array, AJD.create_linear_filter(F)
+        return create_linear_filter(F)
     end
 
     if algorithm == "jdiag_cardoso"
         if typeof(A) <: AbstractArray{<:AbstractArray{<:Real}} 
             _,F ,_ = jdiag_cardoso(hcat(A...), threshold)
-            return AJD.create_linear_filter(F)
+            return create_linear_filter(F)
         else
             throw(ArgumentError("Not supported for set of Matrices containing imaginary values!"))
         end
@@ -68,12 +65,12 @@ function diagonalize(
     if algorithm == "jdiag_edourdpineau"
         F, _, _ = jdiag_edourdpineau(A)
         #plotting(F)
-        return AJD.create_linear_filter(F)
+        return create_linear_filter(F)
     end
 
     if algorithm in ["FFD", "ffd", "ffdiag"]
         _,F = FFD!(copy(A))
-        return AJD.create_linear_filter(Matrix(F'))
+        return create_linear_filter(Matrix(F'))
     end
 
     # If no vaild algorithm selected throw an error.
