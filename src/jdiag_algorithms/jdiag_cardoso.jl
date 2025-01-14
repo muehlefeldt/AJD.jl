@@ -85,7 +85,8 @@ function jdiag_cardoso(M, jthresh::Real)
             end
         end
     end
-    return A,V,iter
+    
+    return V, A, iter
 end
 
 # generating test matrices which are positive definite and symmetric
