@@ -1,13 +1,4 @@
-using Base:OneTo
-
-function off_diag_norm(Xm::AbstractArray{T,3})::Real where {T<:Union{Real,Complex}}
-    sum = zero(real(T))
-    for i in axes(Xm, 1), j in axes(Xm, 2), k in axes(Xm, 3)
-        i == j && continue
-        sum += abs2(Xm[i, j, k])
-    end
-    return sum
-end
+using Base: OneTo
 
 function rotation(aii::Array{T}, ajj::Array{T}, aij::Array{T}, aji::Array{T})::Matrix{T} where {T<:Complex}
     h = hcat(aii .- ajj, aij .+ aji, (aji .- aij) .* 1im)
@@ -40,7 +31,7 @@ function rotation_symmetric(aii::Array{T}, ajj::Array{T}, aij::Array{T})::Matrix
 end
 
 """
-    jdiag_edourdpineau(X::Vector{M}; iter=100, eps=1e-3) 
+    jdiag_edourdpineau(X::Vector{M}; iter=100, eps=1e-3)
         where {T<:Union{Real,Complex},M<:AbstractMatrix{T}}
 
 Diagonalize a set of matrices using the Jacobi method ("Jacobi Angles for Simultaneous Diagonalization").
@@ -69,7 +60,7 @@ function jdiag_edourdpineau(X::Vector{M}; iter=100, eps=1e-3) where {T<:Number,M
         # println("Current iteration: ", current_iter, " with error: ", diag_err)
         for i in OneTo(n - 1), j in (i+1):n
 
-            if M <: Symmetric || M <: Hermitian
+            if M <: Symmetric
                 R = rotation_symmetric(Xm[i, i, :], Xm[j, j, :], Xm[i, j, :])
             else
                 R = rotation(Xm[i, i, :], Xm[j, j, :], Xm[i, j, :], Xm[j, i, :])

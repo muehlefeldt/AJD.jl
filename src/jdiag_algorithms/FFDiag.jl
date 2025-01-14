@@ -1,7 +1,7 @@
 using LinearAlgebra
 using PosDefManifold
-
-function FFD!(A::Vector{M}; threshold = eps(), max_iter = 1000, norm_ = "frobenius",θ = 1) where {T <: Number, M<:AbstractMatrix{T}}
+#TODO: Not used for complex Matrices
+function FFD!(A::Vector{M}; threshold = eps(), max_iter = 100, norm_ = "frobenius",θ = 0.99) where {T <: Number, M<:AbstractMatrix{T}}
     
     if typeof(A) <: AbstractArray{<:AbstractArray{<:Int}}
         A = float.(A)
@@ -24,7 +24,7 @@ function FFD!(A::Vector{M}; threshold = eps(), max_iter = 1000, norm_ = "frobeni
     
     w = sort_offdiag_elements(W)
     e = sort_offdiag_elements(E)
-    objective = frobenius_offdiag_normation(A)
+    objective = frobenius_offdiag_norm(A)
     
     #while active == true && iteration_step <= max_iter
     while iteration_step <= max_iter
@@ -35,8 +35,11 @@ function FFD!(A::Vector{M}; threshold = eps(), max_iter = 1000, norm_ = "frobeni
             z_j = get_z_fdiag(D,j,j)
             y_ij = get_y_fdiag(D,E,i,j)
             y_ji = get_y_fdiag(D,E,j,i)
-            W[i,j] = (z_ij*y_ji - z_i*y_ij)/(z_j*z_i-z_ij^2)
-            W[j,i] = (z_ij*y_ij - z_j*y_ji)/(z_j*z_i-z_ij^2)
+            #check if denominator is zero to not divide by zero
+            W[i,j] = isfinite((z_ij*y_ji - z_i*y_ij)/(z_j*z_i-z_ij^2)) ? (z_ij*y_ji - z_i*y_ij)/(z_j*z_i-z_ij^2) : 0.0
+            W[j,i] = isfinite((z_ij*y_ij - z_j*y_ji)/(z_j*z_i-z_ij^2)) ? (z_ij*y_ij - z_j*y_ji)/(z_j*z_i-z_ij^2) : 0.0
+            #W[i,j] = (z_ij*y_ji - z_i*y_ij)/(z_j*z_i-z_ij^2)
+            #W[j,i] = (z_ij*y_ij - z_j*y_ji)/(z_j*z_i-z_ij^2)
         end
         
         if normation(W) > θ
@@ -48,7 +51,7 @@ function FFD!(A::Vector{M}; threshold = eps(), max_iter = 1000, norm_ = "frobeni
             A[:,:,m] = (I+W)*A[:,:,m]*(I+W)'
         end
         
-        objective_new = frobenius_offdiag_normation(A)
+        objective_new = frobenius_offdiag_norm(A)
         diff = objective - objective_new
         objective = objective_new 
         
