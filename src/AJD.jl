@@ -42,10 +42,11 @@ function diagonalize(
 
     if algorithm in ["jdiag", "jdiag_gabrieldernbach"]
         B, F = jdiag_gabrieldernbach!(A, max_iter = max_iter, threshold = threshold)
-        plotting(B)
-        plotting(Matrix(F))
+        #plotting(mean(B, dims=3)[:, :, 1])
+        #plotting(Matrix(F))
         #@info A
-        return AJD.create_linear_filter(F)
+        plot_matrix_heatmap(F, B)
+        return B, AJD.create_linear_filter(F)
     end
 
     if algorithm == "jdiag_cardoso"
@@ -59,7 +60,7 @@ function diagonalize(
 
     if algorithm == "jdiag_edourdpineau"
         F, _, _ = jdiag_edourdpineau(A)
-        plotting(F)
+        #plotting(F)
         return AJD.create_linear_filter(F)
     end
 
@@ -103,12 +104,15 @@ end
 """
 What are we trying here? Plot a heatmap of a matrix.
 """
-function plotting(F) 
-    plot = heatmap(F)
-    display(plot)
+function plot_matrix_heatmap(filter::AbstractMatrix, diag_matrices) 
+    theme(:dark)
+    filter_plot = heatmap(filter, yflip=true, title="Filter Matrix")
+    mean_diag_plot = heatmap(mean(diag_matrices, dims=3)[:, :, 1], yflip=true, title="Mean Diagonalized Matrices")
+    combined_plot = plot(filter_plot, mean_diag_plot, layout=(2, 1), legend=false, size=(400, 800))
+    display(combined_plot)
 end
 
-export diagonalize, ajd_benchmark, plotting
+export diagonalize, ajd_benchmark
 
 end
 
