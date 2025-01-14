@@ -69,7 +69,7 @@ function jdiag_edourdpineau(X::Vector{M}; iter=100, eps=1e-3) where {T<:Number,M
         # println("Current iteration: ", current_iter, " with error: ", diag_err)
         for i in OneTo(n - 1), j in (i+1):n
 
-            if M <: Symmetric || M <: Hermitian
+            if M <: Symmetric
                 R = rotation_symmetric(Xm[i, i, :], Xm[j, j, :], Xm[i, j, :])
             else
                 R = rotation(Xm[i, i, :], Xm[j, j, :], Xm[i, j, :], Xm[j, i, :])
