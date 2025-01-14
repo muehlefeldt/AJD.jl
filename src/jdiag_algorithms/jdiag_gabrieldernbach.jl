@@ -13,14 +13,26 @@ JDiag algorithm for complex matrices based on the implementation by Gabrieldernb
     of https://github.com/edouardpineau/Time-Series-ICA-with-SOBI-Jacobi.
 
 """
-function jdiag_gabrieldernbach!(A::Vector{M}; threshold = eps(), max_iter = 1000) where {T<:Real, M<:AbstractMatrix{T}}
+function jdiag_gabrieldernbach!(
+        A::Vector{M};
+        threshold::AbstractFloat = eps(),
+        max_iter = 1000,
+        plot_convergence::Bool = false) where {T<:Real, M<:AbstractMatrix{T}}
     
     if typeof(A) <: AbstractArray{<:AbstractArray{<:Int}}
         A = float.(A)
     end
-
+    
     A = cat(A...,dims = 3) #convert to 3 dimensional matrix and concatenate in the third dimension
     rows, columns, k = size(A)
+
+    error_array = []
+    diag_error = 0.0
+    
+    if plot_convergence
+        diag_error = off_diag_norm(A)
+        push!(error_array, diag_error)
+    end
 
     #initialize the approximate joint eigenvecotrs as described in Cardoso
     V = Matrix((1.0)*I(rows)) 
@@ -69,11 +81,16 @@ function jdiag_gabrieldernbach!(A::Vector{M}; threshold = eps(), max_iter = 1000
             end
         end 
 
+        if plot_convergence
+            diag_error = off_diag_norm(A)
+            push!(error_array, diag_error)
+        end
+
         iteration_step += 1
     
     end
     
-    return  A,V
+    return V, A, error_array
 
 end
 
@@ -146,7 +163,7 @@ function jdiag_gabrieldernbach!(A::Vector{M}; threshold = eps(), max_iter = 1000
         objective_function = objective_function_new
         iteration_step += 1
     end
-    return A,V
+    return V, A
 
 end
 
