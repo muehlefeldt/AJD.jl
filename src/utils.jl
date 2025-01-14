@@ -77,7 +77,7 @@ function create_linear_filter(A::Matrix{T} where {T<:Number})
 end
 
 """
-    frobenius_off_diag_normation(A::Array{<:Number,3})
+    frobenius_off_diag_norm(A::Array{<:Number,3})
 Input
 * A: Vector of matrices
 
