@@ -60,7 +60,8 @@ function diagonalize(
         F, B, error_array = FFD!(A)
 
         # TODO Advise on the use of Matrix() here. I got strange types returned otherwise.
-        F = Matrix(F') # F' due to some FFDiag properties. 
+        #F = Matrix(F') # F' due to some FFDiag properties. 
+        #F = F'
 
     else
         # If no vaild algorithm selected, throw an error.

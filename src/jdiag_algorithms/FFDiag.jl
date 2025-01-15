@@ -75,5 +75,5 @@ function FFD!(
             push!(error_array, off_diag_norm(A))
         end
     end
-    return V, A, error_array
+    return Matrix(V'), A, error_array
 end
