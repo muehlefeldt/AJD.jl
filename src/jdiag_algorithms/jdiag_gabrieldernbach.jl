@@ -1,5 +1,8 @@
 # utils_path = pkgdir(AJD,"src","utils.jl" )
 # include(utils_path)
+
+using AJD
+
 """
     (1) jdiag_gabrieldernbach(A::Vector{Matrix{Float64}}; threshold = eps(), max_iter = 1000)
 
@@ -28,7 +31,7 @@ function jdiag_gabrieldernbach!(
 
     error_array = [] 
     if plot_convergence
-        push!(error_array, off_diag_norm(A))
+        push!(error_array, AJD.off_diag_norm(A))
     end
 
     #initialize the approximate joint eigenvecotrs as described in Cardoso
@@ -79,7 +82,7 @@ function jdiag_gabrieldernbach!(
         end 
 
         if plot_convergence
-            push!(error_array, off_diag_norm(A))
+            push!(error_array, AJD.off_diag_norm(A))
         end
 
         iteration_step += 1
