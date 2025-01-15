@@ -1,6 +1,7 @@
 using Base:OneTo
 
-function off_diag_norm(Xm::AbstractArray{T,3})::Real where {T<:Union{Real,Complex}}
+#function off_diag_norm(Xm::AbstractArray{T,3})::Real where {T<:Union{Real,Complex}}
+function off_diag_norm(Xm)
     sum = zero(real(T))
     for i in axes(Xm, 1), j in axes(Xm, 2), k in axes(Xm, 3)
         i == j && continue
@@ -23,6 +24,7 @@ function rotation(aii::Array{T}, ajj::Array{T}, aij::Array{T}, aji::Array{T})::M
     s = (y - z * im) / sqrt(2.0 * (x + 1.0))
     return [c conj(s); -s conj(c)]
 end
+
 #shouldn't rotation_symmetric only apply to matrices of type real?
 function rotation_symmetric(aii::Array{T}, ajj::Array{T}, aij::Array{T})::Matrix{T} where {T<:Union{Real,Complex}}
     h = hcat(aii .- ajj, 2.0 .* aij)
