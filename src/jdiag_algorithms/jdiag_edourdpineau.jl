@@ -1,7 +1,6 @@
 using Base:OneTo
 
-#function off_diag_norm(Xm::AbstractArray{T,3})::Real where {T<:Union{Real,Complex}}
-function off_diag_norm(Xm)
+function off_diag_norm(Xm::AbstractArray{T,3})::Real where {T<:Union{Real,Complex}}
     sum = zero(real(T))
     for i in axes(Xm, 1), j in axes(Xm, 2), k in axes(Xm, 3)
         i == j && continue
