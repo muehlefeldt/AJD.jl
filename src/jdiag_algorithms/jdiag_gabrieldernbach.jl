@@ -1,8 +1,3 @@
-# utils_path = pkgdir(AJD,"src","utils.jl" )
-# include(utils_path)
-
-using AJD
-
 """
     (1) jdiag_gabrieldernbach(A::Vector{Matrix{Float64}}; threshold = eps(), max_iter = 1000)
 
