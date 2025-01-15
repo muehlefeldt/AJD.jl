@@ -58,22 +58,24 @@ function diagonalize(
 
     elseif algorithm in ["FFD", "ffd", "ffdiag"]
         F, B, error_array = FFD!(A)
-        F = Matrix(F') # F' Due to some FFDiag properties.
+
+        # TODO Advise on the use of Matrix() here. I got strange types returned otherwise.
+        F = Matrix(F') # F' due to some FFDiag properties. 
 
     else
-        # If no vaild algorithm selected throw an error.
+        # If no vaild algorithm selected, throw an error.
         throw(ArgumentError("No valid algorithm selected from available"))
     end
 
     # Plotting output if so selected by the user.
     if plot_matrix
         # Illustrate Filter and diagonlised matrices.
-        plot_matrix_heatmap(F, B)
+        display(plot_matrix_heatmap(F, B))
     end
 
     if plot_convergence
         # Show convergence of the error.
-        plot_convergence_lineplot(error_array, algorithm)
+        display(plot_convergence_lineplot(error_array, algorithm))
     end
 
     return create_linear_filter(F)
