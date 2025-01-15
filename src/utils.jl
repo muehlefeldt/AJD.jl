@@ -38,12 +38,24 @@ M_i * M_j = M_j * M_i for all i,j
 M_i*M_i' = M_i'*M_i for all i
 """
 function random_normal_commuting_matrices(n::Int, m::Int; complex::Bool=false)
+    # Just like the function below, this produces hermitian an symmetric matrices, they are
+    # just not annotated as such
+    # Q, _ = qr(rand(complex ? ComplexF64 : Float64, n,n))
     Q, _ = qr(rand(n,n))
     Q = Matrix(Q)
     if complex
         return [Q*Diagonal(rand(ComplexF64, n))*Q' for _ in 1:m]
     end
     return [Q*Diagonal(rand(n))*Q' for _ in 1:m]
+end
+
+function random_normal_commuting_symmetric_matrices(n::Int, m::Int; complex::Bool=false)
+    Q, _ = qr(rand(complex ? ComplexF64 : Float64, n,n))
+    Q = Matrix(Q)
+    if complex
+        return [Hermitian(Q*Diagonal(rand(n))*Q') for _ in 1:m]
+    end
+    return [Symmetric(Q*Diagonal(rand(n))*Q') for _ in 1:m]
 end
 
 function get_test_data_complex_real(n::Int, m::Int)
@@ -65,16 +77,22 @@ function create_linear_filter(A::Matrix{T} where {T<:Number})
 end
 
 """
-    frobenius_off_diag_normation(A::Array{<:Number,3})
+    frobenius_off_diag_norm(A::Array{<:Number,3})
 Input
 * A: Vector of matrices
 
 Takes an array namely the Array of matrices A_k and gets the offdiagonal elements and applies the frobenius norm (∑ |a_{i,j}|^{2}). 
 Used for the `jdiag_gabrieldernbach` and `FFD` algorithm.
 """
-function frobenius_offdiag_normation(A::Array{<:Number,3})
-    return sum(abs.(get_offdiag_elements(A)).^2) #frobenius norm is applied to offdiagonal elements
+function frobenius_offdiag_norm(Xm::AbstractArray{T,3})::Real where {T<:Number}
+    sum = zero(real(T))
+    for i in axes(Xm, 1), j in axes(Xm, 2), k in axes(Xm, 3)
+        i == j && continue
+        sum += abs2(Xm[i, j, k])
+    end
+    return sum
 end
+
 """
     get_offdiag_elements(A::Array{<:Number,3})
 Input
