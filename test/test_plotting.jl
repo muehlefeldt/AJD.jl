@@ -3,6 +3,7 @@
 
 using Plots: Plot
 using PosDefManifold: mean
+using AJD
 
 accepted_error = 1e-6
 
