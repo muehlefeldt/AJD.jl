@@ -31,7 +31,8 @@ function jdiag_gabrieldernbach!(
 
     error_array = [] 
     if plot_convergence
-        push!(error_array, AJD.off_diag_norm(A))
+        t = off_diag_norm(A)
+        push!(error_array, t)
     end
 
     #initialize the approximate joint eigenvecotrs as described in Cardoso
@@ -82,7 +83,8 @@ function jdiag_gabrieldernbach!(
         end 
 
         if plot_convergence
-            push!(error_array, AJD.off_diag_norm(A))
+            t = off_diag_norm(A)
+            push!(error_array, t)
         end
 
         iteration_step += 1
