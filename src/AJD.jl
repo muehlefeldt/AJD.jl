@@ -4,13 +4,15 @@ using BenchmarkTools
 
 # Import different JDiag algorithms.
 include("jdiag_algorithms/jdiag_cardoso.jl")
-include("jdiag_algorithms/jdiag_gabrieldernbach.jl")
+
 include("jdiag_algorithms/jdiag_edourdpineau.jl")
 include("jdiag_algorithms/FFDiag.jl")
 
 # Utility function import.
 include("utils.jl")
 include("plotting.jl")
+
+include("jdiag_algorithms/jdiag_gabrieldernbach.jl")
 
 """
     diagonalize(
