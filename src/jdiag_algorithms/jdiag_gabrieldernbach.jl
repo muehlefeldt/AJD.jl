@@ -31,6 +31,7 @@ function jdiag_gabrieldernbach!(
 
     error_array = [] 
     if plot_convergence
+        x = random_commuting_matrices(2, 5)
         t = off_diag_norm(A)
         push!(error_array, t)
     end
