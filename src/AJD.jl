@@ -2,15 +2,16 @@ module AJD
 using LinearAlgebra
 using BenchmarkTools
 
-# Import different JDiag algorithms.
+# Import different algorithms.
 include("jdiag_algorithms/jdiag_cardoso.jl")
 include("jdiag_algorithms/jdiag_gabrieldernbach.jl")
 include("jdiag_algorithms/jdiag_edourdpineau.jl")
 include("jdiag_algorithms/FFDiag.jl")
 
-# Utility function import.
+# Utility functions, plotting functions and global constanst imported.
 include("utils.jl")
 include("plotting.jl")
+include("global_constants.jl")
 
 
 
@@ -53,7 +54,7 @@ function diagonalize(
 
     elseif algorithm == "jdiag_cardoso"
         if typeof(A) <: AbstractArray{<:AbstractArray{<:Real}} 
-            F, B, error_array = jdiag_cardoso(hcat(A...), threshold)
+            F, B, error_array = jdiag_cardoso(A, threshold)
         else
             throw(ArgumentError("Not supported for set of Matrices containing imaginary values!"))
         end
