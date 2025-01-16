@@ -4,9 +4,9 @@ CurrentModule = AJD
 
 # AJD.jl Documentation
 
-Documentation for the [AJD.jl](https://github.com/gericke-n/AJD.jl) Package to perform Approximate Joint Diagonalization (AJD) on multiple matrices.
+Documentation for the [AJD.jl](https://github.com/muehlefeldt/AJD.jl) Julia Package to perform Approximate Joint Diagonalization (AJD) on multiple matrices.
 
-Below the main functions of the package are introduced. For the entire documentation of non exported functions of the package  refer to the [detailed docs page](./detailed-docs.md).
+Below the main function of the package is introduced. For the entire documentation, including non exported functions, of the package refer to the [detailed docs page](./detailed-docs.md).
 
 
 ```@docs
