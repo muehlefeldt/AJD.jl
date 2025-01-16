@@ -29,7 +29,7 @@ function jdiag_cardoso(
     
     error_array = [] 
     if plot_convergence
-        push!(error_array, frobenius_offdiag_norm(A))
+        push!(error_array, frobenius_offdiag_norm(reverse_hcat(A)))
     end
 
     while flag
@@ -82,7 +82,7 @@ function jdiag_cardoso(
         end
 
         if plot_convergence
-            push!(error_array, frobenius_offdiag_norm(A))
+            push!(error_array, frobenius_offdiag_norm(reverse_hcat(A)))
         end
     end
     
@@ -90,20 +90,26 @@ function jdiag_cardoso(
 end
 
 # generating test matrices which are positive definite and symmetric
-function generate_psd_matrix(n::Int)
+#function generate_psd_matrix(n::Int)
     """
     生成一个 n x n 的随机正定对称矩阵
     generate one nxn positive symmetric matrix
     """
-    A = randn(n, n)  # 随机矩阵 a random matrix
-    return A * A'    # 保证对称性和正定性 return A*A^T to garentee symmetric and positive definite
-end
+#    A = randn(n, n)  # 随机矩阵 a random matrix
+#    return A * A'    # 保证对称性和正定性 return A*A^T to garentee symmetric and positive definite
+#end
 
-function generate_stacked_psd_matrices(n::Int, count::Int)
+#function generate_stacked_psd_matrices(n::Int, count::Int)
     """
     生成 count 个 n x n 的随机正定对称矩阵，并将它们拼接成一个 n x (n * count) 的大矩阵
     generate count-mal n x n positive definite matrices by casting them together
     """
-    psd_matrices = [generate_psd_matrix(n) for _ in 1:count]  # 生成矩阵列表
-    return hcat(psd_matrices...)  # 按列拼接
+#    psd_matrices = [generate_psd_matrix(n) for _ in 1:count]  # 生成矩阵列表
+#    return hcat(psd_matrices...)  # 按列拼接
+#end
+
+function reverse_hcat(A)
+    n_dim = size(A, 1)
+    n_matrix = size(A, 2)
+    return cat([reshape(A, n_dim, n_dim, n_matrix ÷ n_dim)[:, :, index] for index in 1:n_matrix ÷ n_dim]..., dims=3)
 end
