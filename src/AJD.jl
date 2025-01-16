@@ -69,7 +69,9 @@ function diagonalize(
 
     else
         # If no vaild algorithm selected, throw an error.
-        throw(ArgumentError("No valid algorithm selected."))
+        throw(ArgumentError(
+            "No valid algorithm selected. Available options:" * join(AJD.ALL_ALGORITHMS, ", ")
+        ))
     end
 
     # Plotting output if so selected by the user.
