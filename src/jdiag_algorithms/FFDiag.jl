@@ -34,7 +34,7 @@ function FFD!(
     
     error_array = [] 
     if plot_convergence
-        push!(error_array, off_diag_norm(A))
+        push!(error_array, frobenius_offdiag_norm(A))
     end
 
     #while active == true && iteration_step <= max_iter
@@ -72,7 +72,7 @@ function FFD!(
         iteration_step += 1
 
         if plot_convergence
-            push!(error_array, off_diag_norm(A))
+            push!(error_array, frobenius_offdiag_norm(A))
         end
     end
     return Matrix(V'), A, error_array
