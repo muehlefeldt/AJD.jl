@@ -36,11 +36,13 @@ accepted_error = 0.1
     F, B, error_array = AJD.jdiag_edourdpineau(test_input)
     @test typeof(AJD.plot_convergence_lineplot(error_array, "test")) <: Plot
     @test typeof(AJD.plot_matrix_heatmap(F, B)) <: Plot
+    @test length(error_array) > 2
     
     # Directly test plot functions to generate lineplot and heatmaps.
     # For now only the return type can be checked.
     test_input = AJD.random_normal_commuting_matrices(10, 6)
-    F, B, error_array = AJD.jdiag_cardoso(test_input, 1e-6)
+    F, B, error_array = AJD.jdiag_cardoso(test_input, 1e-6, plot_convergence=true)
     @test typeof(AJD.plot_convergence_lineplot(error_array, "test")) <: Plot
     @test typeof(AJD.plot_matrix_heatmap(F, B)) <: Plot
+    @test length(error_array) > 2
 end
