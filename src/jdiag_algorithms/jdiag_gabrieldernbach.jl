@@ -26,9 +26,7 @@ function jdiag_gabrieldernbach!(
 
     error_array = [] 
     if plot_convergence
-        x = random_commuting_matrices(2, 5)
-        t = frobenius_offdiag_norm(A)
-        push!(error_array, t)
+        push!(error_array, frobenius_offdiag_norm(A))
     end
 
     #initialize the approximate joint eigenvecotrs as described in Cardoso
@@ -79,8 +77,7 @@ function jdiag_gabrieldernbach!(
         end 
 
         if plot_convergence
-            t = frobenius_offdiag_norm(A)
-            push!(error_array, t)
+            push!(error_array, frobenius_offdiag_norm(A))
         end
 
         iteration_step += 1
