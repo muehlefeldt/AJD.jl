@@ -13,7 +13,7 @@ accepted_error = 1e-6
 
 # Base testset with real matrices.
 @testset "Nondiagonality" begin
-    for name in ["jdiag_gabrieldernbach" ,"jdiag_edourdpineau", "FFD"]
+    for name in AJD.ALL_ALGORITHMS
         test_input = AJD.random_normal_commuting_matrices(10, 6)
         result = diagonalize(test_input, algorithm=name)
         # Cardoso implementation shows very high error level.
@@ -40,7 +40,7 @@ end
 
 # Test the algorithms with a single matrix as input.
 @testset "Nondiagonality Single Matrix" begin
-    for name in ["jdiag_gabrieldernbach", "jdiag_cardoso", "jdiag_edourdpineau"]
+    for name in AJD.ALL_ALGORITHMS
         test_input = AJD.random_normal_commuting_matrices(10, 1)
         result = diagonalize(test_input, algorithm=name)
         # TODO: Cardoso implementation shows very high error level.
@@ -55,7 +55,7 @@ end
 # Test nonDiagonality of complex inputs.
 @testset "Nondiagonality Complex" begin
     # Select algorithms supporting complex matrices.
-    for name in ["jdiag_edourdpineau", "jdiag_gabrieldernbach"]
+    for name in AJD.COMLPLEX_ALGORITHMS
         # Generate complex test input and calculate filter.
         test_input = AJD.random_normal_commuting_matrices(6, 6; complex=true)
         result = diagonalize(test_input, algorithm=name)
@@ -63,7 +63,7 @@ end
     end
 
     # Tests to check combination of real and complex matrices.
-    for name in ["jdiag_edourdpineau", "jdiag_gabrieldernbach"]
+    for name in AJD.COMLPLEX_ALGORITHMS
         #A = AJD.random_normal_commuting_matrices(10, 6)
         #B = AJD.random_normal_commuting_matrices(10, 1; complex=true)
         #test_input = [A..., B...]
