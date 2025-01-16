@@ -27,7 +27,7 @@ function jdiag_gabrieldernbach!(
     error_array = [] 
     if plot_convergence
         x = random_commuting_matrices(2, 5)
-        t = off_diag_norm(A)
+        t = frobenius_offdiag_norm(A)
         push!(error_array, t)
     end
 
@@ -79,7 +79,7 @@ function jdiag_gabrieldernbach!(
         end 
 
         if plot_convergence
-            t = off_diag_norm(A)
+            t = frobenius_offdiag_norm(A)
             push!(error_array, t)
         end
 
@@ -114,7 +114,7 @@ function jdiag_gabrieldernbach!(
     # Track error if plot_convergence is selected.
     error_array = [] 
     if plot_convergence
-        push!(error_array, off_diag_norm(A))
+        push!(error_array, frobenius_offdiag_norm(A))
     end
 
     while iteration_step <= max_iter && active == true
@@ -173,7 +173,7 @@ function jdiag_gabrieldernbach!(
 
         # Add error at the end of the iteration to track error convergence.
         if plot_convergence
-            push!(error_array, off_diag_norm(A))
+            push!(error_array, frobenius_offdiag_norm(A))
         end
 
     end
