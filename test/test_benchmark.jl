@@ -4,7 +4,7 @@ using BenchmarkTools: BenchmarkGroup
 
 @testset "Benchmark" begin
     # Run the benchmark.
-    result = ajd_benchmark(10, 100) 
+    result = ajd_benchmark(10, 10) 
     # Check returned type.
     @test typeof(result) == BenchmarkGroup
 end

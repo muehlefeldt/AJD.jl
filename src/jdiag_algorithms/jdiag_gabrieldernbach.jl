@@ -1,5 +1,3 @@
-# utils_path = pkgdir(AJD,"src","utils.jl" )
-# include(utils_path)
 """
     (1) jdiag_gabrieldernbach(A::Vector{Matrix{Float64}}; threshold = eps(), max_iter = 1000)
 
@@ -13,14 +11,23 @@ JDiag algorithm for complex matrices based on the implementation by Gabrieldernb
     of https://github.com/edouardpineau/Time-Series-ICA-with-SOBI-Jacobi.
 
 """
-function jdiag_gabrieldernbach!(A::Vector{M}; threshold = eps(), max_iter = 1000) where {T<:Real, M<:AbstractMatrix{T}}
+function jdiag_gabrieldernbach!(
+        A::Vector{M};
+        threshold::AbstractFloat = eps(),
+        max_iter = 1000,
+        plot_convergence::Bool = false) where {T<:Real, M<:AbstractMatrix{T}}
     
     if typeof(A) <: AbstractArray{<:AbstractArray{<:Int}}
         A = float.(A)
     end
-
+    
     A = cat(A...,dims = 3) #convert to 3 dimensional matrix and concatenate in the third dimension
     rows, columns, k = size(A)
+
+    error_array = [] 
+    if plot_convergence
+        push!(error_array, frobenius_offdiag_norm(A))
+    end
 
     #initialize the approximate joint eigenvecotrs as described in Cardoso
     V = Matrix((1.0)*I(rows)) 
@@ -69,15 +76,23 @@ function jdiag_gabrieldernbach!(A::Vector{M}; threshold = eps(), max_iter = 1000
             end
         end 
 
+        if plot_convergence
+            push!(error_array, frobenius_offdiag_norm(A))
+        end
+
         iteration_step += 1
-    
     end
     
-    return  A,V
+    # Return of the filter, diagonalized matrices and the convergence error (optional).
+    return V, A, error_array
 
 end
 
-function jdiag_gabrieldernbach!(A::Vector{M}; threshold = eps(), max_iter = 1000) where {T<:Complex, M<:AbstractMatrix{T}}
+function jdiag_gabrieldernbach!(
+    A::Vector{M};
+    threshold = eps(),
+    max_iter = 1000,
+    plot_convergence::Bool = false) where {T<:Complex, M<:AbstractMatrix{T}}
     
     A = cat(A...,dims = 3)
     rows, columns, k = size(A)
@@ -91,6 +106,13 @@ function jdiag_gabrieldernbach!(A::Vector{M}; threshold = eps(), max_iter = 1000
     #conditions for abortion initialized
     iteration_step = 0
     active = true
+
+    # Make sure empty error array exists even if not tracked.
+    # Track error if plot_convergence is selected.
+    error_array = [] 
+    if plot_convergence
+        push!(error_array, frobenius_offdiag_norm(A))
+    end
 
     while iteration_step <= max_iter && active == true
         
@@ -145,8 +167,16 @@ function jdiag_gabrieldernbach!(A::Vector{M}; threshold = eps(), max_iter = 1000
 
         objective_function = objective_function_new
         iteration_step += 1
+
+        # Add error at the end of the iteration to track error convergence.
+        if plot_convergence
+            push!(error_array, frobenius_offdiag_norm(A))
+        end
+
     end
-    return A,V
+
+    # Return of the filter, diagonalized matrices and the convergence error (optional).
+    return V, A, error_array
 
 end
 

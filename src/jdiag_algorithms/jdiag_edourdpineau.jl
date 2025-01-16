@@ -14,6 +14,7 @@ function rotation(aii::Array{T}, ajj::Array{T}, aij::Array{T}, aji::Array{T})::M
     return [c conj(s); -s conj(c)]
 end
 
+
 function rotation_symmetric(aii::Array{T}, ajj::Array{T}, aij::Array{T})::Matrix{Real} where {T<:Union{Real,Complex}}
     h = hcat(aii .- ajj, 2.0 .* aij)
     G = real(h' * h)
