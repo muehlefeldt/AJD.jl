@@ -13,7 +13,7 @@ JDiag algorithm for complex matrices based on the implementation by Gabrieldernb
     of https://github.com/edouardpineau/Time-Series-ICA-with-SOBI-Jacobi.
 
 """
-function jdiag_gabrieldernbach!(A::Vector{M}; threshold = eps(), max_iter = 1000) where {T<:Real, M<:AbstractMatrix{T}}
+function jdiag_gabrieldernbach!(A::Vector{M}; threshold = eps(), max_iter = 1000, convergence_value = true) where {T<:Real, M<:AbstractMatrix{T}}
     
     if typeof(A) <: AbstractArray{<:AbstractArray{<:Int}}
         A = float.(A)
@@ -52,7 +52,6 @@ function jdiag_gabrieldernbach!(A::Vector{M}; threshold = eps(), max_iter = 1000
                 #(or max iter is reached)
                 # otherwise rotation is applied to matrix
                 active = active || abs(s) > threshold
-                
                 if abs(s) > threshold
 
                     pair = [row, column]
@@ -118,20 +117,17 @@ function jdiag_gabrieldernbach!(A::Vector{M}; threshold = eps(), max_iter = 1000
                         G = real(adjoint(transpose(h[k,:]))*transpose(h[k,:]))
                     end
                 end
-                #@info typeof(G)
+                
                 R = Jacobi_Rotation(G)
                 pair = [row,column]
                 #A[:,pair,n] = transpose(R*transpose(A[:,pair,n]))
                 #A[pair,:,n] = R*A[pair,:,n]
-                for k_index = 1:k
-                    #might not be correct, maybe use the matrix and multiply like in the python code
-                    #A[[row,column],[row,column],k_index] = R*A[[row,column],[row,column],k_index]*adjoint(R) 
-                    
-                    A[:,pair,k_index] = transpose(R*transpose(A[:,pair,k_index]))
+                for k_index = 1:k                                       
+                    A[:,pair,k_index] = A[:,pair,k_index]*R'
                     A[pair,:,k_index] = R*A[pair,:,k_index]
                 end
-                V[:,[row,column]] = transpose(R*transpose(V[:,[row,column]]))
-                #V[:,[row,column]] = V[:,[row,column]]*R'
+                
+                V[:,[row,column]] = V[:,[row,column]]*R'
             end
         
         end

@@ -41,11 +41,11 @@ function random_normal_commuting_matrices(n::Int, m::Int; complex::Bool=false)
     # Just like the function below, this produces hermitian an symmetric matrices, they are
     # just not annotated as such
     # Q, _ = qr(rand(complex ? ComplexF64 : Float64, n,n))
-    Q, _ = qr(rand(n,n))
+    Q, _ = qr(rand(complex ? ComplexF64 : Float64, n,n))
     Q = Matrix(Q)
-    if complex
-        return [Q*Diagonal(rand(ComplexF64, n))*Q' for _ in 1:m]
-    end
+    # if complex
+    #     return [Q*Diagonal(rand(ComplexF64, n))*Q' for _ in 1:m]
+    # end
     return [Q*Diagonal(rand(n))*Q' for _ in 1:m]
 end
 
@@ -77,14 +77,13 @@ function create_linear_filter(A::Matrix{T} where {T<:Number})
 end
 
 """
-    function frobenius_offdiag_norm(A::AbstractArray{T,3})::Real where {T<:Number}
+    frobenius_offdiag_norm(A::AbstractArray{T,3})::Real where {T<:Number}
 Input
 * A: Vector of matrices
 
-Takes an array namely the Array of matrices A_k and gets the offdiagonal elements and applies the frobenius norm (∑ |a_{i,j}|^{2}). 
+Takes an array namely the Array of matrices A_k and gets the offdiagonal elements and applies the frobenius norm (``\\sum |a_{i,j}|^{2}``). 
 """
 function frobenius_offdiag_norm(A::AbstractArray{T,3})::Real where {T<:Number}
-    
     norm = zero(real(T))
     for row in axes(A, 1), column in axes(A, 2), k in axes(A, 3)
         row == column && continue
@@ -121,10 +120,9 @@ julia> AJD.get_offdiag_elements(A)
  1.0  1.0  0.0```
 """
 function get_offdiag_elements(A::Array{<:Number,3})
-    rows,_ = size(A)
     #copy matrix A to not overwrite it with zeros
     E = copy(A)
-    for row in 1:rows # maybe eachindex better - NG
+    for row in axes(E,1) # maybe eachindex better - NG
         E[row,row,:] .= 0 
     end
     return E
@@ -159,19 +157,15 @@ julia> AJD.get_diag_elements(A)
  0.0  0.0  1.0```
 """
 function get_diag_elements(A::Array)
-
-    rows, columns, k = size(A)
-
+    rows,columns,k = size(A)
     if typeof(A) <: AbstractArray{<:Complex}
         D = complex.(zeros(rows, columns, k))
     else
         D = zeros(rows, columns, k)
     end
-
     for row in 1:rows
         D[row,row,:] = A[row,row,:]
     end
-
     return D
 end
 
@@ -192,13 +186,11 @@ end
 
 function sort_offdiag_elements(A::AbstractArray{<:Number,2})
     rows,_ = size(A)
-
     if typeof(A) <: AbstractArray{<:Complex}
         sorted_array = complex.(zeros(rows*rows-rows))
     else
         sorted_array = zeros(rows*rows-rows)
     end
-   
     i = 1
     for row in 1:rows-1,column in row+1:rows
         #TODO: Benchmark if append! or push! is faster
@@ -240,18 +232,14 @@ Input:
 * A: AbstractMatrix
 
 Used for the FFDiag Algorithm to define whether the Matrix A is strictly diagonally dominant and therefore has an Inverse or not.
-A matrix is strictly dominant if:```|a_{ii}| > \\sum |a_{ij}|, i ≠ j```
+A matrix is strictly dominant if:``|a_{ii}| > \\sum |a_{ij}|, i ≠ j``
 """
 function isstrictly_diagonally_dominant(A::AbstractMatrix)
     for i in eachindex(A[1:end, 1])
-         
         if abs(sum(A[i,:])) - abs(A[i,i]) > abs(A[i,i]) ? true : false
-            
             return false
-
         end
     end
-
     return true
 end
 """
@@ -260,8 +248,8 @@ Input
 * D: Diagonal Matrix with offdiagonal elements set to zero
 * i,j: Denotes the indexes the matrix D
 
-Calculates the factor ```z_ij``` which is defined by:
-``` ∑_{k} D_{i,i}^{k}D_{j,j}^{k} ```
+Calculates the factor ``z_ij`` which is defined by:
+`` ∑_{k} D_{i,i}^{k}D_{j,j}^{k} ``
 """
 function get_z_fdiag(D::AbstractArray{<:Number}, i::Int, j::Int)
     return sum(D[i,i,:].*D[j,j,:])
@@ -273,8 +261,8 @@ Input
 * E: Diagonal Matrix with diagonal elements set to zero
 * i,j: Denotes the indexes of the matrices D and E
 
-Calculates the factor ```y_ij``` which is defined by:
-```math ∑_{k} D_{j,j}^{k}E_{j,i}^{k} ```
+Calculates the factor ``y_ij`` which is defined by:
+`` ∑_{k} D_{j,j}^{k}E_{j,i}^{k} ``
 """
 function get_y_fdiag(D::AbstractArray{<:Number}, E::AbstractArray{<:Number}, i::Int,j::Int)
     return sum(D[j,j,:].*E[i,j,:])
@@ -326,4 +314,28 @@ function addrandomnoise!(A::Vector{M};σ = 0.5,same_noise = true) where {T<:Numb
         end
     end
     return A
+end
+
+function generate_correlation_matrix(signal_data::AbstractArray{<:Function}; 
+    τ<:Number = 1, measurement_time<:Number = 10, 
+    mixing_matrix::AbstractArray{<:Number,2} = ones(length(signal_data),
+    length(signal_data)))
+    #A = mixing matrix
+
+    rows, columns = size(mixing_matrix)
+   
+    total_length_set = floor(Int,measurement_time/τ)
+    x = zeros(rows,total_length_set)
+    C = zeros(rows, rows,total_length_set)
+    for k = 0:total_length_set-1
+        for row in 1:rows
+            for column in 1:columns
+                x[row,k+1] += mixing_matrix[row,column]*signal_data[column](k*τ)
+            end
+            if k > 0
+                C[:,:,k] = cor(hcat(x[:,k],x[:,k+1]))
+            end
+        end
+    end    
+    
 end
