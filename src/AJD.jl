@@ -20,7 +20,9 @@ include("global_constants.jl")
         A::Vector{<:AbstractMatrix{<:Number}};
         algorithm::String = "jdiag_gabrieldernbach",
         max_iter::Int = 1000,
-        threshold::AbstractFloat = eps()
+        threshold::AbstractFloat = eps(),
+        plot_matrix::Bool = false,
+        plot_convergence::Bool = false
         )
 
 Calculate joint diagonalization of multiple input matrices using the requested algorithms.
