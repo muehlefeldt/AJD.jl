@@ -54,17 +54,13 @@ function diagonalize(
 
     elseif algorithm == "jdiag_cardoso"
         if typeof(A) <: AbstractArray{<:AbstractArray{<:Real}} 
-            F, B, error_array = jdiag_cardoso(A, threshold)
+            F, B, error_array = jdiag_cardoso(A, threshold, plot_convergence = plot_convergence)
         else
             throw(ArgumentError("Not supported for set of Matrices containing imaginary values!"))
         end
 
     elseif algorithm in ["FFD", "ffd", "ffdiag"]
-        F, B, error_array = FFD!(A)
-
-        # TODO Advise on the use of Matrix() here. I got strange types returned otherwise.
-        #F = Matrix(F') # F' due to some FFDiag properties. 
-        #F = F'
+        F, B, error_array = FFD!(A, plot_convergence=plot_convergence)
 
     else
         # If no vaild algorithm selected, throw an error.
