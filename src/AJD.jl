@@ -60,11 +60,16 @@ function diagonalize(
         end
 
     elseif algorithm in ["FFD", "ffd", "ffdiag"]
-        F, B, error_array = FFD!(A, plot_convergence=plot_convergence)
+        F, B, error_array = FFD!(
+            A,
+            threshold=threshold,
+            max_iter=max_iter,
+            plot_convergence=plot_convergence
+        )
 
     else
         # If no vaild algorithm selected, throw an error.
-        throw(ArgumentError("No valid algorithm selected from available"))
+        throw(ArgumentError("No valid algorithm selected."))
     end
 
     # Plotting output if so selected by the user.
