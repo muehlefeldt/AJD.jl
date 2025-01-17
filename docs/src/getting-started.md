@@ -3,24 +3,24 @@ CurrentModule = AJD
 ```
 
 # Getting Started Guide
-This guide provides information on implemented algorithms and 
+This guide provides information on the basic usage of the AJD.jl package.
 
 ## Installation
 To install the Package follow these instructions to add the package to a basic Julia environment or use the package in a Pluto notebook.
 
 ### Julia
-Create temporary environment:
-```
+Create temporary environment in the [Julia REPL](https://docs.julialang.org/en/v1/stdlib/REPL/):
+```julia
 ] activate --temp
 ```
 Add the package:
-```
+```julia
 ] add https://github.com/muehlefeldt/AJD.jl
 ```
 
 ### Pluto
-The use in Pluto notebooks is supported. Add the package in one cell of the notebook:
-```
+The use in [Pluto notebooks](https://plutojl.org/) is supported. Add the package in one cell of the notebook:
+```julia
 begin
     using Pkg
     Pkg.activate("MyTestEnv")
