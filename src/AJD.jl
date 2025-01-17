@@ -82,12 +82,12 @@ function diagonalize(
     # Plotting output if so selected by the user.
     if plot_matrix
         # Illustrate Filter and diagonlised matrices.
-        display(plot_matrix_heatmap(F, B))
+        plot_matrix_heatmap(F, B)
     end
 
     if plot_convergence
         # Show convergence of the error.
-        display(plot_convergence_lineplot(error_array, algorithm))
+        plot_convergence_lineplot(error_array, algorithm)
     end
 
     return create_linear_filter(F)
