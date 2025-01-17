@@ -45,7 +45,7 @@ function diagonalize(
     threshold::AbstractFloat = eps(),
     plot_matrix::Bool = false,
     plot_convergence::Bool = false
-    )
+    )::LinearFilter
 
     if !check_input(A)
         throw(ArgumentError("Invalid input."))
