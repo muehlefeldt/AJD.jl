@@ -48,12 +48,8 @@ function diagonalize(
     #plot_convergence::Bool = false
     )::LinearFilter
 
-    if !check_input(A)
-        throw(ArgumentError("Invalid input."))
-    end
     F, _, _ = get_diagonalization(A, algorithm=algorithm, max_iter=max_iter, threshold=threshold)
-    return create_linear_filter(F)
-    
+    return create_linear_filter(F) 
 end
 
 function diagonalize(
