@@ -303,7 +303,7 @@ function addrandomnoise!(A::Vector{M};σ = 0.5,same_noise = true) where {T<:Numb
     k = length(A)
     rows,columns = size(A[1])
     if same_noise == true
-        R = randn(rows,columns)
+        R = randn(rows,columns) #noise matrix
         for index_k = 1:k
             A[index_k] = A[index_k] + σ*R*R'
         end
@@ -316,26 +316,63 @@ function addrandomnoise!(A::Vector{M};σ = 0.5,same_noise = true) where {T<:Numb
     return A
 end
 
-function generate_correlation_matrix(signal_data::AbstractArray{<:Function}; 
-    τ<:Number = 1, measurement_time<:Number = 10, 
-    mixing_matrix::AbstractArray{<:Number,2} = ones(length(signal_data),
-    length(signal_data)))
-    #A = mixing matrix
+#τ<:Number = 1, measurement_length<:Number = 10, no_of_meas<:Int = 10,
+#mixing_matrix::AbstractArray{<:Number,2} = ones(length(signal_data),
+#length(signal_data))
+function generate_correlation_matrix(signal_one_data,signal_two_data)
+    if size(signal_one_data) != size(signal_two_data)
+        throw(ArgumentError("Signals have different sizes!"))
+    end
+    rows,_ = size(signal_one_data)
+    C = zeros(rows,rows)
+    for row in 1:rows, column in 1:rows
+        C[row,column] = cor(signal_one_data[row,:],signal_two_data[column,:])
+        @info signal_one_data[row,:],signal_two_data[column,:]
+    end
+    return C
+end
 
-    rows, columns = size(mixing_matrix)
-   
-    total_length_set = floor(Int,measurement_time/τ)
-    x = zeros(rows,total_length_set)
-    C = zeros(rows, rows,total_length_set)
-    for k = 0:total_length_set-1
-        for row in 1:rows
-            for column in 1:columns
-                x[row,k+1] += mixing_matrix[row,column]*signal_data[column](k*τ)
-            end
-            if k > 0
-                C[:,:,k] = cor(hcat(x[:,k],x[:,k+1]))
+function generate_testdata(signal_sources::AbstractArray{<:Function}, mixing_matrix::AbstractMatrix{<:Number}; 
+    delay::Number = 1; sample_time::Number = 10, 
+    no_of_samples = 100, no_of_cor = 10)
+
+    rows,columns = size(mixing_matrix)
+    if columns != length(signal_sources)
+        throw(ArgumentError("Signal source array and mixing matrix have different dimensions."))
+    end
+    C = zeros(rows,rows,no_of_cor)
+    for k in 0:no_of_cor-1
+        x = zeros(rows,no_of_samples)
+        x_delay = zeros(rows,no_of_samples)
+        for row in 1:rows # axes won't work on Array of Functions
+            for source in 1:length(signal_sources)
+                #needs to be done since broadcasting on vector of anonymous functions doesn't seem to work
+                #tried invoke and .|> but couldn't get it to work which is why iteration is necessary
+
+                x[row,:] = x[row,:] + mixing_matrix[row,source]*signal_sources[source].(range(k*sample_time+1,(k+1)*sample_time,length = no_of_samples))
+
+                x_delay[row,:] = x_delay[row,:] + mixing_matrix[row,source]*signal_sources[source].(range((k*sample_time+1+delay),(k+1)*sample_time+delay, length = no_of_samples))
             end
         end
-    end    
-    
+        C[:,:,k] = generate_correlation_matrix(x,x_delay)
+    end
+    return C
 end
+#     total_length_set = floor(Int,measurement_time/τ)
+#     x = zeros(rows,total_length_set)
+#     C = zeros(rows, rows,total_length_set)
+#     for k = 0:total_length_set-1
+#         for row in 1:rows
+#             for column in 1:columns
+#                 x[row,k+1] += mixing_matrix[row,column]*signal_data[column](k*τ)
+#             end
+#         end
+#         if k > 0
+#                 C[:,:,k] = cor(hcat(x[:,k],x[:,k+1]))
+#             end
+#     end    
+#     C[i,j,k] = 
+#     Cii = cov(xi,xi)/(var(xi)*var(xi))
+
+#     es is nur eine korrelation!!!! mehr is es nicht und die is gegeben als 
+# end
