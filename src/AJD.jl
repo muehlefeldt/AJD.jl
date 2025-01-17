@@ -1,6 +1,7 @@
 module AJD 
 using LinearAlgebra
 using BenchmarkTools
+using Plots: Plot
 
 # Import different algorithms.
 include("jdiag_algorithms/jdiag_cardoso.jl")
@@ -43,54 +44,36 @@ function diagonalize(
     algorithm::String = "jdiag_gabrieldernbach",
     max_iter::Int = 1000,
     threshold::AbstractFloat = eps(),
-    plot_matrix::Bool = false,
-    plot_convergence::Bool = false
+    #plot_matrix::Bool = false,
+    #plot_convergence::Bool = false
     )::LinearFilter
 
     if !check_input(A)
         throw(ArgumentError("Invalid input."))
     end
-
-    if algorithm in ["jdiag", "jdiag_gabrieldernbach"]
-        F, B, error_array = jdiag_gabrieldernbach!(A, max_iter = max_iter, threshold = threshold, plot_convergence = plot_convergence)
-
-    elseif algorithm == "jdiag_edourdpineau"
-        F, B, error_array = jdiag_edourdpineau(A, iter = max_iter)
-
-    elseif algorithm == "jdiag_cardoso"
-        if typeof(A) <: AbstractArray{<:AbstractArray{<:Real}} 
-            F, B, error_array = jdiag_cardoso(A, threshold, plot_convergence = plot_convergence)
-        else
-            throw(ArgumentError("Not supported for set of Matrices containing imaginary values!"))
-        end
-
-    elseif algorithm in ["FFD", "ffd", "ffdiag"]
-        F, B, error_array = FFD!(
-            A,
-            threshold=threshold,
-            max_iter=max_iter,
-            plot_convergence=plot_convergence
-        )
-
-    else
-        # If no vaild algorithm selected, throw an error.
-        throw(ArgumentError(
-            "No valid algorithm selected. Available options:" * join(AJD.ALL_ALGORITHMS, ", ")
-        ))
-    end
-
-    # Plotting output if so selected by the user.
-    if plot_matrix
-        # Illustrate Filter and diagonlised matrices.
-        plot_matrix_heatmap(F, B)
-    end
-
-    if plot_convergence
-        # Show convergence of the error.
-        plot_convergence_lineplot(error_array, algorithm)
-    end
-
+    F, _, _ = get_diagonalization(A, algorithm=algorithm, max_iter=max_iter, threshold=threshold)
     return create_linear_filter(F)
+    
+end
+
+function diagonalize(
+    A::Vector{<:AbstractMatrix{<:Number}},
+    only_plot::Symbol;
+    algorithm::String = "jdiag_gabrieldernbach",
+    max_iter::Int = 1000,
+    threshold::AbstractFloat = eps(),
+    #only_plot::Bool = false
+    #plot_matrix::Bool = false,
+    #plot_convergence::Bool = false
+    )::Plot
+
+    if only_plot == :plot
+        F, B, error_array = get_diagonalization(A, algorithm=algorithm, max_iter=max_iter, threshold=threshold)
+        p = plot_matrix_heatmap(F, B)
+    else
+        throw(ArgumentError("Please use symbol :plot to generate plots."))
+    end
+    return p
 end
 
 """

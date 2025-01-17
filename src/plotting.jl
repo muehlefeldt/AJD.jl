@@ -1,4 +1,5 @@
 using Plots
+#using PlutoPlotly
 
 """
     plot_matrix_heatmap(filter::AbstractMatrix, diag_matrices::AbstractMatrix) 
@@ -27,6 +28,8 @@ end
 Plot the convergence error as recorded during the algorithm execution.
 """
 function plot_convergence_lineplot(error_array::AbstractArray, name::String)
-    theme(:dark)
-    return plot(error_array, w=3, title="Error Convergence", label=name)
+    #plotlyjs()
+    #theme(:dark)
+    #return plot(error_array, w=3, title="Error Convergence", label=name)
+    plot(error_array, w=3, title="Error Convergence", label=name)
 end

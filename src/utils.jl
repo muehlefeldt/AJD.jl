@@ -328,3 +328,52 @@ function addrandomnoise!(A::Vector{M};σ = 0.5,same_noise = true) where {T<:Numb
     end
     return A
 end
+
+function get_diagonalization(
+    A::Vector{<:AbstractMatrix{<:Number}};
+    algorithm::String = "jdiag_gabrieldernbach",
+    max_iter::Int = 1000,
+    threshold::AbstractFloat = eps()
+    )
+    
+
+    if algorithm in ["jdiag", "jdiag_gabrieldernbach"]
+        F, B, error_array = jdiag_gabrieldernbach!(A, max_iter = max_iter, threshold = threshold)
+
+    elseif algorithm == "jdiag_edourdpineau"
+        F, B, error_array = jdiag_edourdpineau(A, iter = max_iter)
+
+    elseif algorithm == "jdiag_cardoso"
+        if typeof(A) <: AbstractArray{<:AbstractArray{<:Real}} 
+            F, B, error_array = jdiag_cardoso(A, threshold)
+        else
+            throw(ArgumentError("Not supported for set of Matrices containing imaginary values!"))
+        end
+
+    elseif algorithm in ["FFD", "ffd", "ffdiag"]
+        F, B, error_array = FFD!(
+            A,
+            threshold=threshold,
+            max_iter=max_iter,
+        )
+
+    else
+        # If no vaild algorithm selected, throw an error.
+        throw(ArgumentError(
+            "No valid algorithm selected. Available options:" * join(AJD.ALL_ALGORITHMS, ", ")
+        ))
+    end
+
+    # Plotting output if so selected by the user.
+    #if plot_matrix
+        # Illustrate Filter and diagonlised matrices.
+        #plot_matrix_heatmap(F, B)
+    #end
+
+    #if plot_convergence
+        # Show convergence of the error.
+    #    display(plot_convergence_lineplot(error_array, algorithm))
+    #end
+
+    return F, B, error_array
+end
