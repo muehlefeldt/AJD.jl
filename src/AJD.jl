@@ -20,18 +20,23 @@ include("global_constants.jl")
         A::Vector{<:AbstractMatrix{<:Number}};
         algorithm::String = "jdiag_gabrieldernbach",
         max_iter::Int = 1000,
-        threshold::AbstractFloat = eps()
+        threshold::AbstractFloat = eps(),
+        plot_matrix::Bool = false,
+        plot_convergence::Bool = false
         )
 
-Calculate joint diagonalization of multiple input matrices using the requested algorithms.
+Calculate joint diagonalization of multiple input matrices ``M_k``.
 
 Main function of the AJD package.
-Implemented algorithms at this point in time are limited to the [JDiag algorithm](https://doi.org/10.1137/S0895479893259546)  in different versions.
-Input of matrices to be diagonalized need to be a vector of matrices.
-The matrices can be of types Float64 or Complex. Limitations of the different implementations apply.
+Implemented algorithms are [JDiag](https://doi.org/10.1137/S0895479893259546) and FFDiag.
+Input of matrices ``M_k`` need to be a vector of matrices.
+The matrices can be of types Float64 or Complex.
 
 Supported algorithms are `jdiag_gabrieldernbach`, `jdiag_cardoso` and `jdiag_edourdpineau`.
-See the Getting Started Guide for information on the algorithms.
+See the Getting Started Guide for information on the algorithms. Test
+
+``M_k``.
+
 """
 function diagonalize(
     A::Vector{<:AbstractMatrix{<:Number}};
@@ -40,7 +45,7 @@ function diagonalize(
     threshold::AbstractFloat = eps(),
     plot_matrix::Bool = false,
     plot_convergence::Bool = false
-    )
+    )::LinearFilter
 
     if !check_input(A)
         throw(ArgumentError("Invalid input."))
@@ -77,12 +82,12 @@ function diagonalize(
     # Plotting output if so selected by the user.
     if plot_matrix
         # Illustrate Filter and diagonlised matrices.
-        display(plot_matrix_heatmap(F, B))
+        plot_matrix_heatmap(F, B)
     end
 
     if plot_convergence
         # Show convergence of the error.
-        display(plot_convergence_lineplot(error_array, algorithm))
+        plot_convergence_lineplot(error_array, algorithm)
     end
 
     return create_linear_filter(F)
