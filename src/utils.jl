@@ -249,8 +249,7 @@ Input
 * D: Diagonal Matrix with offdiagonal elements set to zero
 * i,j: Denotes the indexes the matrix D
 
-Calculates the factor ``z_ij`` which is defined by:
-`` ∑_{k} D_{i,i}^{k}D_{j,j}^{k} ``
+Calculates the factor ``z_ij`` which is defined by: `` ∑_{k} D_{i,i}^{k}D_{j,j}^{k} ``
 """
 function get_z_fdiag(D::AbstractArray{<:Number}, i::Int, j::Int)
     return sum(D[i,i,:].*D[j,j,:])
@@ -380,6 +379,49 @@ function generate_testdata(signal_sources::AbstractArray{<:Function}, mixing_mat
             end
         end
         C[:,:,k+1] = generate_correlation_matrix(x,x_delay)
+    end
+    return C
+end
+"""
+    generate_testdata(signal_sources::Array{<:Array}; delay::Number = 10, no_of_segments::Int = 10)
+* signal_sources: 1D-Array of column vectors defined by (``x_1 , x_2, ..., x_n``)
+* delay: Time/index shift between observations to be correlated
+* no_of:segments: Number of correlation matrices - 1 to be calculated. Puts signal_sources into even segments to be correlated. If the number leads to uneven correlation will throw an error. 
+
+Generate Correlation Matrices for discrete observations ``x_i``.
+"""
+function generate_testdata(signal_sources::Array{<:Array}; 
+    delay::Number = 10, no_of_segments::Int = 10)
+    
+    
+    
+    #initialize the matrix to be diagonalized
+    x = cat(signal_sources..., dims = 1)
+    # in case not all the vectors are column vectors
+    try
+        rows,columns = size(x) 
+    catch
+        x = cat(signal_sources'..., dims = 1)
+    end
+    # if signal has length 100 and delay would be 99 there wouldn't be any data after observation 100 to correlate
+    if columns/delay < 2
+        throw(ArgumentError("Delay too big. Length of signals divided by delay less than 2. Delay shift would lead to array entry for non existent data."))
+    end
+    
+    C = zeros(rows,rows,no_of_segments-1)
+    segmentation = columns/no_of_segments
+    #in case segmentation leads to uneven segments i.e. 200 points and 3 segments -> last observation wouldn't be considered since index will be 66
+    if isinteger(segmentation)
+        segmentation = Int(segmentation)
+    else
+        throw(ArgumentError("Number of Segments leads to segments of different sizes!"))
+    end
+    for k in 1:no_of_segments-1
+        
+        x_new = x[:,(k-1)*segmentation+1:k*segmentation]
+        x_delay = x[:,(k-1)*segmentation+1+delay:k*segmentation+delay]
+        
+        C[:,:,k] = generate_correlation_matrix(x_new,x_delay)
     end
     return C
 end
