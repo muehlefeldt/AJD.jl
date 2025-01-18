@@ -1,5 +1,6 @@
 using LinearAlgebra
 using Diagonalizations
+using Statistics: cor
 
 """
     random_matrices(n::Int, m::Int)
@@ -316,32 +317,54 @@ function addrandomnoise!(A::Vector{M};σ = 0.5,same_noise = true) where {T<:Numb
     return A
 end
 
-#τ<:Number = 1, measurement_length<:Number = 10, no_of_meas<:Int = 10,
-#mixing_matrix::AbstractArray{<:Number,2} = ones(length(signal_data),
-#length(signal_data))
+"""
+    generate_correlation_matrix(signal_one_data,signal_two_data)
+* signal_one_data: Array of dimension (NxM)
+* signal_two_data: Array of dimension (NxM)
+
+Calculates correlation matrix between observations ``x_i(t)`` and ``x_i(t+τ)``.
+"""
 function generate_correlation_matrix(signal_one_data,signal_two_data)
+
     if size(signal_one_data) != size(signal_two_data)
         throw(ArgumentError("Signals have different sizes!"))
     end
-    rows,_ = size(signal_one_data)
-    C = zeros(rows,rows)
-    for row in 1:rows, column in 1:rows
-        C[row,column] = cor(signal_one_data[row,:],signal_two_data[column,:])
-        @info signal_one_data[row,:],signal_two_data[column,:]
-    end
+
+    C = cor(signal_one_data,signal_two_data,dims = 2)
     return C
 end
+"""
+    generate_testdata(signal_sources::AbstractArray{<:Function}, mixing_matrix::AbstractMatrix{<:Number}; <keyword_arguments>)
 
+* signal_sources: Array of anonymous functions for generating time series data of the uncorrelated signals `s` of `BSS` e.g. [ s1 = x-> 1.4*sin(2x), s2 = 2.2sin(x)]
+* mixing matrix: mixing matrix by which the signals ``s_j`` are multiplied to get the measurements/observations ``x_i``
+
+First Calculates from a given array of functions resolved in the time domain, which simulate the uncorrelated signals ``s_j`` and a mixing matrix A, the measurements ``x_i`` with:
+
+```x_i(t) = \\sum_{t = 1}^{T} a_{i,j} * s_j(t) ```.
+Then time delayed correlation matrix between observations mentioned in [source] for a specified number in `no_of_corr`. 
+
+# Arguments
+
+* delay::Number = 1: time delay between signals
+* sample_time::Number = 10: length of single time series (same for all observations)
+* no_of_samples::Int = 100: number of observations in the time series
+* no_of_cor::Int = 10: number of observations made over the entire measurement
+"""
 function generate_testdata(signal_sources::AbstractArray{<:Function}, mixing_matrix::AbstractMatrix{<:Number}; 
-    delay::Number = 1; sample_time::Number = 10, 
-    no_of_samples = 100, no_of_cor = 10)
+    delay::Number = 1, sample_time::Number = 10, 
+    no_of_samples::Int = 100, no_of_cor::Int = 10)
 
     rows,columns = size(mixing_matrix)
     if columns != length(signal_sources)
         throw(ArgumentError("Signal source array and mixing matrix have different dimensions."))
     end
+
+    #initialize the matrix to be diagonalized
     C = zeros(rows,rows,no_of_cor)
+
     for k in 0:no_of_cor-1
+        #own function?
         x = zeros(rows,no_of_samples)
         x_delay = zeros(rows,no_of_samples)
         for row in 1:rows # axes won't work on Array of Functions
@@ -349,30 +372,14 @@ function generate_testdata(signal_sources::AbstractArray{<:Function}, mixing_mat
                 #needs to be done since broadcasting on vector of anonymous functions doesn't seem to work
                 #tried invoke and .|> but couldn't get it to work which is why iteration is necessary
 
+                #observations at starting point t = 1+(k*T)
                 x[row,:] = x[row,:] + mixing_matrix[row,source]*signal_sources[source].(range(k*sample_time+1,(k+1)*sample_time,length = no_of_samples))
-
+                
+                #time delayed observations
                 x_delay[row,:] = x_delay[row,:] + mixing_matrix[row,source]*signal_sources[source].(range((k*sample_time+1+delay),(k+1)*sample_time+delay, length = no_of_samples))
             end
         end
-        C[:,:,k] = generate_correlation_matrix(x,x_delay)
+        C[:,:,k+1] = generate_correlation_matrix(x,x_delay)
     end
     return C
 end
-#     total_length_set = floor(Int,measurement_time/τ)
-#     x = zeros(rows,total_length_set)
-#     C = zeros(rows, rows,total_length_set)
-#     for k = 0:total_length_set-1
-#         for row in 1:rows
-#             for column in 1:columns
-#                 x[row,k+1] += mixing_matrix[row,column]*signal_data[column](k*τ)
-#             end
-#         end
-#         if k > 0
-#                 C[:,:,k] = cor(hcat(x[:,k],x[:,k+1]))
-#             end
-#     end    
-#     C[i,j,k] = 
-#     Cii = cov(xi,xi)/(var(xi)*var(xi))
-
-#     es is nur eine korrelation!!!! mehr is es nicht und die is gegeben als 
-# end
