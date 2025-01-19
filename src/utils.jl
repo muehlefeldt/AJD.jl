@@ -276,7 +276,7 @@ function check_input(A::Vector{<:AbstractMatrix{<:Number}})
     end
     # All matrices must be commuting and of same size.
     for index in 1:length(A)-1
-        if !is_same_size(A[index], A[index+1]) || !is_commuting(A[index], A[index+1])
+        if !is_same_size(A[index], A[index+1])
             return false
         end
     end
@@ -341,6 +341,7 @@ end
 First Calculates from a given array of functions resolved in the time domain, which simulate the uncorrelated signals ``s_j`` and a mixing matrix A, the measurements ``x_i`` with:
 
 ```x_i(t) = \\sum_{t = 1}^{T} a_{i,j} * s_j(t) ```.
+
 Then time delayed correlation matrix between observations mentioned in [source] for a specified number in `no_of_corr`. 
 
 # Arguments
@@ -365,7 +366,7 @@ function generate_testdata(signal_sources::AbstractArray{<:Function}, mixing_mat
     C = zeros(rows,rows,no_of_cor)
 
     for k in 0:no_of_cor-1
-        #own function?
+       
         x = zeros(rows,no_of_samples)
         x_delay = zeros(rows,no_of_samples)
         for row in 1:rows # axes won't work on Array of Functions
@@ -382,51 +383,67 @@ function generate_testdata(signal_sources::AbstractArray{<:Function}, mixing_mat
         end
         C[:,:,k+1] = generate_correlation_matrix(x,x_delay)
     end
+
     return C
 end
 """
-    generate_testdata(signal_sources::Array{<:Array}; delay::Number = 10, no_of_segments::Int = 10)
-* signal_sources: 1D-Array of column vectors defined by (``x_1 , x_2, ..., x_n``)
+    generate_testdata(signal_sources::AbstractArray; delay::Number = 10, no_of_segments::Int = 10)
+* signal_sources: Matrix of rowwise signals [``x_1``; ``x_2``;...; ``x_n``]
 * delay: Time/index shift between observations to be correlated
 * no_of:segments: Number of correlation matrices - 1 to be calculated. Puts signal_sources into even segments to be correlated. If the number leads to uneven correlation will throw an error. 
 
 Generate Correlation Matrices for discrete observations ``x_i``.
+
+# Known Issue
+If your data has a lot of zeros inside the observations setting no_of_segements too high will lead to NaN values since the variance of a vector of zeros is zero!
+You might want to manipulate your data or change the number of segments to be less!
+
 """
 function generate_testdata(signal_sources::AbstractArray; 
     delay::Number = 10, no_of_segments::Int = 10)
     
-    
-    
-    #initialize the matrix to be diagonalized
-    #x = cat(signal_sources..., dims = 1)
-    # in case not all the vectors are column vectors
     x = signal_sources
     rows,columns = size(signal_sources) 
-    # try
-    #     rows,columns = size(x) 
-    # catch
-    #     x = cat(signal_sources'..., dims = 1)
-    #     rows,columns = size(x)
-    # end
+
     # if signal has length 100 and delay would be 99 there wouldn't be any data after observation 100 to correlate
     if columns/delay < 2
         throw(ArgumentError("Delay too big. Length of signals divided by delay less than 2. Delay shift would lead to array entry for non existent data."))
     end
     
-    C = zeros(rows,rows,no_of_segments-1)
     segmentation = columns/no_of_segments
-    #in case segmentation leads to uneven segments i.e. 200 points and 3 segments -> last observation wouldn't be considered since index will be 66
+
+    #in case segmentation leads to uneven segments i.e. 200 points and 
+    #3 segments -> last observation wouldn't be considered since index will be 66
+
     if isinteger(segmentation)
         segmentation = Int(segmentation)
     else
         throw(ArgumentError("Number of Segments leads to segments of different sizes!"))
     end
+    
+    # C needs to be declared before the for loop otherwise won't be part of local scope 
+    # if statement therefore declaring C inside for loop won't work
+    # and declaring C as Matrix[] or Array[] will push first entry to be
+    # Array[...] or Matrix[...] with all other entries being of type Matrix or Array
+
+    # initialize the matrix set with the type of signal_sources
+    C = Matrix{typeof(x[1])}[]
+
     for k in 1:no_of_segments-1
-        
         x_new = x[:,(k-1)*segmentation+1:k*segmentation]
         x_delay = x[:,(k-1)*segmentation+1+delay:k*segmentation+delay]
-        
-        C[:,:,k] = generate_correlation_matrix(x_new,x_delay)
+        push!(C,generate_correlation_matrix(x_new,x_delay))
     end
+    if isnan.(sum(C)) != zeros(rows,rows)
+        throw(ArgumentError("Number of segments leads to NaN inside of correlation matrix. See Documentation for further Info."))
+    end
+
     return C
 end
+
+#using WAV
+#data,fs = wavread("C:\\Users\\Kunde\\.julia\\dev\\AJD\\channels3_room69_mix.wav")
+#data = data' 
+#using AJD
+#testset_data = AJD.generate_testdata(data, delay = 1000,no_of_segments=6)
+#diagonalize(testset_data, algorithm = "jdiag_edourdpineau")
