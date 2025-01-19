@@ -74,3 +74,9 @@ end
     B = Vector{Matrix{Number}}
     @test_throws MethodError diagonalize(B)
 end
+
+# Invalid algorithm should lead to a error.
+@testset "Invalid Algorithm" begin
+    A = AJD.random_normal_commuting_matrices(10, 10)
+    @test_throws ArgumentError diagonalize(A, algorithm="hello")
+end

@@ -1,7 +1,13 @@
 using LinearAlgebra
 using PosDefManifold
 #TODO: Not used for complex Matrices
-function FFD!(A::Vector{M}; threshold = eps(), max_iter = 100, norm_ = "frobenius",θ = 0.99) where {T <: Number, M<:AbstractMatrix{T}}
+function FFD!(
+    A::Vector{M};
+    threshold = eps(),
+    max_iter = 100,
+    norm_ = "frobenius",
+    θ = 0.99,
+    plot_convergence::Bool = false) where {T <: Number, M<:AbstractMatrix{T}}
     
     if typeof(A) <: AbstractArray{<:AbstractArray{<:Int}}
         A = float.(A)
@@ -28,6 +34,11 @@ function FFD!(A::Vector{M}; threshold = eps(), max_iter = 100, norm_ = "frobeniu
     
     objective = frobenius_offdiag_norm(A)
     
+    error_array = [] 
+    if plot_convergence
+        push!(error_array, frobenius_offdiag_norm(A))
+    end
+
     #while active == true && iteration_step <= max_iter
     while iteration_step <= max_iter
         #TODO: This needs a more elegant solution
@@ -61,6 +72,10 @@ function FFD!(A::Vector{M}; threshold = eps(), max_iter = 100, norm_ = "frobeniu
         D = get_diag_elements(A)
         abs(diff) < threshold && break
         iteration_step += 1
+
+        if plot_convergence
+            push!(error_array, frobenius_offdiag_norm(A))
+        end
     end
-    return A,V
+    return Matrix(V'), A, error_array
 end
