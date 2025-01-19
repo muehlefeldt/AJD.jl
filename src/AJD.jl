@@ -109,6 +109,10 @@ function ajd_benchmark(n_dims::Int, n_matrices::Int)
         @benchmarkable diagonalize(data, algorithm = $name) setup =
             (data = AJD.get_test_data(:approx_diag_large, $n_dims, $n_matrices))
     end
+    suite[name]["random"] = begin
+        @benchmarkable diagonalize(data, algorithm = $name) setup =
+            (data = AJD.get_test_data(:random_noice, $n_dims, $n_matrices))
+    end
 
     # Run the actual benchmark.
     tune!(suite)
