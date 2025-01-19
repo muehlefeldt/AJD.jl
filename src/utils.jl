@@ -389,6 +389,7 @@ end
 Generate Correlation Matrices for discrete observations ``x_i``.
 
 # Known Issue
+
 If your data has a lot of zeros inside the observations setting `no_of_segements` too high will lead to NaN values since the variance of a vector of zeros is zero!
 You might want to manipulate your data or change the number of segments to be less!
 
@@ -433,4 +434,5 @@ function generate_testdata(signal_sources::AbstractArray;
     end
 
     return C
+
 end
