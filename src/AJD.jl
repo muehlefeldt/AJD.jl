@@ -44,11 +44,9 @@ function diagonalize(
     algorithm::String = "jdiag_gabrieldernbach",
     max_iter::Int = 1000,
     threshold::AbstractFloat = eps(),
-    #plot_matrix::Bool = false,
-    #plot_convergence::Bool = false
     )::LinearFilter
 
-    F, _, _ = get_diagonalization(A, algorithm=algorithm, max_iter=max_iter, threshold=threshold)
+    F, _, _ = get_diagonalization(A, algorithm=algorithm, max_iter=max_iter, threshold=threshold, only_plot=:no_plot)
     return create_linear_filter(F) 
 end
 
@@ -58,16 +56,19 @@ function diagonalize(
     algorithm::String = "jdiag_gabrieldernbach",
     max_iter::Int = 1000,
     threshold::AbstractFloat = eps(),
-    #only_plot::Bool = false
-    #plot_matrix::Bool = false,
-    #plot_convergence::Bool = false
     )::Plot
 
     if only_plot == :plot
-        F, B, error_array = get_diagonalization(A, algorithm=algorithm, max_iter=max_iter, threshold=threshold)
-        p = plot_matrix_heatmap(F, B)
+        F, B, error_array = get_diagonalization(
+            A, 
+            algorithm=algorithm,
+            max_iter=max_iter, 
+            threshold=threshold,
+            only_plot=only_plot
+        )
+        p = get_plot(F, B, error_array, algorithm)
     else
-        throw(ArgumentError("Please use symbol :plot to generate plots."))
+        throw(ArgumentError("Please use symbol ony_plot=:plot to generate plots."))
     end
     return p
 end
