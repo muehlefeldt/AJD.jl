@@ -39,8 +39,5 @@ end
 @testset "random_noise" begin
     input = [Matrix(1.0I,2,2),Matrix(1.0I,2,2)]
     input = addrandomnoise!(input)
-    @info input
-    @info "Jdiag_linear",diagonalize(input)
-    @info "FFD_Linear",diagonalize(input,algorithm = "FFD")
-    @info "Linear_Filter Eduard", diagonalize(input, algorithm = "jdiag_edourdpineau")
+    
 end

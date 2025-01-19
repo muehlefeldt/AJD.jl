@@ -1,0 +1,18 @@
+using WAV
+data,fs = wavread("channels3_room69_mix.wav")
+data = data' 
+using AJD
+testset_data = AJD.generate_testdata(data, delay = 1000,no_of_segments=6)
+diagonalize(testset_data)
+
+using WAV
+data,fs = wavread("channels2_room69_mix.wav")
+data = data' 
+using AJD
+testset_data = AJD.generate_testdata(data[:,1:320300], delay = 1000,no_of_segments=100)
+diagonalize(testset_data)
+
+using AJD
+signal_sources = [x->1.6sin(2pi*5x+5)+2sin(2pi*20x+27)+0.5sin(2pi*100x)+1,x->1.2(2pi*11x)+sin(2pi*2x)+0.7sin(2pi*111x+10)]
+mixing_matrix = [0.32 -0.43; -1.31 0.34]
+testset_data = AJD.generate_testdata(signal_sources,mixing_matrix)

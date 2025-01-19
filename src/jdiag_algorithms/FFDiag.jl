@@ -13,23 +13,25 @@ function FFD!(
         A = float.(A)
     end
     if norm_ == "frobenius"
-        normation = X -> norm(X,2) #frobenius norm, it says it is frobenius norm but that doesn't make sense!
+        norm_function = X -> norm(X,2) #frobenius norm, it says it is frobenius norm but that doesn't make sense!
     elseif norm_ == "inf"
-        normation = X -> opnorm(X,Inf) #infinity norm
+        norm_function = X -> opnorm(X,Inf) #infinity norm
     end
 
     A = cat(A..., dims = 3)
     rows,columns,k = size(A)
     #initialization
     iteration_step = 0
+    
     V = 1.0*Matrix(I, rows,columns)
     W = zeros(rows,columns)
+    
+    # V = 1.0*Matrix(I, rows,columns)
+    # W = zeros(rows,columns)
     
     E = get_offdiag_elements(A)
     D = get_diag_elements(A)
     
-    w = sort_offdiag_elements(W)
-    e = sort_offdiag_elements(E)
     objective = frobenius_offdiag_norm(A)
     
     error_array = [] 
@@ -53,10 +55,10 @@ function FFD!(
             #W[j,i] = (z_ij*y_ij - z_j*y_ji)/(z_j*z_i-z_ij^2)
         end
         
-        if normation(W) > θ
-            W = θ/normation(W)*W
+        if norm_function(W) > θ
+            W = θ/norm_function(W)*W
         end
-        #A = D + W.*D + D.*W'+E
+        
         V = (I+W)*V
         for m = 1:k
             A[:,:,m] = (I+W)*A[:,:,m]*(I+W)'

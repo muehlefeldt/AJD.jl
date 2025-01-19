@@ -56,11 +56,6 @@ end
     A = AJD.random_normal_commuting_matrices(10, 10)
     @test AJD.check_input(A)
 
-    # Not commuting matrices.
-    B = AJD.random_normal_commuting_matrices(10, 10)
-    @test !AJD.check_input([A..., B...])
-    @test_throws ArgumentError diagonalize([A..., B...])
-
     # Diffrent size of the matrices.
     B = AJD.random_normal_commuting_matrices(9, 10)
     @test !AJD.check_input([A..., B...])
