@@ -392,19 +392,22 @@ end
 
 Generate Correlation Matrices for discrete observations ``x_i``.
 """
-function generate_testdata(signal_sources::Array{<:Array}; 
+function generate_testdata(signal_sources::AbstractArray; 
     delay::Number = 10, no_of_segments::Int = 10)
     
     
     
     #initialize the matrix to be diagonalized
-    x = cat(signal_sources..., dims = 1)
+    #x = cat(signal_sources..., dims = 1)
     # in case not all the vectors are column vectors
-    try
-        rows,columns = size(x) 
-    catch
-        x = cat(signal_sources'..., dims = 1)
-    end
+    x = signal_sources
+    rows,columns = size(signal_sources) 
+    # try
+    #     rows,columns = size(x) 
+    # catch
+    #     x = cat(signal_sources'..., dims = 1)
+    #     rows,columns = size(x)
+    # end
     # if signal has length 100 and delay would be 99 there wouldn't be any data after observation 100 to correlate
     if columns/delay < 2
         throw(ArgumentError("Delay too big. Length of signals divided by delay less than 2. Delay shift would lead to array entry for non existent data."))
