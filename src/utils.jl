@@ -376,6 +376,7 @@ function get_diagonalization(
             A,
             threshold=threshold,
             max_iter=max_iter,
+            plot_convergence=plot_convergence
         )
 
     else
