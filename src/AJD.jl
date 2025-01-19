@@ -1,6 +1,7 @@
 module AJD 
 using LinearAlgebra
 using BenchmarkTools
+using Plots: Plot
 
 # Import different algorithms.
 include("jdiag_algorithms/jdiag_cardoso.jl")
@@ -43,54 +44,33 @@ function diagonalize(
     algorithm::String = "jdiag_gabrieldernbach",
     max_iter::Int = 1000,
     threshold::AbstractFloat = eps(),
-    plot_matrix::Bool = false,
-    plot_convergence::Bool = false
     )::LinearFilter
 
-    if !check_input(A)
-        throw(ArgumentError("Invalid input."))
-    end
+    F, _, _ = get_diagonalization(A, algorithm=algorithm, max_iter=max_iter, threshold=threshold, only_plot=:no_plot)
+    return create_linear_filter(F) 
+end
 
-    if algorithm in ["jdiag", "jdiag_gabrieldernbach"]
-        F, B, error_array = jdiag_gabrieldernbach!(A, max_iter = max_iter, threshold = threshold, plot_convergence = plot_convergence)
+function diagonalize(
+    A::Vector{<:AbstractMatrix{<:Number}},
+    only_plot::Symbol;
+    algorithm::String = "jdiag_gabrieldernbach",
+    max_iter::Int = 1000,
+    threshold::AbstractFloat = eps(),
+    )::Plot
 
-    elseif algorithm == "jdiag_edourdpineau"
-        F, B, error_array = jdiag_edourdpineau(A, iter = max_iter)
-
-    elseif algorithm == "jdiag_cardoso"
-        if typeof(A) <: AbstractArray{<:AbstractArray{<:Real}} 
-            F, B, error_array = jdiag_cardoso(A, threshold, plot_convergence = plot_convergence)
-        else
-            throw(ArgumentError("Not supported for set of Matrices containing imaginary values!"))
-        end
-
-    elseif algorithm in ["FFD", "ffd", "ffdiag"]
-        F, B, error_array = FFD!(
-            A,
+    if only_plot == :plot
+        F, B, error_array = get_diagonalization(
+            A, 
+            algorithm=algorithm,
+            max_iter=max_iter, 
             threshold=threshold,
-            max_iter=max_iter,
-            plot_convergence=plot_convergence
+            only_plot=only_plot
         )
-
+        p = get_plot(F, B, error_array, algorithm)
     else
-        # If no vaild algorithm selected, throw an error.
-        throw(ArgumentError(
-            "No valid algorithm selected. Available options:" * join(AJD.ALL_ALGORITHMS, ", ")
-        ))
+        throw(ArgumentError("Please use symbol ony_plot=:plot to generate plots."))
     end
-
-    # Plotting output if so selected by the user.
-    if plot_matrix
-        # Illustrate Filter and diagonlised matrices.
-        plot_matrix_heatmap(F, B)
-    end
-
-    if plot_convergence
-        # Show convergence of the error.
-        plot_convergence_lineplot(error_array, algorithm)
-    end
-
-    return create_linear_filter(F)
+    return p
 end
 
 """

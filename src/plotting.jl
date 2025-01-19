@@ -1,32 +1,28 @@
 using Plots
 
 """
-    plot_matrix_heatmap(filter::AbstractMatrix, diag_matrices::AbstractMatrix) 
+    get_plot(
+        filter::AbstractArray,
+        diag_matrices::AbstractArray, 
+        error_array::AbstractArray, 
+        name::String)
 
-Plot a heatmap of the calculated filter matrix and the mean of the diagonlized matrices.
-Complex matrices are reduced to real matrices for the plot.
+In case of plot is user selected this generates heatmap plot of the filter matrix and the mean of diagonlaised matrices.
+Also a lineplot of the error history of the algorithm calculation is created.
+A combined plot is returned.
 """
-function plot_matrix_heatmap(filter::AbstractArray, diag_matrices::AbstractArray) 
+function get_plot(
+        filter::AbstractArray,
+        diag_matrices::AbstractArray, 
+        error_array::AbstractArray, 
+        name::String)
+
+    # Select PLots.jl theme.
     theme(:dark)
-    # Subplot of the filter matrix.
+
+    # Get the plots and returned one combined plot.
     filter_plot = heatmap(real.(filter), yflip=true, title="Filter Matrix")
-
-    #if 
-
-    # Subplot of the mean of all the diagonalised matrices.
     mean_diag_plot = heatmap(real.(mean((diag_matrices), dims=3)[:, :, 1]), yflip=true, title="Mean Diagonalized Matrices")
-
-    # Combine subplots and 
-    combined_plot = plot(filter_plot, mean_diag_plot, layout=(2, 1), legend=false, size=(400, 800))
-    return combined_plot
-end
-
-"""
-    plot_convergence_lineplot(error_array::AbstractArray, name::String)
-
-Plot the convergence error as recorded during the algorithm execution.
-"""
-function plot_convergence_lineplot(error_array::AbstractArray, name::String)
-    theme(:dark)
-    return plot(error_array, w=3, title="Error Convergence", label=name)
+    error_plot = plot(error_array, w=3, title="Error Convergence", label=name)
+    return plot(filter_plot, mean_diag_plot, error_plot, layout=(3, 1), legend=false, size=(400, 1200))
 end
