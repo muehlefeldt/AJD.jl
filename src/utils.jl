@@ -329,25 +329,44 @@ function addrandomnoise!(A::Vector{M};σ = 0.5,same_noise = true) where {T<:Numb
     return A
 end
 
+"""
+    function get_diagonalization(
+    A::Vector{<:AbstractMatrix{<:Number}};
+    algorithm::String = "jdiag_gabrieldernbach",
+    max_iter::Int = 1000,
+    threshold::AbstractFloat = eps(),
+    only_plot::Symbol = :no_plot
+    )
+
+Get the actual diagonalization. Function is seperated from `diagonalize()` to facilitate plotting functionality in the REPL and Pluto.
+All implemented algorithms are called from this function.
+To generate the error histories of the algorithm runs, as used for the plots, select `only_plot=:plot`.
+Input is checked here as well.
+"""
 function get_diagonalization(
     A::Vector{<:AbstractMatrix{<:Number}};
     algorithm::String = "jdiag_gabrieldernbach",
     max_iter::Int = 1000,
-    threshold::AbstractFloat = eps()
+    threshold::AbstractFloat = eps(),
+    only_plot::Symbol = :no_plot
     )
     if !check_input(A)
         throw(ArgumentError("Invalid input."))
     end
 
+    # Do we need to get the error history from the algorithms?
+    # If so selected, a performance panelty is to be expected.
+    plot_convergence = only_plot == :plot
+
     if algorithm in ["jdiag", "jdiag_gabrieldernbach"]
-        F, B, error_array = jdiag_gabrieldernbach!(A, max_iter = max_iter, threshold = threshold)
+        F, B, error_array = jdiag_gabrieldernbach!(A, max_iter = max_iter, threshold = threshold, plot_convergence=plot_convergence)
 
     elseif algorithm == "jdiag_edourdpineau"
         F, B, error_array = jdiag_edourdpineau(A, iter = max_iter)
 
     elseif algorithm == "jdiag_cardoso"
         if typeof(A) <: AbstractArray{<:AbstractArray{<:Real}} 
-            F, B, error_array = jdiag_cardoso(A, threshold)
+            F, B, error_array = jdiag_cardoso(A, threshold, plot_convergence=plot_convergence)
         else
             throw(ArgumentError("Not supported for set of Matrices containing imaginary values!"))
         end
@@ -365,17 +384,6 @@ function get_diagonalization(
             "No valid algorithm selected. Available options:" * join(AJD.ALL_ALGORITHMS, ", ")
         ))
     end
-
-    # Plotting output if so selected by the user.
-    #if plot_matrix
-        # Illustrate Filter and diagonlised matrices.
-        #plot_matrix_heatmap(F, B)
-    #end
-
-    #if plot_convergence
-        # Show convergence of the error.
-    #    display(plot_convergence_lineplot(error_array, algorithm))
-    #end
 
     return F, B, error_array
 end
