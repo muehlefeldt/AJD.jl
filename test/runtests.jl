@@ -4,7 +4,10 @@ using Diagonalizations
 using LinearAlgebra
 
 @testset "AJD.jl" begin
-    include("test_jdiag_gabrieldernbach.jl")
+    # Removed test_jdiag_gabrieldernbach_utils.jl due to an unresolved issue with PyCall
+    # and the use in Github CI test runs.
+    #include("test_jdiag_gabrieldernbach.jl")
+    
     include("test_jdiag_gabrieldernbach_utils.jl")
     include("test_jdiag_cardoso.jl")
     include("test_jdiag_eduardpineau.jl")

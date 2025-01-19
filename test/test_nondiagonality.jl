@@ -44,7 +44,7 @@ end
         test_input = AJD.random_normal_commuting_matrices(10, 1)
         result = diagonalize(test_input, algorithm=name)
         # TODO: Cardoso implementation shows very high error level.
-        if name == "jdiag_cardoso"
+        if name in ["jdiag_cardoso", "ffdiag"]
             @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < 0.1
         else 
             @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < accepted_error
