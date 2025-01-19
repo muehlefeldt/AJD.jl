@@ -17,6 +17,7 @@ makedocs(;
         "Getting Started" => "getting-started.md",
         "Detailed Docs" => "detailed-docs.md",
         "Theory" => "theoretical-background.md",
+        "Test Data Generation" => "testdata_generation.md",
         "References" => "references.md",
     ],
 )
