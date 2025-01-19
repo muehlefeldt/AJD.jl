@@ -1,4 +1,4 @@
-module AJD 
+module AJD
 using LinearAlgebra
 using BenchmarkTools
 using Plots: Plot
@@ -45,10 +45,16 @@ function diagonalize(
     algorithm::String = "jdiag_gabrieldernbach",
     max_iter::Int = 1000,
     threshold::AbstractFloat = eps(),
-    )::LinearFilter
+)::LinearFilter
 
-    F, _, _ = get_diagonalization(A, algorithm=algorithm, max_iter=max_iter, threshold=threshold, only_plot=:no_plot)
-    return create_linear_filter(F) 
+    F, _, _ = get_diagonalization(
+        A,
+        algorithm = algorithm,
+        max_iter = max_iter,
+        threshold = threshold,
+        only_plot = :no_plot,
+    )
+    return create_linear_filter(F)
 end
 
 function diagonalize(
@@ -57,15 +63,15 @@ function diagonalize(
     algorithm::String = "jdiag_gabrieldernbach",
     max_iter::Int = 1000,
     threshold::AbstractFloat = eps(),
-    )::Plot
+)::Plot
 
     if only_plot == :plot
         F, B, error_array = get_diagonalization(
-            A, 
-            algorithm=algorithm,
-            max_iter=max_iter, 
-            threshold=threshold,
-            only_plot=only_plot
+            A,
+            algorithm = algorithm,
+            max_iter = max_iter,
+            threshold = threshold,
+            only_plot = only_plot,
         )
         p = get_plot(F, B, error_array, algorithm)
     else
@@ -88,14 +94,20 @@ function ajd_benchmark(n_dims::Int, n_matrices::Int)
         suite[name] = BenchmarkGroup(["jdiag"])
         # Set the function to be benchmarked.
         suite[name]["real"] = begin
-            @benchmarkable diagonalize(data, algorithm=$name) setup=(data=AJD.random_normal_commuting_matrices($n_dims, $n_matrices)) 
+            @benchmarkable diagonalize(data, algorithm = $name) setup =
+                (data = AJD.random_normal_commuting_matrices($n_dims, $n_matrices))
         end
     end
 
     name = "ffdiag"
     suite[name] = BenchmarkGroup([name])
-    suite[name]["real"] = begin
-        @benchmarkable diagonalize(data, algorithm=$name) setup=(data=AJD.random_normal_commuting_matrices($n_dims, $n_matrices)) 
+    suite[name]["exact_diag"] = begin
+        @benchmarkable diagonalize(data, algorithm = $name) setup =
+            (data = AJD.get_test_data(:exact_diag, $n_dims, $n_matrices))
+    end
+    suite[name]["approx_diag_large"] = begin
+        @benchmarkable diagonalize(data, algorithm = $name) setup =
+            (data = AJD.get_test_data(:approx_diag_large, $n_dims, $n_matrices))
     end
 
     # Run the actual benchmark.
