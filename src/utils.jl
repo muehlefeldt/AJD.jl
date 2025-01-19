@@ -327,6 +327,7 @@ function generate_correlation_matrix(signal_one_data,signal_two_data)
     C = cor(signal_one_data,signal_two_data,dims = 2)
     return C
 end
+
 """
     generate_testdata(signal_sources::AbstractArray{<:Function}, mixing_matrix::AbstractMatrix{<:Number}; <keyword_arguments>)
 
@@ -435,8 +436,8 @@ function generate_testdata(signal_sources::AbstractArray;
     end
 
     return C
-
 end
+
 """
     function get_diagonalization(
         A::Vector{<:AbstractMatrix{<:Number}};
