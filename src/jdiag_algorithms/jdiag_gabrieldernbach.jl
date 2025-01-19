@@ -3,13 +3,12 @@
 
 JDiag algorithm based on the implementation by Gabrieldernbach in Python.
 
-Source: [https://github.com/gabrieldernbach/approximate_joint_diagonalization/blob/master/jade/jade_cpu.py](Algorithm)
+Source: [Algorithm](https://github.com/gabrieldernbach/approximate_joint_diagonalization/blob/master/jade/jade_cpu.py)
 
     (2) jdiag_gabrieldernbach(A::Vector{Matrix{ComplexF64}}; threshold = eps(), max_iter = 1000)
 
 JDiag algorithm for complex matrices based on the implementation by Gabrieldernbach in Python, the Cardoso Paper and the code 
-    of [https://github.com/edouardpineau/Time-Series-ICA-with-SOBI-Jacobi.](Algorithm)
-
+of [Algorithm](https://github.com/edouardpineau/Time-Series-ICA-with-SOBI-Jacobi)
 """
 function jdiag_gabrieldernbach!(
         A::Vector{M};

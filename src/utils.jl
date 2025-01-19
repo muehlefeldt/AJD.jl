@@ -345,7 +345,7 @@ Then time delayed correlation matrix between observations mentioned in [source] 
 * `no_of_samples`::Int = 100: number of observations in the time series
 * `no_of_cor`::Int = 10: number of observations made over the entire measurement
 
-For numbers to generate test data set of timeresolved function look here: [https://doi.org/10.21595/jve.2021.21961](source)p.1709
+For numbers to generate test data set of timeresolved function look here: [source p.1709](https://doi.org/10.21595/jve.2021.21961)
 """
 function generate_testdata(signal_sources::AbstractArray{<:Function}, mixing_matrix::AbstractMatrix{<:Number}; 
     delay::Number = 1, sample_time::Number = 10, 
