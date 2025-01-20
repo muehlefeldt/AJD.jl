@@ -1,8 +1,8 @@
 # Test the plotting of diagonalized matrices and convergence behaviour.
 # Verify all plot combinations and the return type.
 
-using Plots: Plot
-using PosDefManifold: mean
+# using Plots: Plot
+# using PosDefManifold: mean
 using AJD
 
 accepted_error = 0.1

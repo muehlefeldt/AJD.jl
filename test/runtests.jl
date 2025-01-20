@@ -1,7 +1,12 @@
 using AJD
 using Test
-using Diagonalizations
+# using Diagonalizations
 using LinearAlgebra
+using Diagonalizations: nonDiagonality,LinearFilter
+using PosDefManifold: mean
+using BenchmarkTools: BenchmarkGroup
+using PyCall
+using Plots: Plot
 
 @testset "AJD.jl" begin
     include("test_jdiag_gabrieldernbach.jl")

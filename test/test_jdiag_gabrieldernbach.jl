@@ -1,7 +1,7 @@
-using PyCall
+# using PyCall
 using AJD
-using LinearAlgebra
-using Diagonalizations
+# using LinearAlgebra
+# using Diagonalizations
 
 # Python implementation of the JDiag algorithm.
 # The Python code is used to compare implementations.

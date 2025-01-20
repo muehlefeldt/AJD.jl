@@ -1,4 +1,4 @@
-using LinearAlgebra
+# using LinearAlgebra
 
 # Verify an ArgumentError is thrown when algorithm = "jdiag_cardoso" is used with
 # complex matrices.

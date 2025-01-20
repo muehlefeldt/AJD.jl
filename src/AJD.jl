@@ -65,7 +65,7 @@ function diagonalize(
         end
 
     elseif algorithm in ["FFD", "ffd", "ffdiag"]
-        F, B, error_array = FFD!(
+        F, B, error_array = ffd(
             A,
             threshold=threshold,
             max_iter=max_iter,

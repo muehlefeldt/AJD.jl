@@ -1,6 +1,6 @@
 # Tests to verfiy benchmark functionality.
 using AJD
-using BenchmarkTools: BenchmarkGroup
+# using BenchmarkTools: BenchmarkGroup
 
 @testset "Benchmark" begin
     # Run the benchmark.
