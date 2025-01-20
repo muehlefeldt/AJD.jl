@@ -22,7 +22,7 @@ end
 Generate m random commuting matrices of size n x n
 These will produce all real rotation matrices using the Jacobi method
 
-``M_i * M_j = M_j * M_i for all i,j``
+``M_i M_j = M_j M_i \\; \\; \\forall i,j``
 """
 function random_commuting_matrices(n::Int, m::Int)
     P = rand(n,n)
@@ -31,12 +31,17 @@ end
 
 """
     random_normal_commuting_matrices(n::Int, m::Int; complex::Bool=false)
-    
+
 Generate m random normal commuting matrices of size n x n
 These can be exactly diagonalized
 
-``M_i * M_j = M_j * M_i for all i,j``
-``M_i*M_i^{T} = M_i^{T}*M_i for all i``
+``
+M_i M_j = M_j M_i \\;\\; \\forall i,j
+``
+
+``
+M_i M_i^{T} = M_i^{T} M_i \\;\\; \\forall i
+``
 """
 function random_normal_commuting_matrices(n::Int, m::Int; complex::Bool=false)
     # Just like the function below, this produces hermitian an symmetric matrices, they are
@@ -62,7 +67,7 @@ end
 function get_test_data_complex_real(n::Int, m::Int)
     Q, _ = qr(rand(n,n))
     Q = Matrix(Q)
-    
+
     C = [Q * Diagonal(rand(ComplexF64, n)) * Q' for _ in 1:m]
     R = [Q * Diagonal(rand(n)) * Q' for _ in 1:m]
     return [C..., R...]
@@ -80,9 +85,9 @@ end
 """
     frobenius_offdiag_norm(A::AbstractArray{T,3})::Real where {T<:Number}
 Input
-* A: Vector of matrices with size n x n x k 
+* A: Vector of matrices with size n x n x k
 
-Takes the offdiagonal elements of an Array of matrices ``A^k`` and applies the frobenius norm (``\\sum |a_{i,j}|^{2}``). 
+Takes the offdiagonal elements of an Array of matrices ``A^k`` and applies the frobenius norm (``\\sum |a_{i,j}|^{2}``).
 """
 function frobenius_offdiag_norm(A::AbstractArray{T,3})::Real where {T<:Number}
     norm = zero(real(T))
@@ -124,7 +129,7 @@ function get_offdiag_elements(A::Array{<:Number,3})
     #copy matrix A to not overwrite it with zeros
     E = copy(A)
     for row in axes(E,1) # maybe eachindex better - NG
-        E[row,row,:] .= 0 
+        E[row,row,:] .= 0
     end
     return E
 end
@@ -198,18 +203,18 @@ function sort_offdiag_elements(A::AbstractArray{<:Number,2})
         i += 1
         sorted_array[i] = A[column,row]
         i +=1
-        
+
     end
     return sorted_array
 end
 
 """
-    is_commuting(A::AbstractMatrix, B::AbstractMatrix) 
+    is_commuting(A::AbstractMatrix, B::AbstractMatrix)
 * A: AbstractMatrix of dimension n x n
 * B: AbstractMatrix of dimension n x n
 
 Check if two matrices A, B are commuting.
- A * B = B * A must hold. 
+ ``A B = B A`` must hold.
  """
 function is_commuting(A::AbstractMatrix, B::AbstractMatrix)
     return isapprox(A*B, B*A)
@@ -312,7 +317,7 @@ end
 
 """
   generate_correlation_matrix(signal_one_data,signal_two_data)
-                                                                                          
+
 * `signal_one_data`: Array of dimension n x m
 * `signal_two_data`: Array of dimension n x m
 
@@ -336,9 +341,9 @@ end
 
 First Calculates from a given array of functions resolved in the time domain, which simulate the uncorrelated signals ``s_j`` and a mixing matrix A, the measurements ``x_i`` with:
 
-``x_i(t) = \\sum_{t = 1}^{T} a_{i,j} * s_j(t) ``.
+``x_i(t) = \\sum_{t = 1}^{T} a_{i,j} s_j(t) ``.
 
-Then time delayed correlation matrix between observations mentioned in [source] for a specified number in `no_of_corr`. 
+Then time delayed correlation matrix between observations mentioned in [source] for a specified number in `no_of_corr`.
 
 # Arguments
 
@@ -349,8 +354,8 @@ Then time delayed correlation matrix between observations mentioned in [source] 
 
 For numbers to generate test data set of timeresolved function look here: [source p.1709](https://doi.org/10.21595/jve.2021.21961)
 """
-function generate_testdata(signal_sources::AbstractArray{<:Function}, mixing_matrix::AbstractMatrix{<:Number}; 
-    delay::Number = 1, sample_time::Number = 10, 
+function generate_testdata(signal_sources::AbstractArray{<:Function}, mixing_matrix::AbstractMatrix{<:Number};
+    delay::Number = 1, sample_time::Number = 10,
     no_of_samples::Int = 100, no_of_cor::Int = 10)
 
     rows,columns = size(mixing_matrix)
@@ -362,7 +367,7 @@ function generate_testdata(signal_sources::AbstractArray{<:Function}, mixing_mat
     C = zeros(rows,rows,no_of_cor)
 
     for k in 0:no_of_cor-1
-       
+
         x = zeros(rows,no_of_samples)
         x_delay = zeros(rows,no_of_samples)
         for row in 1:rows # axes won't work on Array of Functions
@@ -372,7 +377,7 @@ function generate_testdata(signal_sources::AbstractArray{<:Function}, mixing_mat
 
                 #observations at starting point t = 1+(k*T)
                 x[row,:] = x[row,:] + mixing_matrix[row,source]*signal_sources[source].(range(k*sample_time+1,(k+1)*sample_time,length = no_of_samples))
-                
+
                 #time delayed observations
                 x_delay[row,:] = x_delay[row,:] + mixing_matrix[row,source]*signal_sources[source].(range((k*sample_time+1+delay),(k+1)*sample_time+delay, length = no_of_samples))
             end
@@ -386,7 +391,7 @@ end
     generate_testdata(signal_sources::AbstractArray; delay::Number = 10, no_of_segments::Int = 10)
 * `signal_sources``: Matrix of rowwise signals [``x_1``; ``x_2``;...; ``x_n``]
 * `delay``: Time/index shift between observations to be correlated
-* `no_of_segments`: Puts `signal_sources`` into even segments to be correlated. If the number leads to uneven correlation will throw an error. 
+* `no_of_segments`: Puts `signal_sources`` into even segments to be correlated. If the number leads to uneven correlation will throw an error.
 
 Generate Correlation Matrices for discrete observations ``x_i``.
 
@@ -396,20 +401,20 @@ If your data has a lot of zeros inside the observations setting `no_of_segements
 You might want to manipulate your data or change the number of segments to be less!
 
 """
-function generate_testdata(signal_sources::AbstractArray; 
+function generate_testdata(signal_sources::AbstractArray;
     delay::Number = 10, no_of_segments::Int = 10)
-    
+
     x = signal_sources
-    rows,columns = size(signal_sources) 
+    rows,columns = size(signal_sources)
 
     # if signal has length 100 and delay would be 99 there wouldn't be any data after observation 100 to correlate
     if columns/delay < 2
         throw(ArgumentError("Delay too big. Length of signals divided by delay less than 2. Delay shift would lead to array entry for non existent data."))
     end
-    
+
     segmentation = columns/no_of_segments
 
-    #in case segmentation leads to uneven segments i.e. 200 points and 
+    #in case segmentation leads to uneven segments i.e. 200 points and
     #3 segments -> last observation wouldn't be considered since index will be 66
 
     if isinteger(segmentation)
@@ -417,8 +422,8 @@ function generate_testdata(signal_sources::AbstractArray;
     else
         throw(ArgumentError("Number of Segments leads to segments of different sizes!"))
     end
-    
-    # C needs to be declared before the for loop otherwise won't be part of local scope 
+
+    # C needs to be declared before the for loop otherwise won't be part of local scope
     # if statement therefore declaring C inside for loop won't work
     # and declaring C as Matrix[] or Array[] will push first entry to be
     # Array[...] or Matrix[...] with all other entries being of type Matrix or Array
@@ -474,7 +479,7 @@ function get_diagonalization(
         F, B, error_array = jdiag_edourdpineau(A, iter = max_iter)
 
     elseif algorithm == "jdiag_cardoso"
-        if typeof(A) <: AbstractArray{<:AbstractArray{<:Real}} 
+        if typeof(A) <: AbstractArray{<:AbstractArray{<:Real}}
             F, B, error_array = jdiag_cardoso(A, threshold, plot_convergence=plot_convergence)
         else
             throw(ArgumentError("Not supported for set of Matrices containing imaginary values!"))

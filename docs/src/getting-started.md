@@ -42,7 +42,7 @@ D = filter.iF * A * filter.F
 ```
 
 ## Advanced options
-The main function `diagonlaize()` provides several options to be choosen by the user.
+The main function `diagonalize()` provides several options to be choosen by the user.
 
 ### Algorithms
 The package allows to choose diffrent algorithms to calculate the AJD.
