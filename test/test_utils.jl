@@ -1,7 +1,7 @@
 # Test utility functions.
 using PosDefManifold
 using LinearAlgebra
-using AJD: isstrictly_diagonally_dominant, get_offdiag_elements, get_diag_elements,frobenius_offdiag_norm, sort_offdiag_elements, addrandomnoise,generate_correlation_matrix
+using AJD: isstrictly_diagonally_dominant, get_offdiag_elements, get_diag_elements,frobenius_offdiag_norm, addrandomnoise,generate_correlation_matrix
 # Test the generation of random, commuting matrices.
 # Used to create test data for the actual diagonalization.
 # Real and complex matrices are tested.
@@ -101,14 +101,6 @@ end
     @test get_diag_elements(input) == input
 end
 
-@testset "sort_offdiag_elements" begin
-    input_1D = [1 2 3; 4 5 6; 7 8 9]
-    @test sort_offdiag_elements(input_1D) == float.([2,4,3,7,6,8])
-    input = [[1 2 3; 4 5 6; 7 8 9];;;[0 2 4; 4 2 1; 9 0 1]]
-    @test sum(sort_offdiag_elements(input)) == sum(get_offdiag_elements(input))
-    input = reshape(repeat(Matrix(1.0I,2,2), outer = (1,2)),2,2,2) # has dimension 2x2x2 -> number of offdiag_el = 2*2
-    @test sort_offdiag_elements(input) == zeros(4)
-end
 
 @testset "random_noise" begin
     input = [Matrix(1.0I,2,2),Matrix(1.0I,2,2)]
@@ -118,7 +110,6 @@ end
     #highely unlikely they will ever be the same but test could potentially fail
     input_noise = addrandomnoise(input,same_noise = false)
     @test input_noise[1] != input_noise[2]
-    
 end
 
 @testset "generate_correlation_matrix_erroring" begin

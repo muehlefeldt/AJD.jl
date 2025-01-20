@@ -138,32 +138,6 @@ function get_diag_elements(A::Array)
     return D
 end
 
-function sort_offdiag_elements(A::AbstractArray{<:Number,3})
-    rows,_,k = size(A)
-    no_el = rows*rows-rows #number of offdiagonal elements
-    sorted_array = zeros(no_el*k)
-    for matrices in 1:k
-        sorted_array[1+(matrices-1)*(no_el):matrices*(no_el)] = sort_offdiag_elements(A[:,:,matrices])
-    end
-    return sorted_array
-end
-
-function sort_offdiag_elements(A::AbstractArray{<:Number,2})
-    rows,_ = size(A)
-    sorted_array = zeros(rows*rows-rows)
-    
-    i = 1
-    for row in 1:rows-1,column in row+1:rows
-        #TODO: Benchmark if append! or push! is faster
-        sorted_array[i] = A[row, column]
-        i += 1
-        sorted_array[i] = A[column,row]
-        i +=1
-        
-    end
-    return sorted_array
-end
-
 """
     is_commuting(A::AbstractMatrix, B::AbstractMatrix) 
 * A: AbstractMatrix of dimension ``n × n``
@@ -348,7 +322,7 @@ If your data has a segment with variance close to 0 (e.g. due to all of the valu
 
 """
 function generate_testdata(signal_sources::AbstractArray; 
-    delay::Number = 10, no_of_segments::Int = 10,user_input = true)
+    delay::Number = 10, no_of_segments::Int = 10, show_warning = true)
     
     x = signal_sources
     rows,columns = size(signal_sources) 
@@ -365,16 +339,15 @@ function generate_testdata(signal_sources::AbstractArray;
 
     if isinteger(segmentation)
         segmentation = Int(segmentation)
-    elseif user_input == true
-        print("Number of Segments leads to segments of different sizes! Will skip last segment. Do you want to continue? [y, n]\n")
-        if readline() in ["n", "no","No","N"]
-            throw(ArgumentError("Operation aborted"))
-        else
-            no_of_segments -= 1
-            segmentation = floor(Int64,segmentation)
-        end
     else
-        throw(ArgumentError("Number of Segments leads to segments of different sizes!"))
+        # for testing should be false! could be also done with Logging module and
+        # disable_logging(Logging.Warn) but that would supress all warnings for the test case
+        # which might not be desirable!
+        if show_warning == true
+            @warn "Number of Segments leads to segments of different sizes! Will skip last segment.\n"
+        end
+        no_of_segments -= 1
+        segmentation = floor(Int64,segmentation)       
     end
     
     # C needs to be declared before the for loop otherwise won't be part of local scope 
@@ -431,7 +404,7 @@ function get_diagonalization(
     end
 
     # Do we need to get the error history from the algorithms?
-    # If so selected, a performance panelty is to be expected.
+    # If so selected, a performance penalty is to be expected.
     plot_convergence = only_plot == :plot
 
     if algorithm in ["jdiag", "jdiag_gabrieldernbach"]
@@ -448,7 +421,7 @@ function get_diagonalization(
         end
 
     elseif algorithm in ["FFD", "ffd", "ffdiag"]
-        F, B, error_array = FFD!(
+        F, B, error_array = ffd(
             A,
             threshold=threshold,
             max_iter=max_iter,
