@@ -75,3 +75,10 @@ end
         @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < accepted_error
     end
 end
+@testset "Nondiagonality of same matrix concatenated as input" begin
+    test_input = AJD.random_normal_commuting_matrices(10, 1)
+    test_input = push!(test_input, test_input[1])
+    
+    result = diagonalize(test_input, algorithm="jdiag_edourdpineau")
+    @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < accepted_error
+end

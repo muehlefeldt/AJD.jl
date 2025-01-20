@@ -1,42 +1,15 @@
 using LinearAlgebra
 using Diagonalizations
 using Statistics: cor
-
-"""
-    random_matrices(n::Int, m::Int)
-
-Generate m random matrices of size n x n
-"""
-function random_matrices(n::Int, m::Int)
-    return [rand(n,n) for i in 1:m]
-end
-
-"""
-Generate m random symmetric matrices of size n x n
-"""
-function random_symmetric_matrices(n::Int, m::Int)
-    return [Symmetric(rand(n,n)) for i in 1:m]
-end
-
-"""
-Generate m random commuting matrices of size n x n
-These will produce all real rotation matrices using the Jacobi method
-
-``M_i * M_j = M_j * M_i for all i,j``
-"""
-function random_commuting_matrices(n::Int, m::Int)
-    P = rand(n,n)
-    return [P*Diagonal(rand(n))*inv(P) for _ in 1:m] #change inv to cholesky if possible?
-end
-
+using Random
 """
     random_normal_commuting_matrices(n::Int, m::Int; complex::Bool=false)
     
-Generate m random normal commuting matrices of size n x n
+Generate m random normal commuting matrices of size ``n × n``
 These can be exactly diagonalized
 
-``M_i * M_j = M_j * M_i for all i,j``
-``M_i*M_i^{T} = M_i^{T}*M_i for all i``
+``M_i * M_j = M_j * M_i`` for all i,j
+``M_i*M_i' = M_i'*M_i`` for all i
 """
 function random_normal_commuting_matrices(n::Int, m::Int; complex::Bool=false)
     # Just like the function below, this produces hermitian an symmetric matrices, they are
@@ -80,7 +53,7 @@ end
 """
     frobenius_offdiag_norm(A::AbstractArray{T,3})::Real where {T<:Number}
 Input
-* A: Vector of matrices with size n x n x k 
+* A: Vector of matrices with size ``n × n × k`` 
 
 Takes the offdiagonal elements of an Array of matrices ``A^k`` and applies the frobenius norm (``\\sum |a_{i,j}|^{2}``). 
 """
@@ -158,55 +131,17 @@ julia> AJD.get_diag_elements(A)
 """
 function get_diag_elements(A::Array)
     rows,columns,k = size(A)
-    if typeof(A) <: AbstractArray{<:Complex}
-        D = complex.(zeros(rows, columns, k))
-    else
-        D = zeros(rows, columns, k)
-    end
+    D = zeros(rows, columns, k)
     for row in 1:rows
         D[row,row,:] = A[row,row,:]
     end
     return D
 end
 
-function sort_offdiag_elements(A::AbstractArray{<:Number,3})
-    rows,_,k = size(A)
-    no_el = rows*rows-rows #number of offdiagonal elements
-    if typeof(A) <: AbstractArray{<:Complex}
-        sorted_array = complex.(zeros(no_el*k))
-    else
-        sorted_array = zeros(no_el*k)
-    end
-
-    for matrices in 1:k
-        sorted_array[1+(matrices-1)*(no_el):matrices*(no_el)] = sort_offdiag_elements(A[:,:,matrices])
-    end
-    return sorted_array
-end
-
-function sort_offdiag_elements(A::AbstractArray{<:Number,2})
-    rows,_ = size(A)
-    if typeof(A) <: AbstractArray{<:Complex}
-        sorted_array = complex.(zeros(rows*rows-rows))
-    else
-        sorted_array = zeros(rows*rows-rows)
-    end
-    i = 1
-    for row in 1:rows-1,column in row+1:rows
-        #TODO: Benchmark if append! or push! is faster
-        sorted_array[i] = A[row, column]
-        i += 1
-        sorted_array[i] = A[column,row]
-        i +=1
-        
-    end
-    return sorted_array
-end
-
 """
     is_commuting(A::AbstractMatrix, B::AbstractMatrix) 
-* A: AbstractMatrix of dimension n x n
-* B: AbstractMatrix of dimension n x n
+* A: AbstractMatrix of dimension ``n × n``
+* B: AbstractMatrix of dimension ``n × n``
 
 Check if two matrices A, B are commuting.
  A * B = B * A must hold. 
@@ -242,7 +177,7 @@ end
 """
     get_z_fdiag(D::AbstractArray{<:Number}, i::Int, j::Int)
 * D: Diagonal Matrix with offdiagonal elements set to zero
-* i,j: Denotes the indexes the matrix D
+* i,j: Denotes the indexes of matrix D
 
 Calculates the factor ``z_{ij}`` which is defined by: `` ∑_{k} D_{i,i}^{k}D_{j,j}^{k} ``
 """
@@ -293,28 +228,11 @@ function addrandomnoise(A::Vector{M};σ = 0.5,same_noise = true) where {T<:Numbe
     end
     return A
 end
-function addrandomnoise!(A::Vector{M};σ = 0.5,same_noise = true) where {T<:Number, M<:AbstractMatrix{T}}
-    k = length(A)
-    rows,columns = size(A[1])
-    if same_noise == true
-        R = randn(rows,columns) #noise matrix
-        for index_k = 1:k
-            A[index_k] = A[index_k] + σ*R*R'
-        end
-    else
-        for index_k = 1:k
-            R = randn(rows,columns)
-            A[k] = A[k] + σ*R*R'
-        end
-    end
-    return A
-end
 
 """
-  generate_correlation_matrix(signal_one_data,signal_two_data)
-                                                                                          
-* `signal_one_data`: Array of dimension n x m
-* `signal_two_data`: Array of dimension n x m
+    generate_correlation_matrix(signal_one_data,signal_two_data)
+* `signal_one_data`: Array of dimension ``n × m``
+* `signal_two_data`: Array of dimension ``n × m``
 
 Calculates correlation matrix between observations ``x_i(t)`` and ``x_i(t+τ)``.
 """
@@ -336,7 +254,7 @@ end
 
 First Calculates from a given array of functions resolved in the time domain, which simulate the uncorrelated signals ``s_j`` and a mixing matrix A, the measurements ``x_i`` with:
 
-``x_i(t) = \\sum_{t = 1}^{T} a_{i,j} * s_j(t) ``.
+``x_i(t) = \\sum_{t = 1}^{T} a_{i,j} s_j(t) ``.
 
 Then time delayed correlation matrix between observations mentioned in [source] for a specified number in `no_of_corr`. 
 
@@ -355,11 +273,11 @@ function generate_testdata(signal_sources::AbstractArray{<:Function}, mixing_mat
 
     rows,columns = size(mixing_matrix)
     if columns != length(signal_sources)
-        throw(ArgumentError("Signal source array and mixing matrix have different dimensions."))
+        throw(ArgumentError("Signal source array and mixing matrix have different dimensions (columns of matrix don't match signals in signal_sources)."))
     end
 
     #initialize the matrix to be diagonalized
-    C = zeros(rows,rows,no_of_cor)
+    C = Matrix{}[]
 
     for k in 0:no_of_cor-1
        
@@ -377,27 +295,34 @@ function generate_testdata(signal_sources::AbstractArray{<:Function}, mixing_mat
                 x_delay[row,:] = x_delay[row,:] + mixing_matrix[row,source]*signal_sources[source].(range((k*sample_time+1+delay),(k+1)*sample_time+delay, length = no_of_samples))
             end
         end
-        C[:,:,k+1] = generate_correlation_matrix(x,x_delay)
+        push!(C,generate_correlation_matrix(x,x_delay))
+    end
+
+    #convert C to appropriate type
+    if all(isa.(C, Matrix{Float64})) == true
+        C = convert(Vector{Matrix{Float64}},C)
+    else
+        C = convert(Vector{Matrix{ComplexF64}},C)
     end
 
     return C
 end
 """
     generate_testdata(signal_sources::AbstractArray; delay::Number = 10, no_of_segments::Int = 10)
-* `signal_sources``: Matrix of rowwise signals [``x_1``; ``x_2``;...; ``x_n``]
-* `delay``: Time/index shift between observations to be correlated
-* `no_of_segments`: Puts `signal_sources`` into even segments to be correlated. If the number leads to uneven correlation will throw an error. 
+* `signal_sources`: Matrix of rowwise signals [``x_1``; ``x_2``;...; ``x_n``]
+* `delay`: Time/index shift between observations to be correlated
+* `no_of_segments`: Puts `signal_sources` into even segments to be correlated. If the number leads to uneven correlation will throw an error if `user_input = false`.
+* `user_input`: If true will show a prompt in the julia repl window in case segments are uneven. Continuation of the process will lead to one less segment than declared cutting data of
 
 Generate Correlation Matrices for discrete observations ``x_i``.
 
 # Known Issue
 
-If your data has a lot of zeros inside the observations setting `no_of_segements` too high will lead to NaN values since the variance of a vector of zeros is zero!
-You might want to manipulate your data or change the number of segments to be less!
+If your data has a segment with variance close to 0 (e.g. due to all of the values being the same) the correlation matrix will have NaN values inside. Setting the number of segments to a lower value might help.
 
 """
 function generate_testdata(signal_sources::AbstractArray; 
-    delay::Number = 10, no_of_segments::Int = 10)
+    delay::Number = 10, no_of_segments::Int = 10, show_warning::Bool = true)
     
     x = signal_sources
     rows,columns = size(signal_sources) 
@@ -415,7 +340,14 @@ function generate_testdata(signal_sources::AbstractArray;
     if isinteger(segmentation)
         segmentation = Int(segmentation)
     else
-        throw(ArgumentError("Number of Segments leads to segments of different sizes!"))
+        # for testing should be false! could be also done with Logging module and
+        # disable_logging(Logging.Warn) but that would supress all warnings for the test case
+        # which might not be desirable!
+        if show_warning == true
+            @warn "Number of Segments leads to segments of different sizes! Will skip last segment.\n"
+        end
+        no_of_segments -= 1
+        segmentation = floor(Int64,segmentation)       
     end
     
     # C needs to be declared before the for loop otherwise won't be part of local scope 
@@ -424,20 +356,43 @@ function generate_testdata(signal_sources::AbstractArray;
     # Array[...] or Matrix[...] with all other entries being of type Matrix or Array
 
     # initialize the matrix set with the type of signal_sources
-    C = Matrix{typeof(x[1])}[]
+    # this might lead to an error if the type of signals differs from eachother however
+    # if only waveform files are used for testdata generation this shouldn't fail. could
+    # 
+    C = Matrix{}[]
 
     for k in 1:no_of_segments-1
-        x_new = x[:,(k-1)*segmentation+1:k*segmentation]
+        x_t = x[:,(k-1)*segmentation+1:k*segmentation]
         x_delay = x[:,(k-1)*segmentation+1+delay:k*segmentation+delay]
-        push!(C,generate_correlation_matrix(x_new,x_delay))
+        push!(C,generate_correlation_matrix(x_t,x_delay))
     end
     if isnan.(sum(C)) != zeros(rows,rows)
         throw(ArgumentError("Number of segments leads to NaN inside of correlation matrix. See Documentation for further Info."))
     end
-
+    # convert C to appropriate type
+    if all(isa.(C, Matrix{Float64})) == true
+        C = convert(Vector{Matrix{Float64}},C)
+    else
+        C = convert(Vector{Matrix{ComplexF64}},C)
+    end
     return C
 end
+"""
+    generate_random_signals(no_of_signals::Int, no_of_samples::Int; seed = Xoshiro(), signal_type = Float64)
+*`no_of_signals`: used to declare how many signals ``s_{j}`` are inside of the testdata
+*`no_of_samples`: used to declare how many samples each signal ``s_j`` has
+*`seed`: seed for the `rand` function, might need to import the module Random
+*`signal_type`: default is Float64 but ComplexF64 is possible as well
 
+Similar to `random_commuting_matrices` function. Gives the opportunity to generate testdata randomly and pluck it into the discrete version of generate_testdata.
+"""
+function generate_random_signals(no_of_signals::Int, no_of_samples::Int; seed = Xoshiro(), signal_type::DataType = Float64)
+    signals = Matrix{signal_type}(undef,no_of_signals,no_of_samples)
+    for signal in 1:no_of_signals
+        signals[signal,:] = rand(seed,signal_type, no_of_samples)
+    end
+    return signals
+end
 """
     function get_diagonalization(
         A::Vector{<:AbstractMatrix{<:Number}};
@@ -464,7 +419,7 @@ function get_diagonalization(
     end
 
     # Do we need to get the error history from the algorithms?
-    # If so selected, a performance panelty is to be expected.
+    # If so selected, a performance penalty is to be expected.
     plot_convergence = only_plot == :plot
 
     if algorithm in ["jdiag", "jdiag_gabrieldernbach"]
@@ -481,7 +436,7 @@ function get_diagonalization(
         end
 
     elseif algorithm in ["FFD", "ffd", "ffdiag"]
-        F, B, error_array = FFD!(
+        F, B, error_array = ffd(
             A,
             threshold=threshold,
             max_iter=max_iter,

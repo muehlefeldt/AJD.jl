@@ -12,6 +12,6 @@ accepted_error = 1e-6
     @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < accepted_error
     
     # Test use of infinity norm. Default always uses frobenius norm.
-    result = AJD.create_linear_filter(AJD.FFD!(test_input, norm_ = "inf")[1])
+    result = AJD.create_linear_filter(AJD.ffd(test_input, norm_ = "inf")[1])
     @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < accepted_error
 end

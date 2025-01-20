@@ -1,7 +1,7 @@
 using LinearAlgebra
 using PosDefManifold
 #TODO: Not used for complex Matrices
-function FFD!(
+function ffd(
     A::Vector{M};
     threshold = eps(),
     max_iter = 100,

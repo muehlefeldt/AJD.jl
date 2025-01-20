@@ -1,6 +1,7 @@
 # Test implementation of AJD.jdiag_edourdpineau().
 
 using Diagonalizations: nonDiagonality
+using PosDefManifold: mean
 
 "Accepted error level."
 accepted_error = 1e-15

@@ -57,7 +57,7 @@ function jdiag_gabrieldernbach!(
                 # if threshold for minimize function is reached abort calculations 
                 #(or max iter is reached)
                 # otherwise rotation is applied to matrix
-                active = active || abs(s) > threshold
+                active = abs(s) > threshold
                 if abs(s) > threshold
 
                     pair = [row, column]
