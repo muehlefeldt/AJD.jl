@@ -11,7 +11,8 @@ Usage:
 * `:approx_diag`
 * `:random_noice`
 """
-function get_test_data(type::Symbol; n_dim::Int = 10, n_matrices::Int = 10)
+#TODO: Change n_dim and n_matrices to kwargs?
+function get_test_data(type::Symbol, n_dim::Int = 10, n_matrices::Int = 10)
     if type == :exact_diag
         return random_normal_commuting_matrices(n_dim, n_matrices)
     elseif type == :approx_diag 
