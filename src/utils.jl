@@ -8,8 +8,8 @@ using Random
 Generate m random normal commuting matrices of size ``n × n``
 These can be exactly diagonalized
 
-``M_i * M_j = M_j * M_i`` for all i,j
-``M_i*M_i' = M_i'*M_i`` for all i
+``M_i M_j = M_j  M_i`` for all i,j
+``M_i M_i' = M_i' M_i`` for all i
 """
 function random_normal_commuting_matrices(n::Int, m::Int; complex::Bool=false)
     # Just like the function below, this produces hermitian an symmetric matrices, they are
@@ -52,7 +52,6 @@ end
 
 """
     frobenius_offdiag_norm(A::AbstractArray{T,3})::Real where {T<:Number}
-Input
 * A: Vector of matrices with size ``n × n × k`` 
 
 Takes the offdiagonal elements of an Array of matrices ``A^k`` and applies the frobenius norm (``\\sum |a_{i,j}|^{2}``). 
@@ -67,13 +66,12 @@ function frobenius_offdiag_norm(A::AbstractArray{T,3})::Real where {T<:Number}
 end
 """
     get_offdiag_elements(A::Array{<:Number,3})
-Input
 * A: Vector of matrices
 
 Takes an array of matrices and returns the offdiagonal elements of A.
 
 # Examples
-```jldoctest
+```julia
 julia> A = ones(3,3,3);
 
 julia> AJD.get_offdiag_elements(A)
@@ -109,7 +107,7 @@ Takes an array of matrices and returns the diagonal elements as a diagonal matri
 
 # Examples
 
-```jldoctest
+```julia
 julia> A = ones(3,3,3);
 
 julia> AJD.get_diag_elements(A)
@@ -144,7 +142,7 @@ end
 * B: AbstractMatrix of dimension ``n × n``
 
 Check if two matrices A, B are commuting.
- A * B = B * A must hold. 
+ ``AB = BA`` must hold. 
  """
 function is_commuting(A::AbstractMatrix, B::AbstractMatrix)
     return isapprox(A*B, B*A)
@@ -212,7 +210,8 @@ function check_input(A::Vector{<:AbstractMatrix{<:Number}})
     return true
 end
 
-function addrandomnoise(A::Vector{M};σ = 0.5,same_noise = true) where {T<:Number, M<:AbstractMatrix{T}}
+function addrandomnoise(A::Vector{M};σ::AbstractFloat = 0.5,
+    same_noise::Bool = true) where {T<:Number, M<:AbstractMatrix{T}}
     k = length(A)
     rows,columns = size(A[1])
     if same_noise == true
@@ -230,13 +229,13 @@ function addrandomnoise(A::Vector{M};σ = 0.5,same_noise = true) where {T<:Numbe
 end
 
 """
-    generate_correlation_matrix(signal_one_data,signal_two_data)
+    generate_correlation_matrix(signal_one_data::AbstractArray,signal_two_data::AbstractArray)
 * `signal_one_data`: Array of dimension ``n × m``
 * `signal_two_data`: Array of dimension ``n × m``
 
 Calculates correlation matrix between observations ``x_i(t)`` and ``x_i(t+τ)``.
 """
-function generate_correlation_matrix(signal_one_data,signal_two_data)
+function generate_correlation_matrix(signal_one_data::AbstractArray,signal_two_data::AbstractArray)
 
     if size(signal_one_data) != size(signal_two_data)
         throw(ArgumentError("Signals have different sizes!"))
@@ -247,25 +246,28 @@ function generate_correlation_matrix(signal_one_data,signal_two_data)
 end
 
 """
-    generate_testdata(signal_sources::AbstractArray{<:Function}, mixing_matrix::AbstractMatrix{<:Number}; <keyword_arguments>)
+    generate_testdata(signal_sources::AbstractArray{<:Function}, 
+    mixing_matrix::AbstractMatrix{<:Number}; <keyword_arguments>)
 
 * `signal_sources`: Array of anonymous functions for generating time series data of the uncorrelated signals ``s_j`` of `BSS` e.g. [ s1 = x-> 1.4*sin(2x), s2 = 2.2sin(x)]
 * `mixing_matrix`: mixing matrix by which the signals ``s_j`` are multiplied to get the measurements/observations ``x_i``
 
-First Calculates from a given array of functions resolved in the time domain, which simulate the uncorrelated signals ``s_j`` and a mixing matrix A, the measurements ``x_i`` with:
+First Calculates from a given array of functions, which simulate the uncorrelated signals ``s_j(t)`` and a mixing matrix A, the observations ``x_i``:
 
 ``x_i(t) = \\sum_{t = 1}^{T} a_{i,j} s_j(t) ``.
 
-Then time delayed correlation matrix between observations mentioned in [source] for a specified number in `no_of_corr`. 
-
+Then a number of time delayed correlation matrices specified by `no_of_corr` is calculated.
 # Arguments
 
 * `delay`::Number = 1: time delay between signals
 * `sample_time`::Number = 10: length of single time series (same for all observations)
-* `no_of_samples`::Int = 100: number of observations in the time series
+* `no_of_samples`::Int = 100: number of observations made during `sample_time`
 * `no_of_cor`::Int = 10: number of observations made over the entire measurement
-
-For numbers to generate test data set of timeresolved function look here: [source p.1709](https://doi.org/10.21595/jve.2021.21961)
+# Example for `signal_sources` and `mixing_matrix`
+```julia
+signal_sources = [x->1.6sin(2pi*5x+5)+2sin(2pi*20x+27)+0.5sin(2pi*100x)+1,x->1.2(2pi*11x)+sin(2pi*2x)+0.7sin(2pi*111x+10)]
+mixing_matrix = [0.32 -0.43; -1.31 0.34]
+```julia
 """
 function generate_testdata(signal_sources::AbstractArray{<:Function}, mixing_matrix::AbstractMatrix{<:Number}; 
     delay::Number = 1, sample_time::Number = 10, 
@@ -308,18 +310,18 @@ function generate_testdata(signal_sources::AbstractArray{<:Function}, mixing_mat
     return C
 end
 """
-    generate_testdata(signal_sources::AbstractArray; delay::Number = 10, no_of_segments::Int = 10)
+    generate_testdata(signal_sources::AbstractArray; 
+    delay::Number = 10, no_of_segments::Int = 10)
 * `signal_sources`: Matrix of rowwise signals [``x_1``; ``x_2``;...; ``x_n``]
 * `delay`: Time/index shift between observations to be correlated
-* `no_of_segments`: Puts `signal_sources` into even segments to be correlated. If the number leads to uneven correlation will throw an error if `user_input = false`.
-* `user_input`: If true will show a prompt in the julia repl window in case segments are uneven. Continuation of the process will lead to one less segment than declared cutting data of
+* `no_of_segments`: Puts `signal_sources` into even segments to be correlated. If the number leads to uneven correlation will throw a warning if show_warning is true
+* `show_warning`: If true will show a warning in case segments are uneven. Will lead to one less correlation matrix
 
 Generate Correlation Matrices for discrete observations ``x_i``.
 
 # Known Issue
 
 If your data has a segment with variance close to 0 (e.g. due to all of the values being the same) the correlation matrix will have NaN values inside. Setting the number of segments to a lower value might help.
-
 """
 function generate_testdata(signal_sources::AbstractArray; 
     delay::Number = 10, no_of_segments::Int = 10, show_warning::Bool = true)
@@ -378,7 +380,8 @@ function generate_testdata(signal_sources::AbstractArray;
     return C
 end
 """
-    generate_random_signals(no_of_signals::Int, no_of_samples::Int; seed = Xoshiro(), signal_type = Float64)
+    generate_random_signals(no_of_signals::Int, 
+    no_of_samples::Int; seed = Xoshiro(), signal_type = Float64)
 *`no_of_signals`: used to declare how many signals ``s_{j}`` are inside of the testdata
 *`no_of_samples`: used to declare how many samples each signal ``s_j`` has
 *`seed`: seed for the `rand` function, might need to import the module Random
