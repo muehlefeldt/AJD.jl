@@ -13,7 +13,7 @@ data = AJD.get_test_data(:exact_diag; n_dim = 10, n_matrices = 10)
 filter_ = diagonalize(data)
 ```
 
-with data being a random set of normal commuting matrices with dimension `n_dim` ``\\times`` `n_dim` ``\\times`` `n_matrices`.
+with data being a random set of normal commuting matrices with dimension `n_dim` ``\times`` `n_dim` ``\times`` `n_matrices`.
 
 The first way is essentially the same as writing:
 
@@ -64,7 +64,7 @@ Source Signals are time dependent functions, but for **testing purposes only** d
 
 Be careful though with choosing functions since if the variance of the signal becomes zero for long times the correlation matrix will include NaN values!
 
-The input `mixing_matrix` can be a random matrix, the only constraint being that it has to have the same column size as signals in the source signals vector. Otherwise the calculation of the measurements/observations ``x_i = \\sum_{j=1}^m A_{ij}s_j(t)`` won't be possible. (For further information about calculation of the measurements see [Ziehe (p.6 ff.)](https://publishup.uni-potsdam.de/opus4-ubp/frontdoor/deliver/index/docId/501/file/ziehe.pdf))
+The input `mixing_matrix` can be a random matrix, the only constraint being that it has to have the same column size as signals in the source signals vector. Otherwise the calculation of the measurements/observations ``x_i = \sum_{j=1}^m A_{ij}s_j(t)`` won't be possible. (For further information about calculation of the measurements see [Ziehe (p.6 ff.)](https://publishup.uni-potsdam.de/opus4-ubp/frontdoor/deliver/index/docId/501/file/ziehe.pdf))
 ```julia 
 # mixing matrix is the same as in https://doi.org/10.21595/jve.2021.21961 p.1709
 mixing_matrix =  [0.32 -0.43; -1.31 0.34]

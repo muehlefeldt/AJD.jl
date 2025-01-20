@@ -4,12 +4,12 @@
 Only works for matrix with real valued entries. Based on [Matlab Code by Cardoso](https://www2.iap.fr/users/cardoso/jointdiag.html).
 
 Input:
-* A is a mxnm matrix,(A1,...,An), each with dimension mxm
+* A is a ``m×m×n`` matrix,(``A_1,...,A_n``), each with dimension ``m×m``
 * thresh is a threshold for approximation stop, normally = 10e-8.
 
 Output:
-* V : is a  mxm matrix, which accumulates givens rotations G in each iteration.
-* A : is a mxnm matrix, which contains [VA1V',...,VAnV']
+* V : is a  ``m × m`` matrix, which accumulates givens rotations G in each iteration.
+* A : is a `` m × m × n`` matrix, which contains [``VA_1V'``,...,``VA_nV'``]
 * iter: accumulates the iteration numbers
 """
 function jdiag_cardoso(
