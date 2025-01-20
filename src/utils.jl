@@ -5,24 +5,24 @@ using Statistics: cor
 """
     random_matrices(n::Int, m::Int)
 
-Generate m random matrices of size n x n
+Generate m random matrices of size ``n × n``
 """
 function random_matrices(n::Int, m::Int)
     return [rand(n,n) for i in 1:m]
 end
 
 """
-Generate m random symmetric matrices of size n x n
+Generate m random symmetric matrices of size ``n × n``
 """
 function random_symmetric_matrices(n::Int, m::Int)
     return [Symmetric(rand(n,n)) for i in 1:m]
 end
 
 """
-Generate m random commuting matrices of size n x n
+Generate m random commuting matrices of size ``n × n``
 These will produce all real rotation matrices using the Jacobi method
 
-``M_i * M_j = M_j * M_i for all i,j``
+``M_i * M_j = M_j * M_i`` for all i,j
 """
 function random_commuting_matrices(n::Int, m::Int)
     P = rand(n,n)
@@ -32,11 +32,11 @@ end
 """
     random_normal_commuting_matrices(n::Int, m::Int; complex::Bool=false)
     
-Generate m random normal commuting matrices of size n x n
+Generate m random normal commuting matrices of size ``n × n``
 These can be exactly diagonalized
 
-``M_i * M_j = M_j * M_i for all i,j``
-``M_i*M_i^{T} = M_i^{T}*M_i for all i``
+``M_i * M_j = M_j * M_i`` for all i,j
+``M_i*M_i' = M_i'*M_i`` for all i
 """
 function random_normal_commuting_matrices(n::Int, m::Int; complex::Bool=false)
     # Just like the function below, this produces hermitian an symmetric matrices, they are
@@ -80,7 +80,7 @@ end
 """
     frobenius_offdiag_norm(A::AbstractArray{T,3})::Real where {T<:Number}
 Input
-* A: Vector of matrices with size n x n x k 
+* A: Vector of matrices with size ``n × n × k`` 
 
 Takes the offdiagonal elements of an Array of matrices ``A^k`` and applies the frobenius norm (``\\sum |a_{i,j}|^{2}``). 
 """
@@ -205,8 +205,8 @@ end
 
 """
     is_commuting(A::AbstractMatrix, B::AbstractMatrix) 
-* A: AbstractMatrix of dimension n x n
-* B: AbstractMatrix of dimension n x n
+* A: AbstractMatrix of dimension ``n × n``
+* B: AbstractMatrix of dimension ``n × n``
 
 Check if two matrices A, B are commuting.
  A * B = B * A must hold. 
@@ -242,7 +242,7 @@ end
 """
     get_z_fdiag(D::AbstractArray{<:Number}, i::Int, j::Int)
 * D: Diagonal Matrix with offdiagonal elements set to zero
-* i,j: Denotes the indexes the matrix D
+* i,j: Denotes the indexes of matrix D
 
 Calculates the factor ``z_{ij}`` which is defined by: `` ∑_{k} D_{i,i}^{k}D_{j,j}^{k} ``
 """
@@ -312,8 +312,8 @@ end
 
 """
     generate_correlation_matrix(signal_one_data,signal_two_data)
-* `signal_one_data`: Array of dimension n x m
-* `signal_two_data`: Array of dimension n x m
+* `signal_one_data`: Array of dimension ``n × m``
+* `signal_two_data`: Array of dimension ``n × m``
 
 Calculates correlation matrix between observations ``x_i(t)`` and ``x_i(t+τ)``.
 """
@@ -334,7 +334,7 @@ end
 
 First Calculates from a given array of functions resolved in the time domain, which simulate the uncorrelated signals ``s_j`` and a mixing matrix A, the measurements ``x_i`` with:
 
-``x_i(t) = \\sum_{t = 1}^{T} a_{i,j} * s_j(t) ``.
+``x_i(t) = \\sum_{t = 1}^{T} a_{i,j} s_j(t) ``.
 
 Then time delayed correlation matrix between observations mentioned in [source] for a specified number in `no_of_corr`. 
 
@@ -382,9 +382,9 @@ function generate_testdata(signal_sources::AbstractArray{<:Function}, mixing_mat
 end
 """
     generate_testdata(signal_sources::AbstractArray; delay::Number = 10, no_of_segments::Int = 10)
-* `signal_sources``: Matrix of rowwise signals [``x_1``; ``x_2``;...; ``x_n``]
-* `delay``: Time/index shift between observations to be correlated
-* `no_of_segments`: Puts `signal_sources`` into even segments to be correlated. If the number leads to uneven correlation will throw an error. 
+* `signal_sources`: Matrix of rowwise signals [``x_1``; ``x_2``;...; ``x_n``]
+* `delay`: Time/index shift between observations to be correlated
+* `no_of_segments`: Puts `signal_sources` into even segments to be correlated. If the number leads to uneven correlation will throw an error. 
 
 Generate Correlation Matrices for discrete observations ``x_i``.
 

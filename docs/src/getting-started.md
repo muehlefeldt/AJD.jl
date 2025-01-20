@@ -36,13 +36,13 @@ using AJD
 filter = diagonalize(M)
 ```
 
-The returned object `filter` of `diagonalize()` is a LinearFilter containing the matrix ``F`` as well as ``F'``. Assuming ``A \in M`` these are used to diagonlize ``A`` by calculating ``D = F' * A * F``. ``D`` being the diagonalized matrix. In Julia you calculate:
+The returned object `filter` of `diagonalize()` is a LinearFilter containing the matrix ``F`` as well as ``F'``. Assuming ``A \in M`` these are used to diagonalize ``A`` by calculating ``D = F' * A * F``. ``D`` being the diagonalized matrix. In Julia you calculate:
 ```julia
 D = filter.iF * A * filter.F
 ```
 
 ## Advanced options
-The main function `diagonlaize()` provides several options to be choosen by the user.
+The main function `diagonalize()` provides several options to be choosen by the user.
 
 ### Algorithms
 The package allows to choose diffrent algorithms to calculate the AJD.
@@ -87,7 +87,7 @@ The generate plot:
 ![](conv.png)
 
 #### Plot Filter and Diagonalized matrix
-To plot the filter matrix and the diagonalized matrices use the keyword `plot_matrix=true`. The diagonalized matrices ``D_k`` are summarised and only ``mean(D_k)`` is plotted to proivde an overview. Execute:
+To plot the filter matrix and the diagonalized matrices use the keyword `plot_matrix=true`. The diagonalized matrices ``D_k`` are summarised and only ``mean(D_k)`` is plotted to provide an overview. Execute:
 ```julia
 # Generate 1000 matrices of 10 x 10 size.
 M = AJD.random_normal_commuting_matrices(10, 1000)
@@ -105,4 +105,4 @@ All implementations of the algorithms can be benchmarked by executing:
 ajd_benchmark(10, 1000)
 ```
 
-Large input sizes require a lot compute time du to repeated execution.
+Large input sizes require a lot compute time due to repeated execution.
