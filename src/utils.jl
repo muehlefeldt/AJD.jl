@@ -3,33 +3,6 @@ using Diagonalizations
 using Statistics: cor
 
 """
-    random_matrices(n::Int, m::Int)
-
-Generate m random matrices of size ``n × n``
-"""
-function random_matrices(n::Int, m::Int)
-    return [rand(n,n) for i in 1:m]
-end
-
-"""
-Generate m random symmetric matrices of size ``n × n``
-"""
-function random_symmetric_matrices(n::Int, m::Int)
-    return [Symmetric(rand(n,n)) for i in 1:m]
-end
-
-"""
-Generate m random commuting matrices of size ``n × n``
-These will produce all real rotation matrices using the Jacobi method
-
-``M_i * M_j = M_j * M_i`` for all i,j
-"""
-function random_commuting_matrices(n::Int, m::Int)
-    P = rand(n,n)
-    return [P*Diagonal(rand(n))*inv(P) for _ in 1:m] #change inv to cholesky if possible?
-end
-
-"""
     random_normal_commuting_matrices(n::Int, m::Int; complex::Bool=false)
     
 Generate m random normal commuting matrices of size ``n × n``
@@ -158,11 +131,7 @@ julia> AJD.get_diag_elements(A)
 """
 function get_diag_elements(A::Array)
     rows,columns,k = size(A)
-    if typeof(A) <: AbstractArray{<:Complex}
-        D = complex.(zeros(rows, columns, k))
-    else
-        D = zeros(rows, columns, k)
-    end
+    D = zeros(rows, columns, k)
     for row in 1:rows
         D[row,row,:] = A[row,row,:]
     end
@@ -172,12 +141,7 @@ end
 function sort_offdiag_elements(A::AbstractArray{<:Number,3})
     rows,_,k = size(A)
     no_el = rows*rows-rows #number of offdiagonal elements
-    if typeof(A) <: AbstractArray{<:Complex}
-        sorted_array = complex.(zeros(no_el*k))
-    else
-        sorted_array = zeros(no_el*k)
-    end
-
+    sorted_array = zeros(no_el*k)
     for matrices in 1:k
         sorted_array[1+(matrices-1)*(no_el):matrices*(no_el)] = sort_offdiag_elements(A[:,:,matrices])
     end
@@ -186,11 +150,8 @@ end
 
 function sort_offdiag_elements(A::AbstractArray{<:Number,2})
     rows,_ = size(A)
-    if typeof(A) <: AbstractArray{<:Complex}
-        sorted_array = complex.(zeros(rows*rows-rows))
-    else
-        sorted_array = zeros(rows*rows-rows)
-    end
+    sorted_array = zeros(rows*rows-rows)
+    
     i = 1
     for row in 1:rows-1,column in row+1:rows
         #TODO: Benchmark if append! or push! is faster
@@ -293,22 +254,6 @@ function addrandomnoise(A::Vector{M};σ = 0.5,same_noise = true) where {T<:Numbe
     end
     return A
 end
-function addrandomnoise!(A::Vector{M};σ = 0.5,same_noise = true) where {T<:Number, M<:AbstractMatrix{T}}
-    k = length(A)
-    rows,columns = size(A[1])
-    if same_noise == true
-        R = randn(rows,columns) #noise matrix
-        for index_k = 1:k
-            A[index_k] = A[index_k] + σ*R*R'
-        end
-    else
-        for index_k = 1:k
-            R = randn(rows,columns)
-            A[k] = A[k] + σ*R*R'
-        end
-    end
-    return A
-end
 
 """
     generate_correlation_matrix(signal_one_data,signal_two_data)
@@ -353,11 +298,11 @@ function generate_testdata(signal_sources::AbstractArray{<:Function}, mixing_mat
 
     rows,columns = size(mixing_matrix)
     if columns != length(signal_sources)
-        throw(ArgumentError("Signal source array and mixing matrix have different dimensions."))
+        throw(ArgumentError("Signal source array and mixing matrix have different dimensions (columns of matrix don't match signals in signal_sources)."))
     end
 
     #initialize the matrix to be diagonalized
-    C = zeros(rows,rows,no_of_cor)
+    C = Matrix{}[]
 
     for k in 0:no_of_cor-1
        
@@ -375,7 +320,14 @@ function generate_testdata(signal_sources::AbstractArray{<:Function}, mixing_mat
                 x_delay[row,:] = x_delay[row,:] + mixing_matrix[row,source]*signal_sources[source].(range((k*sample_time+1+delay),(k+1)*sample_time+delay, length = no_of_samples))
             end
         end
-        C[:,:,k+1] = generate_correlation_matrix(x,x_delay)
+        push!(C,generate_correlation_matrix(x,x_delay))
+    end
+
+    #convert C to appropriate type
+    if all(isa.(C, Matrix{Float64})) == true
+        C = convert(Vector{Matrix{Float64}},C)
+    else
+        C = convert(Vector{Matrix{ComplexF64}},C)
     end
 
     return C
@@ -384,18 +336,18 @@ end
     generate_testdata(signal_sources::AbstractArray; delay::Number = 10, no_of_segments::Int = 10)
 * `signal_sources`: Matrix of rowwise signals [``x_1``; ``x_2``;...; ``x_n``]
 * `delay`: Time/index shift between observations to be correlated
-* `no_of_segments`: Puts `signal_sources` into even segments to be correlated. If the number leads to uneven correlation will throw an error. 
+* `no_of_segments`: Puts `signal_sources` into even segments to be correlated. If the number leads to uneven correlation will throw an error if `user_input = false`.
+* `user_input`: If true will show a prompt in the julia repl window in case segments are uneven. Continuation of the process will lead to one less segment than declared cutting data of
 
 Generate Correlation Matrices for discrete observations ``x_i``.
 
 # Known Issue
 
-If your data has a lot of zeros inside the observations setting `no_of_segements` too high will lead to NaN values since the variance of a vector of zeros is zero!
-You might want to manipulate your data or change the number of segments to be less!
+If your data has a segment with variance close to 0 (e.g. due to all of the values being the same) the correlation matrix will have NaN values inside. Setting the number of segments to a lower value might help.
 
 """
 function generate_testdata(signal_sources::AbstractArray; 
-    delay::Number = 10, no_of_segments::Int = 10)
+    delay::Number = 10, no_of_segments::Int = 10,user_input = true)
     
     x = signal_sources
     rows,columns = size(signal_sources) 
@@ -412,6 +364,14 @@ function generate_testdata(signal_sources::AbstractArray;
 
     if isinteger(segmentation)
         segmentation = Int(segmentation)
+    elseif user_input == true
+        print("Number of Segments leads to segments of different sizes! Will skip last segment. Do you want to continue? [y, n]\n")
+        if readline() in ["n", "no","No","N"]
+            throw(ArgumentError("Operation aborted"))
+        else
+            no_of_segments -= 1
+            segmentation = floor(Int64,segmentation)
+        end
     else
         throw(ArgumentError("Number of Segments leads to segments of different sizes!"))
     end
@@ -422,17 +382,25 @@ function generate_testdata(signal_sources::AbstractArray;
     # Array[...] or Matrix[...] with all other entries being of type Matrix or Array
 
     # initialize the matrix set with the type of signal_sources
-    C = Matrix{typeof(x[1])}[]
+    # this might lead to an error if the type of signals differs from eachother however
+    # if only waveform files are used for testdata generation this shouldn't fail. could
+    # 
+    C = Matrix{}[]
 
     for k in 1:no_of_segments-1
-        x_new = x[:,(k-1)*segmentation+1:k*segmentation]
+        x_t = x[:,(k-1)*segmentation+1:k*segmentation]
         x_delay = x[:,(k-1)*segmentation+1+delay:k*segmentation+delay]
-        push!(C,generate_correlation_matrix(x_new,x_delay))
+        push!(C,generate_correlation_matrix(x_t,x_delay))
     end
     if isnan.(sum(C)) != zeros(rows,rows)
         throw(ArgumentError("Number of segments leads to NaN inside of correlation matrix. See Documentation for further Info."))
     end
-
+    # convert C to appropriate type
+    if all(isa.(C, Matrix{Float64})) == true
+        C = convert(Vector{Matrix{Float64}},C)
+    else
+        C = convert(Vector{Matrix{ComplexF64}},C)
+    end
     return C
 
 end

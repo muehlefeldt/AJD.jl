@@ -1,8 +1,7 @@
 # Test utility functions.
-# using LinearAlgebra
-# using PosDefManifold
-using AJD: isstrictly_diagonally_dominant, get_offdiag_elements, get_diag_elements,frobenius_offdiag_norm, sort_offdiag_elements, addrandomnoise,addrandomnoise!
-
+using PosDefManifold
+using LinearAlgebra
+using AJD: isstrictly_diagonally_dominant, get_offdiag_elements, get_diag_elements,frobenius_offdiag_norm, sort_offdiag_elements, addrandomnoise,generate_correlation_matrix
 # Test the generation of random, commuting matrices.
 # Used to create test data for the actual diagonalization.
 # Real and complex matrices are tested.
@@ -113,6 +112,19 @@ end
 
 @testset "random_noise" begin
     input = [Matrix(1.0I,2,2),Matrix(1.0I,2,2)]
-    input = addrandomnoise!(input)
+    input_noise = addrandomnoise(input,same_noise = true)
+    @test input_noise[1] == input_noise[2]
+    #check if noise is the same on both matrices
+    #highely unlikely they will ever be the same but test could potentially fail
+    input_noise = addrandomnoise(input,same_noise = false)
+    @test input_noise[1] != input_noise[2]
     
 end
+
+@testset "generate_correlation_matrix_erroring" begin
+    signal1 = [1 2 3 4]
+    signal2 = [1 2 3]
+    #check if function throws error if both signals have different sizes
+    @test_throws ArgumentError generate_correlation_matrix(signal1,signal2)
+end
+

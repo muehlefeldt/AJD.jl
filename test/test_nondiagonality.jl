@@ -4,8 +4,8 @@
 # nonDiagonality(I) = 0 as I is a diagonal matrix.
 
 using AJD
-# using Diagonalizations
-# using PosDefManifold
+using Diagonalizations
+using PosDefManifold
 # Define the acceptable error level.
 # How far the diagonalised matrices can be away from a perfect diagonal matrix.
 # Diagonalizations.jl set the error level to 1e-6.

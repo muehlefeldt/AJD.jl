@@ -1,7 +1,7 @@
 # FFDiag specific tests.
 
-# using Diagonalizations: nonDiagonality
-# using PosDefManifold: mean
+using Diagonalizations: nonDiagonality
+using PosDefManifold: mean
 
 accepted_error = 1e-6
 

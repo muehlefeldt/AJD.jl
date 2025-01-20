@@ -10,7 +10,6 @@ using Plots: Plot
 
 @testset "AJD.jl" begin
     include("test_jdiag_gabrieldernbach.jl")
-    include("test_jdiag_gabrieldernbach_utils.jl")
     include("test_jdiag_cardoso.jl")
     include("test_jdiag_eduardpineau.jl")
     include("test_linearfilter.jl")
