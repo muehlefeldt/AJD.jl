@@ -35,9 +35,7 @@ Input of matrices ``M_k`` need to be a vector of matrices.
 The matrices can be of types Float64 or Complex.
 
 Supported algorithms are `jdiag_gabrieldernbach`, `jdiag_cardoso` and `jdiag_edourdpineau`.
-See the Getting Started Guide for information on the algorithms. Test
-
-``M_k``.
+See the Getting Started Guide for information on the algorithms.
 
 """
 function diagonalize(

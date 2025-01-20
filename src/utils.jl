@@ -1,7 +1,7 @@
 using LinearAlgebra
 using Diagonalizations
 using Statistics: cor
-
+using Random
 """
     random_normal_commuting_matrices(n::Int, m::Int; complex::Bool=false)
     
@@ -322,7 +322,7 @@ If your data has a segment with variance close to 0 (e.g. due to all of the valu
 
 """
 function generate_testdata(signal_sources::AbstractArray; 
-    delay::Number = 10, no_of_segments::Int = 10, show_warning = true)
+    delay::Number = 10, no_of_segments::Int = 10, show_warning::Bool = true)
     
     x = signal_sources
     rows,columns = size(signal_sources) 
@@ -377,7 +377,22 @@ function generate_testdata(signal_sources::AbstractArray;
     end
     return C
 end
+"""
+    generate_random_signals(no_of_signals::Int, no_of_samples::Int; seed = Xoshiro(), signal_type = Float64)
+*`no_of_signals`: used to declare how many signals ``s_{j}`` are inside of the testdata
+*`no_of_samples`: used to declare how many samples each signal ``s_j`` has
+*`seed`: seed for the `rand` function, might need to import the module Random
+*`signal_type`: default is Float64 but ComplexF64 is possible as well
 
+Similar to `random_commuting_matrices` function. Gives the opportunity to generate testdata randomly and pluck it into the discrete version of generate_testdata.
+"""
+function generate_random_signals(no_of_signals::Int, no_of_samples::Int; seed = Xoshiro(), signal_type::DataType = Float64)
+    signals = Matrix{signal_type}(undef,no_of_signals,no_of_samples)
+    for signal in 1:no_of_signals
+        signals[signal,:] = rand(seed,signal_type, no_of_samples)
+    end
+    return signals
+end
 """
     function get_diagonalization(
         A::Vector{<:AbstractMatrix{<:Number}};

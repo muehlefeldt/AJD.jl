@@ -1,7 +1,9 @@
 # Test utility functions.
 using PosDefManifold
 using LinearAlgebra
-using AJD: isstrictly_diagonally_dominant, get_offdiag_elements, get_diag_elements,frobenius_offdiag_norm, addrandomnoise,generate_correlation_matrix
+using AJD: isstrictly_diagonally_dominant, get_offdiag_elements, get_diag_elements,
+frobenius_offdiag_norm, addrandomnoise,generate_correlation_matrix, generate_random_signals
+using Random: Xoshiro
 # Test the generation of random, commuting matrices.
 # Used to create test data for the actual diagonalization.
 # Real and complex matrices are tested.
@@ -119,3 +121,9 @@ end
     @test_throws ArgumentError generate_correlation_matrix(signal1,signal2)
 end
 
+@testset"generate_random_signals" begin
+    test_input = generate_random_signals(3,3,seed = Xoshiro(123),signal_type = Float64)
+    @test typeof(test_input) == Matrix{Float64}
+    @test size(test_input) == (3,3)
+    @test test_input[1,:] == rand(Xoshiro(123),Float64,3)
+end
