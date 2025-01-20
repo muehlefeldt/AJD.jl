@@ -14,35 +14,18 @@ accepted_error = 0.1
     # Check all implemented algorithms.
     for name in AJD.ALL_ALGORITHMS
         test_input = AJD.random_normal_commuting_matrices(10, 6)
-        result = diagonalize(test_input, algorithm=name, plot_matrix=true)
-        @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < accepted_error
+        result = diagonalize(test_input, :plot, algorithm=name)
+        @test typeof(result) <: Plot
 
-        # Check if the normal operation is still performed even if plot of filter and
-        # input matrices is selected in addition to convergence plot.
         test_input = AJD.random_normal_commuting_matrices(10, 6)
-        result = diagonalize(test_input, algorithm=name, plot_matrix=true, plot_convergence=true)
-        @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < accepted_error
+        @test_throws ArgumentError diagonalize(test_input, :test, algorithm=name)
 
-        # Only convergence plot selected.
-        test_input = AJD.random_normal_commuting_matrices(10, 6)
-        result = diagonalize(test_input, algorithm=name, plot_convergence=true)
-        @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < accepted_error
+        # Verify get_diagonalization() works as well when plot is requested.
+        # Expected are the returns:
+        # Filter, diagonalized matrices and the error array.
+        result = AJD.get_diagonalization(test_input, algorithm=name, only_plot=:plot)
+        @test length(result) == 3
+        @test length(result[3]) > 0
+        @test mean([nonDiagonality((result[1]') * A * (result[1])) for A in test_input]) < accepted_error
     end
-
-    # Directly test plot functions to generate lineplot and heatmaps with complex matrices.
-    # For now only the return type can be checked.
-    test_input = AJD.random_normal_commuting_matrices(10, 6)
-    # F, B are complex.
-    F, B, error_array = AJD.jdiag_edourdpineau(test_input)
-    @test typeof(AJD.plot_convergence_lineplot(error_array, "test")) <: Plot
-    @test typeof(AJD.plot_matrix_heatmap(F, B)) <: Plot
-    @test length(error_array) > 2
-    
-    # Directly test plot functions to generate lineplot and heatmaps.
-    # For now only the return type can be checked.
-    test_input = AJD.random_normal_commuting_matrices(10, 6)
-    F, B, error_array = AJD.jdiag_cardoso(test_input, 1e-6, plot_convergence=true)
-    @test typeof(AJD.plot_convergence_lineplot(error_array, "test")) <: Plot
-    @test typeof(AJD.plot_matrix_heatmap(F, B)) <: Plot
-    @test length(error_array) > 2
 end

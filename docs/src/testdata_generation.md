@@ -29,6 +29,7 @@ Multiplying the Mixing Matrix and the signal sources leads to the observations `
 
 The arguments `sample_time` is used as the ending time of the signal in seconds and  `no_of_samples` is the frequency/sampletime of the signal.
 
+
 `no_of_cor` is used as an indicator how many time delayed correlation matrices are to be calculated.
 
 The argument `delay` is used to indicate the time shift between two observations ``x(t)`` and ``x(t+\tau)``.
@@ -53,9 +54,7 @@ generate_testdata(signal_sources::AbstractArray; delay::Number = 10, no_of_segme
 behaves differently for discrete signals than the continous counterpart.
 
 `signal_sources` is a matrix with the observations ``x_i(t)`` ordered rowwise [``x_1(t)``; ``x_2(t)``; ``x_3(t)``].
-
 `delay` is the shift index by which the time delay is emulated. `delay`= 1000 means x[`curr_column` + 1000].
-
 `no_of_segments` divides the `signal_sources` into even segments to be correlated. Future implementation will also include the keyword `points_per_segment` which will behave similar to `sample_time` of analog counterpart, to be more intuitive.
 
 If the segments are not equally divided the method will throw an error. Make sure the length of the observations is dividable by the number of segments or trim your data to be able to!

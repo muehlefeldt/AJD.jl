@@ -1,6 +1,7 @@
-module AJD 
+module AJD
 using LinearAlgebra
 using BenchmarkTools
+using Plots: Plot
 
 # Import different algorithms.
 include("jdiag_algorithms/jdiag_cardoso.jl")
@@ -10,6 +11,7 @@ include("jdiag_algorithms/FFDiag.jl")
 
 # Utility functions, plotting functions and global constanst imported.
 include("utils.jl")
+include("utils_test_data.jl")
 include("plotting.jl")
 include("global_constants.jl")
 
@@ -43,54 +45,39 @@ function diagonalize(
     algorithm::String = "jdiag_gabrieldernbach",
     max_iter::Int = 1000,
     threshold::AbstractFloat = eps(),
-    plot_matrix::Bool = false,
-    plot_convergence::Bool = false
-    )::LinearFilter
+)::LinearFilter
 
-    if !check_input(A)
-        throw(ArgumentError("Invalid input."))
-    end
-
-    if algorithm in ["jdiag", "jdiag_gabrieldernbach"]
-        F, B, error_array = jdiag_gabrieldernbach!(A, max_iter = max_iter, threshold = threshold, plot_convergence = plot_convergence)
-
-    elseif algorithm == "jdiag_edourdpineau"
-        F, B, error_array = jdiag_edourdpineau(A, iter = max_iter)
-
-    elseif algorithm == "jdiag_cardoso"
-        if typeof(A) <: AbstractArray{<:AbstractArray{<:Real}} 
-            F, B, error_array = jdiag_cardoso(A, threshold, plot_convergence = plot_convergence)
-        else
-            throw(ArgumentError("Not supported for set of Matrices containing imaginary values!"))
-        end
-
-    elseif algorithm in ["FFD", "ffd", "ffdiag"]
-        F, B, error_array = FFD!(
-            A,
-            threshold=threshold,
-            max_iter=max_iter,
-            plot_convergence=plot_convergence
-        )
-
-    else
-        # If no vaild algorithm selected, throw an error.
-        throw(ArgumentError(
-            "No valid algorithm selected. Available options:" * join(AJD.ALL_ALGORITHMS, ", ")
-        ))
-    end
-
-    # Plotting output if so selected by the user.
-    if plot_matrix
-        # Illustrate Filter and diagonlised matrices.
-        plot_matrix_heatmap(F, B)
-    end
-
-    if plot_convergence
-        # Show convergence of the error.
-        plot_convergence_lineplot(error_array, algorithm)
-    end
-
+    F, _, _ = get_diagonalization(
+        A,
+        algorithm = algorithm,
+        max_iter = max_iter,
+        threshold = threshold,
+        only_plot = :no_plot,
+    )
     return create_linear_filter(F)
+end
+
+function diagonalize(
+    A::Vector{<:AbstractMatrix{<:Number}},
+    only_plot::Symbol;
+    algorithm::String = "jdiag_gabrieldernbach",
+    max_iter::Int = 1000,
+    threshold::AbstractFloat = eps(),
+)::Plot
+
+    if only_plot == :plot
+        F, B, error_array = get_diagonalization(
+            A,
+            algorithm = algorithm,
+            max_iter = max_iter,
+            threshold = threshold,
+            only_plot = only_plot,
+        )
+        p = get_plot(F, B, error_array, algorithm)
+    else
+        throw(ArgumentError("Please use symbol ony_plot=:plot to generate plots."))
+    end
+    return p
 end
 
 """
@@ -107,14 +94,24 @@ function ajd_benchmark(n_dims::Int, n_matrices::Int)
         suite[name] = BenchmarkGroup(["jdiag"])
         # Set the function to be benchmarked.
         suite[name]["real"] = begin
-            @benchmarkable diagonalize(data, algorithm=$name) setup=(data=AJD.random_normal_commuting_matrices($n_dims, $n_matrices)) 
+            @benchmarkable diagonalize(data, algorithm = $name) setup =
+                (data = AJD.random_normal_commuting_matrices($n_dims, $n_matrices))
         end
     end
 
     name = "ffdiag"
     suite[name] = BenchmarkGroup([name])
-    suite[name]["real"] = begin
-        @benchmarkable diagonalize(data, algorithm=$name) setup=(data=AJD.random_normal_commuting_matrices($n_dims, $n_matrices)) 
+    suite[name]["exact_diag"] = begin
+        @benchmarkable diagonalize(data, algorithm = $name) setup =
+            (data = AJD.get_test_data(:exact_diag, $n_dims, $n_matrices))
+    end
+    suite[name]["approx_diag_large"] = begin
+        @benchmarkable diagonalize(data, algorithm = $name) setup =
+            (data = AJD.get_test_data(:approx_diag_large, $n_dims, $n_matrices))
+    end
+    suite[name]["random"] = begin
+        @benchmarkable diagonalize(data, algorithm = $name) setup =
+            (data = AJD.get_test_data(:random_noice, $n_dims, $n_matrices))
     end
 
     # Run the actual benchmark.
