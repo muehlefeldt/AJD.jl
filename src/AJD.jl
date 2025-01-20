@@ -19,34 +19,31 @@ include("global_constants.jl")
 
 """
     diagonalize(
-        A::Vector{<:AbstractMatrix{<:Number}};
+        M::Vector{<:AbstractMatrix{<:Number}};
         algorithm::String = "jdiag_gabrieldernbach",
         max_iter::Int = 1000,
         threshold::AbstractFloat = eps(),
-        plot_matrix::Bool = false,
-        plot_convergence::Bool = false
-        )
+    )::LinearFilter
 
 Calculate joint diagonalization of multiple input matrices ``M_k``.
 
 Main function of the AJD package.
-Implemented algorithms are [JDiag](https://doi.org/10.1137/S0895479893259546) and FFDiag.
-Input of matrices ``M_k`` need to be a vector of matrices.
+Implemented algorithms are [JDiag](https://doi.org/10.1137/S0895479893259546) and [FFDiag](https://www.jmlr.org/papers/v5/ziehe04a.html).
+Input: Set of matrices ``M_k``, as a vector of matrices. Returns a LinearFilter containing filter matrix ``F``. 
 The matrices can be of types Float64 or Complex.
 
 Supported algorithms are `jdiag_gabrieldernbach`, `jdiag_cardoso` and `jdiag_edourdpineau`.
-See the Getting Started Guide for information on the algorithms.
-
+See the [Getting Started Guide](https://muehlefeldt.github.io/AJD.jl/dev/getting-started/) for further information to get you started.
 """
 function diagonalize(
-    A::Vector{<:AbstractMatrix{<:Number}};
+    M::Vector{<:AbstractMatrix{<:Number}};
     algorithm::String = "jdiag_gabrieldernbach",
     max_iter::Int = 1000,
     threshold::AbstractFloat = eps(),
 )::LinearFilter
 
     F, _, _ = get_diagonalization(
-        A,
+        M,
         algorithm = algorithm,
         max_iter = max_iter,
         threshold = threshold,
@@ -55,8 +52,21 @@ function diagonalize(
     return create_linear_filter(F)
 end
 
+"""
+    diagonalize(
+        M::Vector{<:AbstractMatrix{<:Number}},
+        only_plot::Symbol;
+        algorithm::String = "jdiag_gabrieldernbach",
+        max_iter::Int = 1000,
+        threshold::AbstractFloat = eps(),
+    )::Plot
+
+Calculate joint diagonalization of multiple input matrices ``M_k`` and return plot.
+
+Plots contain visual representations of the filter matrix, diagonlized matrices and convergence behavior.
+"""
 function diagonalize(
-    A::Vector{<:AbstractMatrix{<:Number}},
+    M::Vector{<:AbstractMatrix{<:Number}},
     only_plot::Symbol;
     algorithm::String = "jdiag_gabrieldernbach",
     max_iter::Int = 1000,
@@ -65,7 +75,7 @@ function diagonalize(
 
     if only_plot == :plot
         F, B, error_array = get_diagonalization(
-            A,
+            M,
             algorithm = algorithm,
             max_iter = max_iter,
             threshold = threshold,
