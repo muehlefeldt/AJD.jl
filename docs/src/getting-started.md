@@ -36,7 +36,7 @@ using AJD
 filter = diagonalize(M)
 ```
 
-The returned object `filter` of `diagonalize()` is a LinearFilter containing the matrix ``F`` as well as ``F'``. Assuming ``A \in M`` these are used to diagonalize ``A`` by calculating ``D = F' * A * F``. ``D`` being the diagonalized matrix. In Julia you calculate:
+The returned object `filter` of `diagonalize()` is a LinearFilter containing the matrix ``F`` as well as ``F'``. Assuming ``A \in M`` these are used to diagonalize ``A`` by calculating ``D = F' A  F``. ``D`` being the diagonalized matrix. In Julia you calculate:
 ```julia
 D = filter.iF * A * filter.F
 ```
