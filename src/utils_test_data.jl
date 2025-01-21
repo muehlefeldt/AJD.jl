@@ -13,7 +13,7 @@ Usage:
 """
 #not pretty but if the files should be included the directory is needed to make abs. path
 directory = dirname(@__DIR__)
-function get_test_data(type::Symbol, n_dim::Int = 10, n_matrices::Int = 10)
+function get_test_data(type::Symbol; n_dim::Int = 10, n_matrices::Int = 10)
     if type == :exact_diag
         return random_normal_commuting_matrices(n_dim, n_matrices)
     elseif type == :approx_diag 
@@ -28,7 +28,7 @@ function get_test_data(type::Symbol, n_dim::Int = 10, n_matrices::Int = 10)
         show_warning = false)
     elseif type ==:random_noice
         A = random_normal_commuting_matrices(n_dim, n_matrices)
-        return addrandomnoise(A)
+        return addrandomnoise(A, same_noise=false)
     #TODO: include this but will need additional arguments in get_test_data
     #look for best way to do this!
     # elseif type == :random_signals
