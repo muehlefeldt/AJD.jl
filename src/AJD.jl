@@ -34,7 +34,7 @@ Implemented algorithms are [JDiag](https://doi.org/10.1137/S0895479893259546) an
 Input of matrices ``M_k`` need to be a vector of matrices.
 The matrices can be of types Float64 or Complex.
 
-Supported algorithms are `jdiag_gabrieldernbach`, `jdiag_cardoso` and `jdiag_edourdpineau`.
+Supported algorithms are `jdiag_gabrieldernbach`, `jdiag_cardoso`, `jdiag_edourdpineau` and `ffdiag`.
 See the Getting Started Guide for information on the algorithms.
 
 """
@@ -129,5 +129,3 @@ end
 export diagonalize, ajd_benchmark
 
 end
-
-
