@@ -92,16 +92,31 @@ function ajd_benchmark(n_dims::Int, n_matrices::Int)
     for name in ["jade", "ffdiag"]
         suite[name] = BenchmarkGroup([name])
         suite[name]["exact_diag"] = begin
-            @benchmarkable diagonalize(data, algorithm = $name) setup =
-                (data = AJD.get_test_data(:exact_diag, $n_dims, $n_matrices))
+            @benchmarkable diagonalize(data, algorithm = $name) setup = (
+                data = AJD.get_test_data(
+                    :exact_diag,
+                    n_dims = $n_dims,
+                    n_matrices = $n_matrices,
+                )
+            )
         end
         suite[name]["approx_diag_large"] = begin
-            @benchmarkable diagonalize(data, algorithm = $name) setup =
-                (data = AJD.get_test_data(:approx_diag_large, $n_dims, $n_matrices))
+            @benchmarkable diagonalize(data, algorithm = $name) setup = (
+                data = AJD.get_test_data(
+                    :approx_diag_large,
+                    n_dims = $n_dims,
+                    n_matrices = $n_matrices,
+                )
+            )
         end
         suite[name]["random"] = begin
-            @benchmarkable diagonalize(data, algorithm = $name) setup =
-                (data = AJD.get_test_data(:random_noice, $n_dims, $n_matrices))
+            @benchmarkable diagonalize(data, algorithm = $name) setup = (
+                data = AJD.get_test_data(
+                    :random_noice,
+                    n_dims = $n_dims,
+                    n_matrices = $n_matrices,
+                )
+            )
         end
     end
 
