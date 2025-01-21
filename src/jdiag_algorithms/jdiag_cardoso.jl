@@ -4,7 +4,7 @@
 Only works for matrix with real valued entries. Based on [Matlab Code by Cardoso](https://www2.iap.fr/users/cardoso/jointdiag.html).
 
 Input:
-* A is a ``m×m×n`` matrix,(``A_1,...,A_n``), each with dimension ``m×m``
+* A is a ``m × m × n`` matrix,(``A_1,...,A_n``), each with dimension ``m × m``
 * thresh is a threshold for approximation stop, normally = 10e-8.
 
 Output:
