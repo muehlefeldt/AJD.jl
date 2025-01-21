@@ -1,10 +1,10 @@
 using WAV
 """
-    function get_test_data(
-    type::Symbol,
-    n_dim::Int = 10,
-    n_matrices::Int = 10
-    )
+    get_test_data(
+        type::Symbol,
+        n_dim::Int = 10,
+        n_matrices::Int = 10
+        )
 
 Usage:
 * `:exact_diag`

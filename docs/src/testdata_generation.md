@@ -1,3 +1,15 @@
+```@meta
+CurrentModule = AJD
+```
+
+# Generating Test Data
+The AJD.jl ackage provides a convenient function to generate valid test data. The function `AJD.get_test_data()` return test data of diffrent size and type while using sane default values.
+
+```@docs
+get_test_data
+```
+
+
 # Generating (time correlated) matrices
 The function `AJD.generate_testdata` is currently not exported but will give you the opportunity to create your own testsets to be diagonalized, consisting of an implementation of time delayed correlation matrices. The implementation of the time delayed correlation matrices used are explained [here (p.16)](https://publishup.uni-potsdam.de/opus4-ubp/frontdoor/deliver/index/docId/501/file/ziehe.pdf).
 

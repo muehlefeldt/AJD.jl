@@ -9,7 +9,7 @@ This guide provides information on the basic usage of the AJD.jl package.
 To install the Package follow these instructions to add the package to a basic Julia environment or use the package in a Pluto notebook.
 
 ### Julia
-Create temporary environment in the [Julia REPL](https://docs.julialang.org/en/v1/stdlib/REPL/):
+Create a temporary environment in the [Julia REPL](https://docs.julialang.org/en/v1/stdlib/REPL/):
 ```julia
 ] activate --temp
 ```

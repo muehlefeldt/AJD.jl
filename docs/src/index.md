@@ -17,12 +17,5 @@ Documentation for the [AJD.jl](https://github.com/muehlefeldt/AJD.jl) Julia Pack
 Below the main function of the AJD.jl package `diagonlaize()` is introduced below. For the entire documentation, including non exported functions, of the package refer to the [detailed docs page](detailed-docs.md).
 
 ```@docs
-diagonalize(
-        A::Vector{<:AbstractMatrix{<:Number}};
-        algorithm::String = "jdiag_gabrieldernbach",
-        max_iter::Int = 1000,
-        threshold::AbstractFloat = eps(),
-        plot_matrix::Bool = false,
-        plot_convergence::Bool = false
-        )
+diagonalize
 ```
