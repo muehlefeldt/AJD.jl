@@ -88,39 +88,26 @@ Returns BenchmarkGroup containing detailed results.
 function ajd_benchmark(n_dims::Int, n_matrices::Int)
     # Define a parent BenchmarkGroup to contain our suite
     suite = BenchmarkGroup()
-    for name in ["jdiag_gabrieldernbach", "jdiag_cardoso", "jdiag_edourdpineau"]
-        suite[name] = BenchmarkGroup(["jdiag"])
-        # Set the function to be benchmarked.
-        suite[name]["real"] = begin
-            @benchmarkable diagonalize(data, algorithm = $name) setup =
-                (data = AJD.random_normal_commuting_matrices($n_dims, $n_matrices))
-        end
-    end
 
-    name = "ffdiag"
-    suite[name] = BenchmarkGroup([name])
-    suite[name]["exact_diag"] = begin
-        @benchmarkable diagonalize(data, algorithm = $name) setup =
-            (data = AJD.get_test_data(:exact_diag, $n_dims, $n_matrices))
-    end
-    suite[name]["approx_diag_large"] = begin
-        @benchmarkable diagonalize(data, algorithm = $name) setup =
-            (data = AJD.get_test_data(:approx_diag_large, $n_dims, $n_matrices))
-    end
-    suite[name]["random"] = begin
-        @benchmarkable diagonalize(data, algorithm = $name) setup =
-            (data = AJD.get_test_data(:random_noice, $n_dims, $n_matrices))
+    for name in ["jade", "ffdiag"]
+        suite[name] = BenchmarkGroup([name])
+        suite[name]["exact_diag"] = begin
+            @benchmarkable diagonalize(data, algorithm = $name) setup =
+                (data = AJD.get_test_data(:exact_diag, $n_dims, $n_matrices))
+        end
+        suite[name]["approx_diag_large"] = begin
+            @benchmarkable diagonalize(data, algorithm = $name) setup =
+                (data = AJD.get_test_data(:approx_diag_large, $n_dims, $n_matrices))
+        end
+        suite[name]["random"] = begin
+            @benchmarkable diagonalize(data, algorithm = $name) setup =
+                (data = AJD.get_test_data(:random_noice, $n_dims, $n_matrices))
+        end
     end
 
     # Run the actual benchmark.
     tune!(suite)
     results = run(suite, verbose = true)
-
-    # Print basic overview.
-    for name in ["jdiag_gabrieldernbach", "jdiag_cardoso", "jdiag_edourdpineau"]
-        print(name)
-        print(median(results[name]["real"]))
-    end
 
     # Return BenchmarkGroup for further evaluation.
     return results

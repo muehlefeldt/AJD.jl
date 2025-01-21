@@ -428,7 +428,7 @@ function get_diagonalization(
     if algorithm in ["jdiag", "jdiag_gabrieldernbach"]
         F, B, error_array = jdiag_gabrieldernbach!(A, max_iter = max_iter, threshold = threshold, plot_convergence=plot_convergence)
 
-    elseif algorithm == "jdiag_edourdpineau"
+    elseif algorithm in ["jdiag_edourdpineau", "jade"]
         F, B, error_array = jdiag_edourdpineau(A, iter = max_iter)
 
     elseif algorithm == "jdiag_cardoso"
