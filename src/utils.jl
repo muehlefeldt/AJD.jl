@@ -222,7 +222,7 @@ function addrandomnoise(A::Vector{M};σ::AbstractFloat = 0.5,
     else
         for index_k = 1:k
             R = randn(rows,columns)
-            A[k] = A[k] + σ*R*R'
+            A[index_k]= A[index_k] + σ*R*R'
         end
     end
     return A
