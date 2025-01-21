@@ -3,13 +3,13 @@ The function `AJD.generate_testdata` is currently not exported but will give you
 
 If you just want to start with generating data to be diagonalized currently the recommended way is either to use the code:
 ```julia
-data = AJD.get_test_data(type:::approx_diag_large, n_dim = 10, n_matrices = 10)
+data = AJD.get_test_data(:approx_diag_large, 10, 10)
 filter_ = diagonalize(data)
 ```
 which takes a waveform file part of the repository (`channels3_room69_mix.wav`) and reads the audio data from the file, which consists of three different audio signals mixed together and diagonalizes the set of matrices or the code
 
 ```julia
-data = AJD.get_test_data(:exact_diag; n_dim = 10, n_matrices = 10)
+data = AJD.get_test_data(:exact_diag, 10, 10)
 filter_ = diagonalize(data)
 ```
 
