@@ -51,8 +51,6 @@ function ffd(
             #check if denominator is zero to not divide by zero
             W[i,j] = isfinite((z_ij*y_ji - z_i*y_ij)/(z_j*z_i-z_ij^2)) ? (z_ij*y_ji - z_i*y_ij)/(z_j*z_i-z_ij^2) : 0.0
             W[j,i] = isfinite((z_ij*y_ij - z_j*y_ji)/(z_j*z_i-z_ij^2)) ? (z_ij*y_ij - z_j*y_ji)/(z_j*z_i-z_ij^2) : 0.0
-            #W[i,j] = (z_ij*y_ji - z_i*y_ij)/(z_j*z_i-z_ij^2)
-            #W[j,i] = (z_ij*y_ij - z_j*y_ji)/(z_j*z_i-z_ij^2)
         end
         
         if norm_function(W) > θ
