@@ -14,7 +14,7 @@ Documentation for the [AJD.jl](https://github.com/muehlefeldt/AJD.jl) Julia Pack
 
 ## Main AJD.jl functions
 
-Below the main function of the AJD.jl package `diagonlaize()` is introduced below. For the entire documentation, including non exported functions, of the package refer to the [detailed docs page](detailed-docs.md).
+Below the main function of the AJD.jl package `diagonalize()` is introduced below. For the entire documentation, including non exported functions, of the package refer to the [detailed docs page](detailed-docs.md).
 
 ```@docs
 diagonalize(

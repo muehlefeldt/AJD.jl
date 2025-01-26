@@ -8,8 +8,12 @@ using Random
 Generate m random normal commuting matrices of size ``n × n``
 These can be exactly diagonalized
 
-``M_i M_j = M_j  M_i`` for all i,j
-``M_i M_i' = M_i' M_i`` for all i
+``
+M_i M_j = M_j M_i \\;\\; \\forall i,j
+``
+``
+M_i M_i' = M_i' M_i \\;\\; \\forall i
+``
 """
 function random_normal_commuting_matrices(n::Int, m::Int; complex::Bool=false)
     # Just like the function below, this produces hermitian an symmetric matrices, they are
