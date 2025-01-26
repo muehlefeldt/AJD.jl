@@ -5,10 +5,9 @@ function rotation(aii::Array{T}, ajj::Array{T}, aij::Array{T}, aji::Array{T})::M
     _, vecs = eigen(G)
     x, y, z = vecs[:, end]
     if x < 0.0
-        x, y, z = -x, -y, -z
+        # we use abs on x so julia knows that the values in the sqrt are positive
+        x, y, z = abs(x), -y, -z
     end
-    r = sqrt(x^2 + y^2 + z^2)  # julia's eigen returns normalized eigenvectors
-    @assert isapprox(r, 1.0)
     c = sqrt((x + 1.0) / 2.0)
     s = (y - z * im) / sqrt(2.0 * (x + 1.0))
     return [c conj(s); -s conj(c)]
@@ -28,7 +27,7 @@ function rotation_symmetric(aii::Array{T}, ajj::Array{T}, aij::Array{T})::Matrix
     x, y = cos(theta), sin(theta)
 
     if x < 0.0
-        x, y = -x, -y
+        x, y = abs(x), -y
     end
 
     c = sqrt((x + 1.0) / 2.0)
