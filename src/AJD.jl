@@ -2,6 +2,7 @@ module AJD
 using LinearAlgebra
 using BenchmarkTools
 using Plots: Plot
+using ProgressMeter
 
 # Import different algorithms.
 include("jdiag_algorithms/jdiag_cardoso.jl")
