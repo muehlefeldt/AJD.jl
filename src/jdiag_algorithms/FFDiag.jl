@@ -18,6 +18,9 @@ function ffd(
         norm_function = X -> opnorm(X,Inf) #infinity norm
     end
 
+    # Initial setup of the progressbar.
+    progress_bar = ProgressThresh(threshold; desc="Minimizing:")
+
     A = cat(A..., dims = 3)
     rows,columns,k = size(A)
     #initialization
@@ -33,7 +36,7 @@ function ffd(
     D = get_diag_elements(A)
     
     objective = frobenius_offdiag_norm(A)
-    
+
     error_array = [] 
     if plot_convergence
         push!(error_array, frobenius_offdiag_norm(A))
@@ -65,17 +68,22 @@ function ffd(
         end
         
         objective_new = frobenius_offdiag_norm(A)
-        diff = objective - objective_new
+        diff = abs(objective - objective_new)
         objective = objective_new 
         
-        E = get_offdiag_elements(A)
-        D = get_diag_elements(A)
-        abs(diff) < threshold && break
-        iteration_step += 1
+        # Update progress info.
+        update!(progress_bar, diff)
 
         if plot_convergence
             push!(error_array, objective_new)
         end
+        
+        E = get_offdiag_elements(A)
+        D = get_diag_elements(A)
+        diff < threshold && break
+        iteration_step += 1
+
+        
     end
     return Matrix(V'), A, error_array
 end

@@ -60,6 +60,9 @@ function jdiag_edourdpineau(X::Vector{M}; iter=100, rtol=1e-3, atol=eps()) where
     norm = frobenius_offdiag_norm(Xm)
     norm_history = [norm]
 
+    # Initial setup of the progressbar.
+    progress_bar = ProgressThresh(atol; desc="Minimizing:")
+
     for _ in 1:iter
         for i in 1:(n-1), j in (i+1):n
             if M <: Symmetric
@@ -79,10 +82,15 @@ function jdiag_edourdpineau(X::Vector{M}; iter=100, rtol=1e-3, atol=eps()) where
         push!(norm_history, new_norm)
 
         diff = abs(new_norm - norm)
+
+        # Update progress info.
+        update!(progress_bar, diff)
+
         if diff < atol || diff < rtol * norm
             break
         end
         norm = new_norm
     end
+    finish!(progress_bar)
     return V, Xm, norm_history
 end
