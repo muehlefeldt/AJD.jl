@@ -74,7 +74,7 @@ function ffd(
         iteration_step += 1
 
         if plot_convergence
-            push!(error_array, frobenius_offdiag_norm(A))
+            push!(error_array, objective_new)
         end
     end
     return Matrix(V'), A, error_array
