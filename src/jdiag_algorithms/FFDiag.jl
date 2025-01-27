@@ -67,7 +67,7 @@ function ffd(
             z_j = get_z_fdiag(D,j,j)
             y_ij = get_y_fdiag(D,E,i,j)
             y_ji = get_y_fdiag(D,E,j,i)
-           
+          
             W[i,j] = (z_ij*y_ji - z_i*y_ij)/(z_j*z_i-z_ij^2) 
             W[j,i] = (z_ij*y_ij - z_j*y_ji)/(z_j*z_i-z_ij^2)
         end
