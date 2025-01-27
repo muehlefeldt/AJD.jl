@@ -1,5 +1,10 @@
 
-function rotation(aii::Array{T}, ajj::Array{T}, aij::Array{T}, aji::Array{T})::Matrix{T} where {T<:Complex}
+function rotation(
+    aii::Array{T},
+    ajj::Array{T},
+    aij::Array{T},
+    aji::Array{T},
+)::Matrix{T} where {T<:Complex}
     h = hcat(aii .- ajj, aij .+ aji, (aji .- aij) .* 1im)
     G = real(h' * h)
     _, vecs = eigen(G)
@@ -14,7 +19,11 @@ function rotation(aii::Array{T}, ajj::Array{T}, aij::Array{T}, aji::Array{T})::M
 end
 
 
-function rotation_symmetric(aii::Array{T}, ajj::Array{T}, aij::Array{T})::Matrix{Real} where {T<:Union{Real,Complex}}
+function rotation_symmetric(
+    aii::Array{T},
+    ajj::Array{T},
+    aij::Array{T},
+)::Matrix{Real} where {T<:Union{Real,Complex}}
     h = hcat(aii .- ajj, 2.0 .* aij)
     G = real(h' * h)
     # G is now a 2x2 symmetric matrix
@@ -25,7 +34,7 @@ function rotation_symmetric(aii::Array{T}, ajj::Array{T}, aij::Array{T})::Matrix
     # Calculate theta for the largest eigenvector
     theta = 0.5 * atan(2b, a - c)
     x, y = cos(theta), sin(theta)
-    
+
     # x will always be positive, we add the abs so the compiler know this too
     c = sqrt(abs((x + 1.0) / 2.0))
     s = y / sqrt(abs(2.0 * (x + 1.0)))
@@ -39,9 +48,14 @@ end
 Diagonalize a set of matrices using the Jacobi method ("Jacobi Angles for Simultaneous Diagonalization").
 Code adapted from [Edouardpineaus Python implementation](https://github.com/edouardpineau/Time-Series-ICA-with-SOBI-Jacobi)
 """
-function jdiag_edourdpineau(X::Vector{M}; iter=100, rtol=1e-3, atol=eps()) where {T<:Number,M<:AbstractMatrix{T}}
+function jdiag_edourdpineau(
+    X::Vector{M};
+    iter = 100,
+    rtol = 1e-3,
+    atol = eps(),
+) where {T<:Number,M<:AbstractMatrix{T}}
 
-    Xm = cat(X..., dims=3)
+    Xm = cat(X..., dims = 3)
     m = length(X)
     n = size(X[1], 1)
     @assert n == size(X[1], 2)
@@ -56,15 +70,15 @@ function jdiag_edourdpineau(X::Vector{M}; iter=100, rtol=1e-3, atol=eps()) where
     norm = frobenius_offdiag_norm(Xm)
     norm_history = [norm]
 
-    for _ in 1:iter
-        for i in 1:(n-1), j in (i+1):n
+    for _ = 1:iter
+        for i = 1:(n-1), j = (i+1):n
             if M <: Symmetric
                 R = rotation_symmetric(Xm[i, i, :], Xm[j, j, :], Xm[i, j, :])
             else
                 R = rotation(Xm[i, i, :], Xm[j, j, :], Xm[i, j, :], Xm[j, i, :])
             end
 
-            for k in 1:m
+            for k = 1:m
                 Xm[[i, j], :, k] = R * Xm[[i, j], :, k]
                 Xm[:, [i, j], k] = Xm[:, [i, j], k] * R'
             end
