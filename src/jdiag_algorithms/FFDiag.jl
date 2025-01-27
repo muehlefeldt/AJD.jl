@@ -29,7 +29,7 @@ function ffd(
     norm_ = "frobenius",
     θ = 0.99,
     plot_convergence::Bool = false,
-    initial_guess = 1.0*Matrix(I,size(A[1])[1],size(A[1])[2])) where {T <: Number, M<:AbstractMatrix{T}}
+    initial_guess = 1.0*Matrix(I,size(A[1])[1],size(A[1])[2])) where {T <: Real, M<:AbstractMatrix{T}}
     
     if typeof(A) <: AbstractArray{<:AbstractArray{<:Int}}
         A = float.(A)
@@ -40,7 +40,7 @@ function ffd(
         norm_function = X -> opnorm(X,Inf) #infinity norm
     end
 
-    A = cat(A..., dims = 3)
+    A = cat(A..., dims = 3)::AbstractArray{<:Real}
     rows,columns,k = size(A)
     #initialization
     iteration_step = 0
