@@ -42,7 +42,7 @@ function get_test_data_complex_real(n::Int, m::Int)
 end
 
 """
-Create LinearFilter object as introduced by Diagonalizations.jl.
+Create [LinearFilter](https://marco-congedo.github.io/Diagonalizations.jl/dev/Diagonalizations/#LinearFilter) object as introduced by [Diagonalizations.jl](https://marco-congedo.github.io/Diagonalizations.jl/dev/).
 Output of AJD.jl follows convention of Diagonalizations.jl and produces a LinearFilter.
 """
 function create_linear_filter(A::Matrix{T} where {T<:Number})

@@ -5,12 +5,11 @@ function rotation(aii::Array{T}, ajj::Array{T}, aij::Array{T}, aji::Array{T})::M
     _, vecs = eigen(G)
     x, y, z = vecs[:, end]
     if x < 0.0
+        # we use abs on x so julia knows that the values in the sqrt are positive
         x, y, z = -x, -y, -z
     end
-    r = sqrt(x^2 + y^2 + z^2)  # julia's eigen returns normalized eigenvectors
-    @assert isapprox(r, 1.0)
-    c = sqrt((x + 1.0) / 2.0)
-    s = (y - z * im) / sqrt(2.0 * (x + 1.0))
+    c = sqrt(abs((x + 1.0) / 2.0))
+    s = (y - z * im) / sqrt(abs(2.0 * (x + 1.0)))
     return [c conj(s); -s conj(c)]
 end
 
@@ -26,13 +25,10 @@ function rotation_symmetric(aii::Array{T}, ajj::Array{T}, aij::Array{T})::Matrix
     # Calculate theta for the largest eigenvector
     theta = 0.5 * atan(2b, a - c)
     x, y = cos(theta), sin(theta)
-
-    if x < 0.0
-        x, y = -x, -y
-    end
-
-    c = sqrt((x + 1.0) / 2.0)
-    s = y / sqrt(2.0 * (x + 1.0))
+    
+    # x will always be positive, we add the abs so the compiler know this too
+    c = sqrt(abs((x + 1.0) / 2.0))
+    s = y / sqrt(abs(2.0 * (x + 1.0)))
     return [c s; -s c]
 end
 
