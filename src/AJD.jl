@@ -45,9 +45,7 @@ function diagonalize(
     threshold::AbstractFloat = eps(),
 )::LinearFilter
 
-    if max_iter <= 0
-        throw(ArgumentError("Max iteration must be 1 or larger."))
-    end
+    check_input(A, max_iter, threshold)
 
     F, _, _, n_iter = get_diagonalization(
         A,
@@ -72,9 +70,7 @@ function diagonalize(
     threshold::AbstractFloat = eps(),
 )::Plot
 
-    if max_iter <= 0
-        throw(ArgumentError("Max iteration must be 1 or larger."))
-    end
+    check_input(A, max_iter, threshold)
 
     if only_plot == :plot
         F, B, error_array, n_iter = get_diagonalization(

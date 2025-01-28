@@ -195,19 +195,47 @@ function get_y_fdiag(D::AbstractArray{<:Number}, E::AbstractArray{<:Number}, i::
     return sum(D[j,j,:].*E[i,j,:])
 end
 
-"Check for valid input of diagonalize()."
-function check_input(A::Vector{<:AbstractMatrix{<:Number}})
+"""
+    check_input(
+        A::Vector{<:AbstractMatrix{<:Number}},
+        max_iter::Int,
+        threshold::AbstractFloat,
+        )
+
+Check input of diagonalize(). Validate matrices, threshold  and max iteration.
+"""
+function check_input(
+    A::Vector{<:AbstractMatrix{<:Number}},
+    max_iter::Int,
+    threshold::AbstractFloat,
+    )
+    
     # Input may be empty.
     if length(A) <= 0
-        return false
+        throw(ArgumentError("Invalid input: Vector of matrices must have length > 0."))
     end
-    # All matrices must be commuting and of same size.
+
+    # All matrices must be of same size.
     for index in 1:length(A)-1
         if !is_same_size(A[index], A[index+1])
-            return false
+            throw(ArgumentError("Invalid input: Vector of matrices must be of same size."))
         end
     end
-    return true
+    
+    # Max iteration must be 1 or higher.
+    if max_iter <= 0
+        throw(ArgumentError("Invalid input: Max iteration must be 1 or larger."))
+    end
+
+    # Too small threshold is non-sensical to procede with.
+    if threshold < eps()
+        throw(ArgumentError("Invalid input: Threshold too small. Minimum: " * string(eps())))
+    end
+
+    # Warning in case of very high threshold.
+    if threshold > 1.0e-1
+        @warn "Threshold very high. Recommend threshold of 1e-10 or smaller. Consider machine precision of your system."
+    end
 end
 
 function addrandomnoise(A::Vector{M};σ::AbstractFloat = 0.5,
@@ -417,10 +445,7 @@ function get_diagonalization(
     threshold::AbstractFloat = eps(),
     only_plot::Symbol = :no_plot
     )
-    if !check_input(A)
-        throw(ArgumentError("Invalid input."))
-    end
-
+    
     # Do we need to get the error history from the algorithms?
     # If so selected, a performance penalty is to be expected.
     plot_convergence = only_plot == :plot
@@ -433,7 +458,7 @@ function get_diagonalization(
 
     elseif algorithm == "jdiag_cardoso"
         if typeof(A) <: AbstractArray{<:AbstractArray{<:Real}} 
-            F, B, error_array, n_iter = jdiag_cardoso(A, threshold, plot_convergence=plot_convergence)
+            F, B, error_array, n_iter = jdiag_cardoso(A, threshold, plot_convergence=plot_convergence, max_iter=max_iter)
         else
             throw(ArgumentError("Not supported for set of Matrices containing imaginary values!"))
         end
