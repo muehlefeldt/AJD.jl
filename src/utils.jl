@@ -426,10 +426,10 @@ function get_diagonalization(
     plot_convergence = only_plot == :plot
 
     if algorithm in ["jdiag", "jdiag_gabrieldernbach"]
-        F, B, error_array = jdiag_gabrieldernbach!(A, max_iter = max_iter, threshold = threshold, plot_convergence=plot_convergence)
+        F, B, error_array, n_iter = jdiag_gabrieldernbach!(A, max_iter = max_iter, threshold = threshold, plot_convergence=plot_convergence)
 
     elseif algorithm in ["jdiag_edourdpineau", "jade"]
-        F, B, error_array = jdiag_edourdpineau(A, iter = max_iter)
+        F, B, error_array, n_iter = jdiag_edourdpineau(A, iter = max_iter)
 
     elseif algorithm == "jdiag_cardoso"
         if typeof(A) <: AbstractArray{<:AbstractArray{<:Real}} 
@@ -453,5 +453,5 @@ function get_diagonalization(
         ))
     end
 
-    return F, B, error_array
+    return F, B, error_array, n_iter
 end
