@@ -202,7 +202,7 @@ end
         threshold::AbstractFloat,
         )
 
-Check input of diagonalize(). Validate matrices, threshold  and max iteration.
+Check input of diagonalize(). Validate matrices, threshold and max iteration as selected.
 """
 function check_input(
     A::Vector{<:AbstractMatrix{<:Number}},
