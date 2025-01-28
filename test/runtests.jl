@@ -11,7 +11,7 @@ using Plots: Plot
 @testset "AJD.jl" begin
     # Removed test_jdiag_gabrieldernbach_utils.jl due to an unresolved issue with PyCall
     # and the use in Github CI test runs.
-    #include("test_jdiag_gabrieldernbach.jl")
+    include("test_jdiag_gabrieldernbach.jl")
 
     include("test_jdiag_cardoso.jl")
     include("test_jdiag_eduardpineau.jl")
@@ -25,4 +25,6 @@ using Plots: Plot
     include("test_benchmark.jl")
     include("test_ffdiag.jl")
     include("test_plotting.jl")
+
+    include("test_max_iter_warning.jl")
 end
