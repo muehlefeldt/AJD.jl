@@ -96,7 +96,7 @@ function jdiag_cardoso(
         end
         
     end # while
-    return A, V, off_norm_array
+    return V, A, off_norm_array
 end
 
 
