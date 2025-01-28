@@ -84,7 +84,7 @@ function jdiag_gabrieldernbach!(
     end
     
     # Return of the filter, diagonalized matrices and the convergence error (optional).
-    return V, A, error_array
+    return V, A, error_array, iteration_step
 
 end
 
@@ -173,7 +173,7 @@ function jdiag_gabrieldernbach!(
     end
 
     # Return of the filter, diagonalized matrices and the convergence error (optional).
-    return V, A, error_array
+    return V, A, error_array, iteration_step
 
 end
 
