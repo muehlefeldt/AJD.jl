@@ -26,5 +26,6 @@ using Plots: Plot
     include("test_ffdiag.jl")
     include("test_plotting.jl")
 
+    # Make sure diffrent selected algorithms show comparable error handling.
     include("test_max_iter_warning.jl")
 end
