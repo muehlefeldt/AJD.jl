@@ -16,12 +16,7 @@ accepted_error = 1e-6
     for name in AJD.ALL_ALGORITHMS
         test_input = AJD.random_normal_commuting_matrices(10, 6)
         result = diagonalize(test_input, algorithm=name)
-        # Cardoso implementation shows very high error level.
-        if name == "jdiag_cardoso"
-            @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < 0.1
-        else 
-            @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < accepted_error
-        end
+        @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < accepted_error
     end
 end
 
@@ -43,10 +38,7 @@ end
     for name in AJD.ALL_ALGORITHMS
         test_input = AJD.random_normal_commuting_matrices(10, 1)
         result = diagonalize(test_input, algorithm=name)
-        # TODO: Cardoso implementation shows very high error level.
-        if name in ["jdiag_cardoso"]
-            @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < 0.1
-        elseif name in ["ffdiag"] 
+        if name in ["ffdiag"] 
             @test isfinite(mean([nonDiagonality(result.iF * A * result.F) for A in test_input])) == false
         else 
             @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < accepted_error
