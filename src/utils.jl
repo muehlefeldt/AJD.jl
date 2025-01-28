@@ -234,7 +234,7 @@ function check_input(
 
     # Warning in case of very high threshold.
     if threshold > 1.0e-1
-        @warn "Threshold very high. Recommend threshold of 1e-10 or smaller. Consider machine precision of your system."
+        @warn "Threshold very high. Recommend threshold of 1e-5 or smaller. Consider machine precision of your system."
     end
 end
 
