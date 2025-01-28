@@ -1,5 +1,5 @@
 module AJD
-using LinearAlgebra
+using LinearAlgebra: eigen, norm, Symmetric, Hermitian, I, qr
 using BenchmarkTools
 using Plots: Plot
 

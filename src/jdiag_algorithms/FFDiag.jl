@@ -1,5 +1,4 @@
-using LinearAlgebra
-using PosDefManifold
+using LinearAlgebra: norm, opnorm, I
 """
     function ffd(A::Vector{M}; <keyword_arguments>) where {T <: Number, M<:AbstractMatrix{T}}
 *`A`: Vector of matrices of dimension ``n × n × k``
