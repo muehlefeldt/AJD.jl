@@ -76,6 +76,21 @@ end
 
     A = AJD.get_test_data(:exact_diag, n_dims=10, n_matrices=10)
     @test_nowarn AJD.check_input(A, 1000, eps())
+
+    # Input of same size matrices, threshold too low.
+    A = AJD.get_test_data(:exact_diag, n_dims=10, n_matrices=10)
+    @test_throws ArgumentError AJD.check_input(A, 1000, eps()/10)
+    @test_throws ArgumentError diagonalize(A, threshold=eps()/10)
+
+    # Input of same size matrices, threshold too high.
+    @test_logs (
+        :warn,
+        "Threshold very high. Recommend threshold of 1e-5 or smaller. Consider machine precision of your system.",
+    ) diagonalize(A, threshold=1.0)
+    @test_logs (
+        :warn,
+        "Threshold very high. Recommend threshold of 1e-5 or smaller. Consider machine precision of your system.",
+    ) AJD.check_input(A, 1000, 0.2)
 end
 
 # Invalid algorithm should lead to a error.
