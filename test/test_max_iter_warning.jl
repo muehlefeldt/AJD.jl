@@ -17,7 +17,37 @@ end
 @testset "Error max_iter too low" begin
     for name in AJD.ALL_ALGORITHMS
         test_input = AJD.random_normal_commuting_matrices(20, 6)
-        @test_throws ArgumentError diagonalize(test_input, algorithm = name, max_iter = 0)
-        @test_throws ArgumentError diagonalize(test_input, algorithm = name, max_iter = -1)
+        @test_throws ArgumentError diagonalize(
+            test_input,
+            algorithm = name,
+            max_iter = 0,
+        )
+        @test_throws ArgumentError diagonalize(
+            test_input,
+            algorithm = name,
+            max_iter = -1,
+        )
+    end
+end
+
+# Make sure the counting of the iterations is consitent between the algorithms.
+@testset "Number of iterations correct" begin
+    for name in AJD.ALL_ALGORITHMS
+        test_input = AJD.random_normal_commuting_matrices(20, 6)
+        requested_iter = 1
+        _, _, _, n_iter = AJD.get_diagonalization(
+            test_input,
+            algorithm = name,
+            max_iter = requested_iter,
+        )
+        @test n_iter == requested_iter
+
+        requested_iter = 2
+        _, _, _, n_iter = AJD.get_diagonalization(
+            test_input,
+            algorithm = name,
+            max_iter = requested_iter,
+        )
+        @test n_iter == requested_iter
     end
 end
