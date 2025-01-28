@@ -100,5 +100,5 @@ function ffd(
             push!(error_array, frobenius_offdiag_norm(A))
         end
     end
-    return Matrix(V'), A, error_array
+    return Matrix(V'), A, error_array, iteration_step
 end

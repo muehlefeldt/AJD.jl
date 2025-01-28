@@ -86,7 +86,7 @@ function jdiag_cardoso(
         end
     end
     
-    return V, A, error_array
+    return V, A, error_array, iter
 end
 
 function reverse_hcat(A)
