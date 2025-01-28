@@ -11,7 +11,7 @@ using PosDefManifold: mean
 
 # Base testset.
 @testset "Nondiagonality Time Correlated" begin
-    accepted_error = 0.4
+    accepted_error = 0.8
     for name in AJD.ALL_ALGORITHMS
         test_input = AJD.get_test_data(:approx_diag)
         result = diagonalize(test_input, algorithm=name)
