@@ -70,7 +70,11 @@ function jdiag_edourdpineau(
     norm = frobenius_offdiag_norm(Xm)
     norm_history = [norm]
 
+    # Iteration counter.
+    n_iteration = 0
+
     for _ = 1:iter
+        n_iteration += 1
         for i = 1:(n-1), j = (i+1):n
             if M <: Symmetric
                 R = rotation_symmetric(Xm[i, i, :], Xm[j, j, :], Xm[i, j, :])
@@ -94,5 +98,5 @@ function jdiag_edourdpineau(
         end
         norm = new_norm
     end
-    return V, Xm, norm_history
+    return V, Xm, norm_history, n_iteration
 end
