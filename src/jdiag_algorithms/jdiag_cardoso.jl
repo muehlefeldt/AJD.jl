@@ -13,9 +13,9 @@ Output:
 * iter: accumulates the iteration numbers
 """
 function jdiag_cardoso(
-    M::Vector{<:AbstractMatrix{<:Real}};
+    M::Vector{<:AbstractMatrix{<:Real}},
+    jthresh :: Real;
     max_iter = 800,
-    jthresh = 10e-8,
     plot_convergence::Bool = false)
     # This version only works for matrix with real valued entries
     # Input:
@@ -96,7 +96,7 @@ function jdiag_cardoso(
         end
         
     end # while
-    return iter, A, V, off_norm_array
+    return A, V, off_norm_array
 end
 
 
