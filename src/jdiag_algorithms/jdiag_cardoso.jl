@@ -15,7 +15,8 @@ Output:
 function jdiag_cardoso(
     M::Vector{<:AbstractMatrix{<:Real}},
     jthresh::Real;
-    plot_convergence::Bool = false)
+    plot_convergence::Bool = false,
+    max_iter::Int = 1000)
 
     A = copy(hcat(M...))
     m,nm = size(A)
@@ -32,16 +33,14 @@ function jdiag_cardoso(
         push!(error_array, frobenius_offdiag_norm(reverse_hcat(A)))
     end
 
-    while flag
+    while flag && iter < max_iter
         flag = false
 
         iter+=1
         for p in 1: m-1
-            iter+=1
             Ip = p:m:nm
             
             for q in p+1:m
-                iter+=1
                 Iq = q:m:nm
 
                 # computing the givens angles base on Cardoso's paper
