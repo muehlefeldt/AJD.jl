@@ -14,6 +14,7 @@ Output:
 """
 function jdiag_cardoso(
     M::Vector{<:AbstractMatrix{<:Real}},
+
     jthresh :: Real;
     max_iter = 800,
     plot_convergence::Bool = false)
@@ -43,11 +44,12 @@ function jdiag_cardoso(
     if plot_convergence
         push!(off_norm_array, off_norm)
     end
-    
+
     while flag && iter < max_iter
         flag = false
 
         iter+=1
+
          for p in 1: m-1
 
             Ip = p:m:nm
@@ -94,9 +96,10 @@ function jdiag_cardoso(
         if plot_convergence
             push!(off_norm_array,off_norm)
         end
+
         
     end # while
-    return V, A, off_norm_array
+    return V, A, off_norm_array, iter
 end
 
 

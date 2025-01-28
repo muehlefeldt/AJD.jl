@@ -45,13 +45,20 @@ function diagonalize(
     threshold::AbstractFloat = eps(),
 )::LinearFilter
 
-    F, _, _ = get_diagonalization(
+    check_input(A, max_iter, threshold)
+
+    F, _, _, n_iter = get_diagonalization(
         A,
         algorithm = algorithm,
         max_iter = max_iter,
         threshold = threshold,
         only_plot = :no_plot,
     )
+    
+    if n_iter >= max_iter
+        @warn "Max iteration was reached. Consider increasing max_iter: diagonalize(M, max_iter=...)."
+    end
+
     return create_linear_filter(F)
 end
 
@@ -63,14 +70,21 @@ function diagonalize(
     threshold::AbstractFloat = eps(),
 )::Plot
 
+    check_input(A, max_iter, threshold)
+
     if only_plot == :plot
-        F, B, error_array = get_diagonalization(
+        F, B, error_array, n_iter = get_diagonalization(
             A,
             algorithm = algorithm,
             max_iter = max_iter,
             threshold = threshold,
             only_plot = only_plot,
         )
+        
+        if n_iter >= max_iter
+            @warn "Max iteration was reached. Consider increasing max_iter: diagonalize(M, max_iter=...)."
+        end
+
         p = get_plot(F, B, error_array, algorithm)
     else
         throw(ArgumentError("Please use symbol only_plot=:plot to generate plots."))

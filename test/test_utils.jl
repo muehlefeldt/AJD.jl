@@ -53,15 +53,17 @@ end
     E = (-1.0).*(reshape(repeat(Matrix(1.0I(3)),outer = (1,2)),3,3,2) .-ones(3,3))
     @test AJD.get_y_fdiag(D,E,1,2) == 2
 end
+
 # Input verification.
 @testset "AJD.check_input()" begin
-    # Input of communting and same size matrices.
-    A = AJD.random_normal_commuting_matrices(10, 10)
-    @test AJD.check_input(A)
+    # Input of same size matrices, ok max_iter and ok threshold.
+    A = AJD.get_test_data(:exact_diag, n_dims=10, n_matrices=10)
+    @test_nowarn AJD.check_input(A, 1000, eps())
 
     # Diffrent size of the matrices.
+    # Verify check_input() and diagonalize() itself. 
     B = AJD.random_normal_commuting_matrices(9, 10)
-    @test !AJD.check_input([A..., B...])
+    @test_throws ArgumentError AJD.check_input([A..., B...], 1000, eps())
     @test_throws ArgumentError diagonalize([A..., B...])
 
     # Not acceptable inputs should throw error.
@@ -71,6 +73,24 @@ end
     @test_throws MethodError diagonalize(B)
     B = Vector{Matrix{Number}}
     @test_throws MethodError diagonalize(B)
+
+    A = AJD.get_test_data(:exact_diag, n_dims=10, n_matrices=10)
+    @test_nowarn AJD.check_input(A, 1000, eps())
+
+    # Input of same size matrices, threshold too low.
+    A = AJD.get_test_data(:exact_diag, n_dims=10, n_matrices=10)
+    @test_throws ArgumentError AJD.check_input(A, 1000, eps()/10)
+    @test_throws ArgumentError diagonalize(A, threshold=eps()/10)
+
+    # Input of same size matrices, threshold too high.
+    @test_logs (
+        :warn,
+        "Threshold very high. Recommend threshold of 1e-5 or smaller. Consider machine precision of your system.",
+    ) diagonalize(A, threshold=1.0)
+    @test_logs (
+        :warn,
+        "Threshold very high. Recommend threshold of 1e-5 or smaller. Consider machine precision of your system.",
+    ) AJD.check_input(A, 1000, 0.2)
 end
 
 # Invalid algorithm should lead to a error.
