@@ -1,5 +1,5 @@
 module AJD
-using LinearAlgebra
+using LinearAlgebra: eigen, norm, Symmetric, Hermitian, I, qr, dot
 using BenchmarkTools
 using Plots: Plot
 
@@ -73,7 +73,7 @@ function diagonalize(
         )
         p = get_plot(F, B, error_array, algorithm)
     else
-        throw(ArgumentError("Please use symbol ony_plot=:plot to generate plots."))
+        throw(ArgumentError("Please use symbol only_plot=:plot to generate plots."))
     end
     return p
 end

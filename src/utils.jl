@@ -1,7 +1,7 @@
-using LinearAlgebra
-using Diagonalizations
+using LinearAlgebra: qr, Diagonal, Hermitian, Symmetric
+using Diagonalizations: LinearFilter
 using Statistics: cor
-using Random
+using Random: rand, randn
 """
     random_normal_commuting_matrices(n::Int, m::Int; complex::Bool=false)
     
