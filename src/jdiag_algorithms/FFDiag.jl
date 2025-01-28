@@ -59,8 +59,9 @@ function ffd(
     end
 
    
-    while iteration_step <= max_iter
-       
+    while iteration_step < max_iter
+        iteration_step += 1
+        
         for i = 1:rows-1, j = i+1:rows
             z_ij = get_z_fdiag(D,i,j)
             z_i = get_z_fdiag(D,i,i)
@@ -94,7 +95,7 @@ function ffd(
         E = get_offdiag_elements(A)
         D = get_diag_elements(A)
         
-        iteration_step += 1
+        
 
         if plot_convergence
             push!(error_array, frobenius_offdiag_norm(A))
