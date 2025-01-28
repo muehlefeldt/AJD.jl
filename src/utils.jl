@@ -1,7 +1,7 @@
-using LinearAlgebra
-using Diagonalizations
+using LinearAlgebra: qr, Diagonal, Hermitian, Symmetric
+using Diagonalizations: LinearFilter
 using Statistics: cor
-using Random
+using Random: rand, randn
 """
     random_normal_commuting_matrices(n::Int, m::Int; complex::Bool=false)
     
@@ -42,7 +42,7 @@ function get_test_data_complex_real(n::Int, m::Int)
 end
 
 """
-Create LinearFilter object as introduced by Diagonalizations.jl.
+Create [LinearFilter](https://marco-congedo.github.io/Diagonalizations.jl/dev/Diagonalizations/#LinearFilter) object as introduced by [Diagonalizations.jl](https://marco-congedo.github.io/Diagonalizations.jl/dev/).
 Output of AJD.jl follows convention of Diagonalizations.jl and produces a LinearFilter.
 """
 function create_linear_filter(A::Matrix{T} where {T<:Number})
@@ -222,7 +222,7 @@ function addrandomnoise(A::Vector{M};σ::AbstractFloat = 0.5,
     else
         for index_k = 1:k
             R = randn(rows,columns)
-            A[k] = A[k] + σ*R*R'
+            A[index_k]= A[index_k] + σ*R*R'
         end
     end
     return A
