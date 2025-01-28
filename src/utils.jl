@@ -433,13 +433,13 @@ function get_diagonalization(
 
     elseif algorithm == "jdiag_cardoso"
         if typeof(A) <: AbstractArray{<:AbstractArray{<:Real}} 
-            F, B, error_array = jdiag_cardoso(A, threshold, plot_convergence=plot_convergence)
+            F, B, error_array, n_iter = jdiag_cardoso(A, threshold, plot_convergence=plot_convergence)
         else
             throw(ArgumentError("Not supported for set of Matrices containing imaginary values!"))
         end
 
     elseif algorithm in ["FFD", "ffd", "ffdiag"]
-        F, B, error_array = ffd(
+        F, B, error_array, n_iter = ffd(
             A,
             threshold=threshold,
             max_iter=max_iter,
