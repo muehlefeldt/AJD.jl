@@ -8,7 +8,7 @@ using ProgressMeter
 include("jdiag_algorithms/jdiag_cardoso.jl")
 include("jdiag_algorithms/jdiag_gabrieldernbach.jl")
 include("jdiag_algorithms/jdiag_edourdpineau.jl")
-include("jdiag_algorithms/FFDiag.jl")
+include("FFDiag.jl")
 
 # Utility functions, plotting functions and global constanst imported.
 include("utils.jl")
