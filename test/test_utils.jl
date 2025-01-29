@@ -54,7 +54,10 @@ end
     @test AJD.get_y_fdiag(D,E,1,2) == 2
 end
 
-# Input verification.
+# Input verification using AJD.check_input().
+# Test of AJD.check_input() directly and of diagonalize().
+# diagonalize() calls the verification during normal ops.
+# We want to make sure error as correctly handled / passed during all ops situations.
 @testset "AJD.check_input()" begin
     # Input of same size matrices, ok max_iter and ok threshold.
     A = AJD.get_test_data(:exact_diag, n_dims=10, n_matrices=10)
@@ -91,6 +94,24 @@ end
         :warn,
         "Threshold very high. Recommend threshold of 1e-5 or smaller. Consider machine precision of your system.",
     ) AJD.check_input(A, 1000, 0.2)
+
+    # Input of zero matrices must throw ArgumentError.
+    A = AJD.get_test_data(:exact_diag, n_dims=10, n_matrices=10)
+    A = [A..., zeros(Float32, 10, 10)]
+    @test_throws ArgumentError diagonalize(A)
+    @test_throws ArgumentError AJD.check_input(A, 1000, eps())
+
+    # Input of zero matrices must throw ArgumentError.
+    A = AJD.get_test_data(:exact_diag, n_dims=10, n_matrices=10)
+    A = [zeros(Float32, 10, 10), A...]
+    @test_throws ArgumentError diagonalize(A)
+    @test_throws ArgumentError AJD.check_input(A, 1000, eps())
+
+    # Input of zero matrices must throw ArgumentError.
+    A = [zeros(Float32, 10, 10), zeros(Float32, 10, 10)]
+    @test_throws ArgumentError diagonalize(A)
+    @test_throws ArgumentError AJD.check_input(A, 1000, eps())
+
 end
 
 # Invalid algorithm should lead to a error.
