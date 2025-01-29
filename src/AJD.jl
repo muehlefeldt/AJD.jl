@@ -16,8 +16,6 @@ include("utils_test_data.jl")
 include("plotting.jl")
 include("global_constants.jl")
 
-
-
 """
     diagonalize(
         A::Vector{<:AbstractMatrix{<:Number}};
@@ -44,8 +42,7 @@ function diagonalize(
     algorithm::String = "jdiag_gabrieldernbach",
     max_iter::Int = 1000,
     threshold::AbstractFloat = eps(),
-)::LinearFilter
-
+)
     check_input(A, max_iter, threshold)
 
     F, _, _, n_iter = get_diagonalization(
@@ -69,7 +66,7 @@ function diagonalize(
     algorithm::String = "jdiag_gabrieldernbach",
     max_iter::Int = 1000,
     threshold::AbstractFloat = eps(),
-)::Plot
+)
 
     check_input(A, max_iter, threshold)
 
