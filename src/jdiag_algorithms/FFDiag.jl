@@ -7,7 +7,7 @@ using LinearAlgebra: norm, opnorm, I
 
 *`max_iter`: max number of iterations. default is 100.
 
-*`norm_`: norm by which the update matrix is divided by. can either be "frobenius" or "inf". default is "frobenius"
+*`norm_`: norm by which the update matrix is divided by. can either be :frobenius or :inf. default is :frobenius
 
 *`θ`: normation criterion. should be smaller than 1. default is 0.99. See paper on [ffdiag](https://www.jmlr.org/papers/volume5/ziehe04a/ziehe04a.pdf) for more information.
 
@@ -25,17 +25,17 @@ function ffd(
     A::Vector{M};
     threshold = eps(),
     max_iter = 100,
-    norm_ = "frobenius",
+    norm_ = :frobenius,
     θ = 0.99,
     plot_convergence::Bool = false,
-    initial_guess = 1.0*Matrix(I,size(A[1])[1],size(A[1])[2])) where {T <: Real, M<:AbstractMatrix{T}}
+    initial_guess = 1.0*Matrix(I(size(A[1])[1]))) where {T <: Real, M<:AbstractMatrix{T}}
     
     if typeof(A) <: AbstractArray{<:AbstractArray{<:Int}}
         A = float.(A)
     end
-    if norm_ == "frobenius"
+    if norm_ == :frobenius
         norm_function = X -> norm(X,2) #frobenius norm, it says it is frobenius norm but that doesn't make sense!
-    elseif norm_ == "inf"
+    elseif norm_ == :inf
         norm_function = X -> opnorm(X,Inf) #infinity norm
     end
 
@@ -47,8 +47,7 @@ function ffd(
     V = initial_guess
     W = zeros(rows,columns)
         
-    E = get_offdiag_elements(A)
-    D = get_diag_elements(A)
+
     
     objective = frobenius_offdiag_norm(A)
     
@@ -60,7 +59,10 @@ function ffd(
    
     while iteration_step < max_iter
         iteration_step += 1
-        
+        E = get_offdiag_elements(A)
+        D = get_diag_elements(A)
+        #can be done since cat will reset indices which will work with OffsetArrays and
+        #linear indexing
         for i = 1:rows-1, j = i+1:rows
             z_ij = get_z_fdiag(D,i,j)
             z_i = get_z_fdiag(D,i,i)
@@ -90,10 +92,6 @@ function ffd(
         abs(diff) < threshold && break
 
         objective = objective_new 
-        
-        E = get_offdiag_elements(A)
-        D = get_diag_elements(A)
-        
         
 
         if plot_convergence

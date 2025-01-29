@@ -25,13 +25,6 @@ end
     @test !AJD.is_commuting(A,C)
 end
 
-# Verify basic function of is_samesize().
-@testset "AJD.is_same_size()" begin
-    A = ones(2,2)
-    B = ones(1,2)
-    @test AJD.is_same_size(A,A) == true
-    @test AJD.is_same_size(A,B) == false
-end
 @testset "AJD.get_z_fdiag" begin
     A = reshape(repeat(Matrix(1.0I(3)),outer = (1,2)),3,3,2)
     m,n,_ = size(A)

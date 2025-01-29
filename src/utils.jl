@@ -69,32 +69,15 @@ end
 * A: Vector of matrices
 
 Takes an array of matrices and returns the offdiagonal elements of A.
-
-# Examples
-```julia
-julia> A = ones(3,3,3);
-
-julia> AJD.get_offdiag_elements(A)
-3×3×3 Array{Float64, 3}:
-[:, :, 1] =
- 0.0  1.0  1.0
- 1.0  0.0  1.0
- 1.0  1.0  0.0
-
-[:, :, 2] =
- 0.0  1.0  1.0
- 1.0  0.0  1.0
- 1.0  1.0  0.0
-
-[:, :, 3] =
- 0.0  1.0  1.0
- 1.0  0.0  1.0
- 1.0  1.0  0.0```
 """
 function get_offdiag_elements(A::Array{<:Number,3})
     #copy matrix A to not overwrite it with zeros
     E = copy(A)
-    for row in axes(E,1) # maybe eachindex better - NG
+    #give rows as eachindex in cartesian indexing instead of linear
+    #eachrow would be nice however it is slower if eachrow.axes is used
+    #according to @btime with replacing eachindex with eachrow.axes
+    iterator = eachindex(IndexCartesian(),A[:,begin,begin])
+    for row in iterator 
         E[row,row,:] .= 0 
     end
     return E
@@ -104,33 +87,13 @@ end
 * A: Vector of matrices
 
 Takes an array of matrices and returns the diagonal elements as a diagonal matrix D.
-
-# Examples
-
-```julia
-julia> A = ones(3,3,3);
-
-julia> AJD.get_diag_elements(A)
-3×3×3 Array{Float64, 3}:
-[:, :, 1] =
- 1.0  0.0  0.0
- 0.0  1.0  0.0
- 0.0  0.0  1.0
-
-[:, :, 2] =
- 1.0  0.0  0.0
- 0.0  1.0  0.0
- 0.0  0.0  1.0
-
-[:, :, 3] =
- 1.0  0.0  0.0
- 0.0  1.0  0.0
- 0.0  0.0  1.0```
 """
-function get_diag_elements(A::Array)
-    rows,columns,k = size(A)
-    D = zeros(rows, columns, k)
-    for row in 1:rows
+function get_diag_elements(A::Array{<:Number,3})
+    D = zeros(axes(A))
+    iterator = eachindex(IndexCartesian(),A[:,begin,begin])
+    #eachrow.axes might be nicer however it is slower than using eachindex
+    #another way is axes(A,1) which might be faster
+    for row in iterator
         D[row,row,:] = A[row,row,:]
     end
     return D
@@ -148,16 +111,6 @@ function is_commuting(A::AbstractMatrix, B::AbstractMatrix)
     return isapprox(A*B, B*A)
 end
 """
-    is_same_size(A::AbstractMatrix, B::AbstractMatrix)
-* A: AbstractMatrix of variable size
-* B: AbstractMatrix of variable size
-
-Will return true if dimension of A and B is matching otherwise false.
-"""
-function is_same_size(A::AbstractMatrix, B::AbstractMatrix)
-    return size(A) == size(B)
-end
-"""
     isstrictly_diagonally_dominant(A::AbstractMatrix)
 * A: AbstractMatrix
 
@@ -165,7 +118,7 @@ Used for the FFDiag Algorithm to define whether the Matrix A is strictly diagona
 A matrix is strictly dominant if: ``|a_{ii}| > \\sum |a_{ij}|, i ≠ j``
 """
 function isstrictly_diagonally_dominant(A::AbstractMatrix)
-    for i in eachindex(A[1:end, 1])
+    for i in eachindex(IndexCartesian(),A[:, 1])
         if abs(sum(A[i,:])) - abs(A[i,i]) > abs(A[i,i]) ? true : false
             return false
         end
@@ -214,23 +167,13 @@ function check_input(
     if length(A) <= 0
         throw(ArgumentError("Invalid input: Vector of matrices must have length > 0."))
     end
-
-    # All matrices must be of same size and must be non-zero.
-    for index = 1:length(A)-1
-        if !is_same_size(A[index], A[index+1])
-            throw(
-                ArgumentError(
-                    "Invalid input: Vector of matrices must be of same size.",
-                ),
-            )
-        end
-        if iszero(A[index])
-            throw(ArgumentError("Invalid input: All zero matrix not allowed."))
-        end
+    # All matrices must be of same size.
+    if !allequal(size.(A))
+        throw(ArgumentError("Invalid input: Vector of matrices must be of same size."))
     end
 
     # Last matrix needs to be checked for all zeros as earlier loop does not touch the last matrix.
-    if iszero(A[end])
+    if any(iszero.(A))
         throw(ArgumentError("Invalid input: All zero matrix not allowed."))
     end
 
@@ -280,9 +223,9 @@ function addrandomnoise(
         end
     
     else
-        for index_k = 1:k
-            R = randn(rows, columns)
-            A[index_k] = A[index_k] + σ * R * R'
+        for index_k in eachindex(A)
+            R = randn(rows,columns)
+            A[index_k]= A[index_k] + σ*R*R'
         end
     end
     return A
@@ -394,7 +337,7 @@ If your data has a segment with variance close to 0 (e.g. due to all of the valu
 function generate_testdata(signal_sources::AbstractArray; 
     delay::Number = 10, no_of_segments::Int = 10, show_warning::Bool = true)
     
-    x = signal_sources
+    x = copy(signal_sources)
     rows,columns = size(signal_sources) 
 
     # if signal has length 100 and delay would be 99 there wouldn't be any data after observation 100 to correlate
@@ -432,6 +375,8 @@ function generate_testdata(signal_sources::AbstractArray;
     C = Matrix{}[]
 
     for k in 1:no_of_segments-1
+        #won't work for offset arrays however since this is only for testdata generation 
+        #of wav files which are read in shouldn't matter
         x_t = x[:,(k-1)*segmentation+1:k*segmentation]
         x_delay = x[:,(k-1)*segmentation+1+delay:k*segmentation+delay]
         push!(C,generate_correlation_matrix(x_t,x_delay))
