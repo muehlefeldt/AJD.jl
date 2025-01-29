@@ -36,6 +36,4 @@ This module provides two distinct algorithms to solve the AJD problem:
 
 ### References
 
-1. Ziehe, A., Laskov, P., Nolte, G., & Müller, K. R. (2004). A Fast Algorithm for Joint Diagonalization with Non-orthogonal Transformations and its Application to Blind Source Separation. Journal of Machine Learning Research, 5, 777-800.
-
-2. Cardoso, J. F., & Souloumiac, A. (1996). Jacobi Angles for Simultaneous Diagonalization. SIAM Journal on Matrix Analysis and Applications, 17(1), 161-164. https://doi.org/10.1137/S0895479893259546
+Please refere to [References](references.md) for further literature and sources.
