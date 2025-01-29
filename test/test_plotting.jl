@@ -1,8 +1,6 @@
 # Test the plotting of diagonalized matrices and convergence behaviour.
 # Verify all plot combinations and the return type.
 
-using Plots: Plot
-
 accepted_error = 0.1
 
 @testset "Plotting" begin

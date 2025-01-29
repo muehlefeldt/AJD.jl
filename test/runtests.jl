@@ -1,18 +1,13 @@
 using AJD
 using Test
-# using Diagonalizations
+
 using LinearAlgebra
-using Diagonalizations: nonDiagonality,LinearFilter
+using Diagonalizations: nonDiagonality, LinearFilter
 using PosDefManifold: mean
 using BenchmarkTools: BenchmarkGroup
-# using PyCall
 using Plots: Plot
 
 @testset "AJD.jl" begin
-    # Removed test_jdiag_gabrieldernbach_utils.jl due to an unresolved issue with PyCall
-    # and the use in Github CI test runs.
-    #include("test_jdiag_gabrieldernbach.jl")
-
     include("test_jdiag_cardoso.jl")
     include("test_jdiag_eduardpineau.jl")
     include("test_linearfilter.jl")
