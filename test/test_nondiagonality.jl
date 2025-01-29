@@ -33,6 +33,23 @@ end
     @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < accepted_error
 end
 
+# Iterate through all algorithms to ensure all zero matrices are not allowed.
+@testset "Nondiagonality Matrices only Zeros" begin
+    for name in AJD.ALL_ALGORITHMS
+        # Use correct matrices in combination with single zero matrix.
+        test_input = AJD.random_normal_commuting_matrices(10, 6)
+        test_input = [test_input..., zeros(Float32, 10, 10)]
+        @test_throws ArgumentError diagonalize(test_input, algorithm=name)
+    end
+
+    for name in AJD.ALL_ALGORITHMS
+        # Two all zero matrices.
+        test_input = [zeros(Float32, 10, 10), zeros(Float32, 10, 10)]
+        @test_throws ArgumentError diagonalize(test_input, algorithm=name)
+    end
+end
+
+
 # Test the algorithms with a single matrix as input.
 @testset "Nondiagonality Single Matrix" begin
     for name in AJD.ALL_ALGORITHMS
