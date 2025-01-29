@@ -8,15 +8,13 @@ using ProgressMeter
 include("jdiag_algorithms/jdiag_cardoso.jl")
 include("jdiag_algorithms/jdiag_gabrieldernbach.jl")
 include("jdiag_algorithms/jdiag_edourdpineau.jl")
-include("jdiag_algorithms/FFDiag.jl")
+include("FFDiag.jl")
 
 # Utility functions, plotting functions and global constanst imported.
 include("utils.jl")
 include("utils_test_data.jl")
 include("plotting.jl")
 include("global_constants.jl")
-
-
 
 """
     diagonalize(
@@ -44,8 +42,7 @@ function diagonalize(
     algorithm::String = "jdiag_gabrieldernbach",
     max_iter::Int = 1000,
     threshold::AbstractFloat = eps(),
-)::LinearFilter
-
+)
     check_input(A, max_iter, threshold)
 
     F, _, _, n_iter = get_diagonalization(
@@ -69,7 +66,7 @@ function diagonalize(
     algorithm::String = "jdiag_gabrieldernbach",
     max_iter::Int = 1000,
     threshold::AbstractFloat = eps(),
-)::Plot
+)
 
     check_input(A, max_iter, threshold)
 

@@ -2,6 +2,7 @@ using LinearAlgebra: qr, Diagonal, Hermitian, Symmetric
 using Diagonalizations: LinearFilter
 using Statistics: cor
 using Random: rand, randn
+
 """
     random_normal_commuting_matrices(n::Int, m::Int; complex::Bool=false)
     
@@ -64,6 +65,7 @@ function frobenius_offdiag_norm(A::AbstractArray{T,3})::Real where {T<:Number}
     end
     return norm
 end
+
 """
     get_offdiag_elements(A::Array{<:Number,3})
 * A: Vector of matrices
@@ -82,6 +84,7 @@ function get_offdiag_elements(A::Array{<:Number,3})
     end
     return E
 end
+
 """
     get_diag_elements(A::Array)
 * A: Vector of matrices
@@ -110,6 +113,7 @@ Check if two matrices A, B are commuting.
 function is_commuting(A::AbstractMatrix, B::AbstractMatrix)
     return isapprox(A*B, B*A)
 end
+
 """
     isstrictly_diagonally_dominant(A::AbstractMatrix)
 * A: AbstractMatrix
@@ -125,6 +129,7 @@ function isstrictly_diagonally_dominant(A::AbstractMatrix)
     end
     return true
 end
+
 """
     get_z_fdiag(D::AbstractArray{<:Number}, i::Int, j::Int)
 * D: Diagonal Matrix with offdiagonal elements set to zero
@@ -135,6 +140,7 @@ Calculates the factor ``z_{ij}`` which is defined by: `` ∑_{k} D_{i,i}^{k}D_{j
 function get_z_fdiag(D::AbstractArray{<:Number}, i::Int, j::Int)
     return sum(D[i,i,:].*D[j,j,:])
 end
+
 """
     get_y_fdiag(D::AbstractArray{<:Number}, E::AbstractArray{<:Number}, i::Int, j::Int)
 * D: Diagonal Matrix with offdiagonal elements set to zero
@@ -320,6 +326,7 @@ function generate_testdata(signal_sources::AbstractArray{<:Function}, mixing_mat
 
     return C
 end
+
 """
     generate_testdata(signal_sources::AbstractArray; 
     delay::Number = 10, no_of_segments::Int = 10)
@@ -392,9 +399,15 @@ function generate_testdata(signal_sources::AbstractArray;
     end
     return C
 end
+
 """
-    generate_random_signals(no_of_signals::Int, 
-    no_of_samples::Int; seed = Xoshiro(), signal_type = Float64)
+    generate_random_signals(
+        no_of_signals::Int,
+        no_of_samples::Int;
+        seed = Xoshiro(),
+        signal_type::DataType = Float64,
+    )
+
 *`no_of_signals`: used to declare how many signals ``s_{j}`` are inside of the testdata
 *`no_of_samples`: used to declare how many samples each signal ``s_j`` has
 *`seed`: seed for the `rand` function, might need to import the module Random
@@ -402,15 +415,21 @@ end
 
 Similar to `random_commuting_matrices` function. Gives the opportunity to generate testdata randomly and pluck it into the discrete version of generate_testdata.
 """
-function generate_random_signals(no_of_signals::Int, no_of_samples::Int; seed = Xoshiro(), signal_type::DataType = Float64)
-    signals = Matrix{signal_type}(undef,no_of_signals,no_of_samples)
-    for signal in 1:no_of_signals
-        signals[signal,:] = rand(seed,signal_type, no_of_samples)
+function generate_random_signals(
+    no_of_signals::Int,
+    no_of_samples::Int;
+    seed = Xoshiro(),
+    signal_type::DataType = Float64,
+)
+    signals = Matrix{signal_type}(undef, no_of_signals, no_of_samples)
+    for signal = 1:no_of_signals
+        signals[signal, :] = rand(seed, signal_type, no_of_samples)
     end
     return signals
 end
+
 """
-    function get_diagonalization(
+    get_diagonalization(
         A::Vector{<:AbstractMatrix{<:Number}};
         algorithm::String = "jdiag_gabrieldernbach",
         max_iter::Int = 1000,
