@@ -1,15 +1,15 @@
 using WAV
 """
-    function get_test_data(
-    type::Symbol,
-    n_dims::Int = 10,
-    n_matrices::Int = 10
-    )
+    get_test_data(type::Symbol; n_dims::Int = 10, n_matrices::Int = 10)
+
+Get test data to be used as example data or test data.
 
 Usage:
-* `:exact_diag`
-* `:approx_diag`
-* `:random_noice`
+* `get_test_data(:exact_diag)` returns exactly diagonalizable matrices. 
+* `get_test_data(:approx_diag)` returns time correlated correlation matrices that are approx. diagonalizable. 
+* `get_test_data(:random_noise)` returns complete random matrices.
+
+Parameter `n_dims` and `n_matrices` used to select size of matrices and number of matrices respectivley.
 """
 #not pretty but if the files should be included the directory is needed to make abs. path
 directory = dirname(@__DIR__)
@@ -35,7 +35,7 @@ function get_test_data(type::Symbol; n_dims::Int = 10, n_matrices::Int = 10)
             no_of_segments = n_matrices + 1,
             show_warning = false,
         )
-    elseif type == :random_noice
+    elseif type == :random_noise
         A = random_normal_commuting_matrices(n_dims, n_matrices)
         return addrandomnoise(A, same_noise = false)
         #TODO: include this but will need additional arguments in get_test_data
