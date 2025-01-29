@@ -1,11 +1,10 @@
 using AJD
 using Test
-# using Diagonalizations
+
 using LinearAlgebra
-using Diagonalizations: nonDiagonality,LinearFilter
+using Diagonalizations: nonDiagonality, LinearFilter
 using PosDefManifold: mean
 using BenchmarkTools: BenchmarkGroup
-# using PyCall
 using Plots: Plot
 
 @testset "AJD.jl" begin
