@@ -70,9 +70,15 @@ function jdiag_edourdpineau(
     norm = frobenius_offdiag_norm(Xm)
     norm_history = [norm]
 
+    # Initial setup of the progressbar.
+    progress_bar = ProgressThresh(atol; desc="Minimizing:")
+
+    # Initial setup of the progressbar.
+    progress_bar = ProgressThresh(atol; desc="Minimizing:")
+
     # Iteration counter.
     n_iteration = 0
-
+    
     for _ = 1:iter
         n_iteration += 1
         for i = 1:(n-1), j = (i+1):n
@@ -93,10 +99,15 @@ function jdiag_edourdpineau(
         push!(norm_history, new_norm)
 
         diff = abs(new_norm - norm)
+
+        # Update progress info.
+        update!(progress_bar, diff)
+
         if diff < atol || diff < rtol * norm
             break
         end
         norm = new_norm
     end
+    finish!(progress_bar)
     return V, Xm, norm_history, n_iteration
 end

@@ -18,6 +18,10 @@ function jdiag_cardoso(
     jthresh :: Real;
     max_iter = 800,
     plot_convergence::Bool = false)
+
+    # Initial setup of the progressbar.
+    diff = jthresh
+    progress_bar = ProgressThresh(diff; desc="Minimizing:")
     # This version only works for matrix with real valued entries
     # Input:
     # A is a mxnm matrix,(A1,...,An),each with dimension mxm
@@ -70,6 +74,7 @@ function jdiag_cardoso(
                 # calculate the parameters for givens rotation
                 c = sqrt(0.5+angles[1]/2)
                 s = 0.5*(angles[2])/c
+                diff = abs(s)
                 
                 #update matrices A and V by a givens rotation
                 if off_norm >jthresh
@@ -88,6 +93,9 @@ function jdiag_cardoso(
                     
                     # after update matrix A calculate off_diag_norm of A
                     off_norm = off_diagonal_norm_cardoso(A)
+
+                    # Update progress info.
+                    update!(progress_bar, diff)
                     
                 end # if
             end # for q

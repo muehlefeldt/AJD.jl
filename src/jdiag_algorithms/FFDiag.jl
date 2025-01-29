@@ -39,7 +39,10 @@ function ffd(
         norm_function = X -> opnorm(X,Inf) #infinity norm
     end
 
+    # Initial setup of the progressbar.
+    progress_bar = ProgressThresh(threshold; desc="Minimizing:")
     A = cat(A..., dims = 3)::AbstractArray{<:Real}
+
     rows,columns,k = size(A)
     #initialization
     iteration_step = 0
@@ -50,7 +53,7 @@ function ffd(
 
     
     objective = frobenius_offdiag_norm(A)
-    
+
     error_array = Float64[] 
     if plot_convergence
         push!(error_array, frobenius_offdiag_norm(A))
@@ -84,19 +87,26 @@ function ffd(
         end
         
         objective_new = frobenius_offdiag_norm(A)
-        diff = objective - objective_new
+
+        diff = abs(objective - objective_new)
         if !isfinite(diff)
             @warn ("There are NaN values in the matrix. This can occur for a set of a single matrix or if all matrices are the same.")
             break
         end
-        abs(diff) < threshold && break
+        diff < threshold && break
+
 
         objective = objective_new 
         
+        # Update progress info.
+        update!(progress_bar, diff)
 
         if plot_convergence
-            push!(error_array, frobenius_offdiag_norm(A))
+            push!(error_array, objective_new)
         end
+        
+
+        
     end
     return Matrix(V'), A, error_array, iteration_step
 end

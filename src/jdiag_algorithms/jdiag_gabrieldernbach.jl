@@ -30,6 +30,10 @@ function jdiag_gabrieldernbach!(
         push!(error_array, frobenius_offdiag_norm(A))
     end
 
+    # Initial setup of the progressbar.
+    diff = threshold
+    progress_bar = ProgressThresh(diff; desc="Minimizing:")
+
     #initialize the approximate joint eigenvecotrs as described in Cardoso
     V = Matrix((1.0)*I(rows)) 
     
@@ -54,13 +58,15 @@ function jdiag_gabrieldernbach!(
                 #rotational arguments for real matrices
                 c = cos(θ)
                 s = sin(θ)
+                diff = abs(s)
                 R = [ c s; -s c]
 
                 # if threshold for minimize function is reached abort calculations 
                 #(or max iter is reached)
                 # otherwise rotation is applied to matrix
-                active = abs(s) > threshold
-                if abs(s) > threshold
+                active = diff > threshold
+                
+                if diff > threshold
 
                     pair = [row, column]
                 
@@ -75,6 +81,9 @@ function jdiag_gabrieldernbach!(
                 
             end
         end 
+
+        # Update progress info.
+        update!(progress_bar, diff)
 
         if plot_convergence
             push!(error_array, frobenius_offdiag_norm(A))
@@ -113,6 +122,9 @@ function jdiag_gabrieldernbach!(
     if plot_convergence
         push!(error_array, frobenius_offdiag_norm(A))
     end
+
+    # Initial setup of the progressbar.
+    progress_bar = ProgressThresh(threshold; desc="Minimizing:")
 
     while iteration_step < max_iter && active == true
         iteration_step += 1
@@ -157,7 +169,10 @@ function jdiag_gabrieldernbach!(
     
         objective_function_new = frobenius_offdiag_norm(A)
         diff = objective_function_new - objective_function
-        
+
+        # Update progress info.
+        update!(progress_bar, diff)
+
         if abs(diff) > threshold
             active = true
         end
@@ -167,7 +182,7 @@ function jdiag_gabrieldernbach!(
 
         # Add error at the end of the iteration to track error convergence.
         if plot_convergence
-            push!(error_array, frobenius_offdiag_norm(A))
+            push!(error_array, objective_function)
         end
 
     end
