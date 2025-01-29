@@ -124,7 +124,7 @@ function ajd_benchmark(n_dims::Int, n_matrices::Int)
         suite[name]["random"] = begin
             @benchmarkable diagonalize(data, algorithm = $name) setup = (
                 data = AJD.get_test_data(
-                    :random_noice,
+                    :random_noise,
                     n_dims = $n_dims,
                     n_matrices = $n_matrices,
                 )
