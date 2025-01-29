@@ -13,8 +13,10 @@ using Plots: Plot
     include("test_linearfilter.jl")
 
     # Test the actual result of the algorithm by cheking how nondiagonal the matrices are.
+    # Tests use nonDiagonality() of Diagonalizations.jl.
     include("test_nondiagonality.jl")
     include("test_nondiagonality_time_correlated.jl")
+    include("test_nondiagonality_random_noise.jl")
 
     include("test_utils.jl")
     include("test_benchmark.jl")
