@@ -58,7 +58,6 @@ function jdiag_edourdpineau(
     Xm = cat(X..., dims = 3)
     m = length(X)
     n = size(X[1], 1)
-    @assert n == size(X[1], 2)
 
     if !(M <: Symmetric) && (T <: Real)
         Xm = complex.(Xm)
