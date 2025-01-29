@@ -215,11 +215,19 @@ function check_input(
         throw(ArgumentError("Invalid input: Vector of matrices must have length > 0."))
     end
 
-    # All matrices must be of same size.
+    # All matrices must be of same size and must be non-zero.
     for index in 1:length(A)-1
         if !is_same_size(A[index], A[index+1])
             throw(ArgumentError("Invalid input: Vector of matrices must be of same size."))
         end
+        if iszero(A[index])
+            throw(ArgumentError("Invalid input: All zero matrix not allowed."))
+        end
+    end
+
+    # Last matrix needs to be checked for all zeros as earlier loop does not touch the last matrix.
+    if iszero(A[end])
+        throw(ArgumentError("Invalid input: All zero matrix not allowed."))
     end
     
     # Max iteration must be 1 or higher.
