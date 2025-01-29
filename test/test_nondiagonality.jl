@@ -3,9 +3,6 @@
 # The result of nonDiagonality() indicates the "distance" from a perfect diagonal matrix.
 # nonDiagonality(I) = 0 as I is a diagonal matrix.
 
-using AJD
-using Diagonalizations
-using PosDefManifold
 # Define the acceptable error level.
 # How far the diagonalised matrices can be away from a perfect diagonal matrix.
 # Diagonalizations.jl set the error level to 1e-6.
@@ -16,12 +13,7 @@ accepted_error = 1e-6
     for name in AJD.ALL_ALGORITHMS
         test_input = AJD.random_normal_commuting_matrices(10, 6)
         result = diagonalize(test_input, algorithm=name)
-        # Cardoso implementation shows very high error level.
-        if name == "jdiag_cardoso"
-            @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < 0.1
-        else 
-            @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < accepted_error
-        end
+        @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < accepted_error
     end
 end
 
@@ -38,15 +30,29 @@ end
     @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < accepted_error
 end
 
+# Iterate through all algorithms to ensure all zero matrices are not allowed.
+@testset "Nondiagonality Matrices only Zeros" begin
+    for name in AJD.ALL_ALGORITHMS
+        # Use correct matrices in combination with single zero matrix.
+        test_input = AJD.random_normal_commuting_matrices(10, 6)
+        test_input = [test_input..., zeros(Float32, 10, 10)]
+        @test_throws ArgumentError diagonalize(test_input, algorithm=name)
+    end
+
+    for name in AJD.ALL_ALGORITHMS
+        # Two all zero matrices.
+        test_input = [zeros(Float32, 10, 10), zeros(Float32, 10, 10)]
+        @test_throws ArgumentError diagonalize(test_input, algorithm=name)
+    end
+end
+
+
 # Test the algorithms with a single matrix as input.
 @testset "Nondiagonality Single Matrix" begin
     for name in AJD.ALL_ALGORITHMS
         test_input = AJD.random_normal_commuting_matrices(10, 1)
         result = diagonalize(test_input, algorithm=name)
-        # TODO: Cardoso implementation shows very high error level.
-        if name in ["jdiag_cardoso"]
-            @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < 0.1
-        elseif name in ["ffdiag"] 
+        if name in ["ffdiag"] 
             @test isfinite(mean([nonDiagonality(result.iF * A * result.F) for A in test_input])) == false
         else 
             @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < accepted_error

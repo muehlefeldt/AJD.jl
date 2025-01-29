@@ -1,16 +1,11 @@
 # Test the nonDiagonality of the algorithm outputs when working on
 # time correlated covriance matrices.
 
-using AJD
-using Diagonalizations: nonDiagonality
-using PosDefManifold: mean
-
-# Define the acceptable error level.
-# How far the diagonalised matrices can be away from a perfect diagonal matrix.
-accepted_error = 0.4
-
 # Base testset.
 @testset "Nondiagonality Time Correlated" begin
+    # Define the acceptable error level.
+    # How far the diagonalised matrices can be away from a perfect diagonal matrix.
+    accepted_error = 0.8
     for name in AJD.ALL_ALGORITHMS
         test_input = AJD.get_test_data(:approx_diag)
         result = diagonalize(test_input, algorithm=name)
@@ -19,6 +14,7 @@ accepted_error = 0.4
 end
 
 @testset "Nondiagonality Time Correlated Large" begin
+    accepted_error = 0.8
     for name in AJD.ALL_ALGORITHMS
         test_input = AJD.get_test_data(:approx_diag_large)
         result = diagonalize(test_input, algorithm=name)

@@ -57,7 +57,8 @@ function ffd(
     end
 
    
-    while iteration_step <= max_iter
+    while iteration_step < max_iter
+        iteration_step += 1
         E = get_offdiag_elements(A)
         D = get_diag_elements(A)
         #can be done since cat will reset indices which will work with OffsetArrays and
@@ -92,11 +93,10 @@ function ffd(
 
         objective = objective_new 
         
-        iteration_step += 1
 
         if plot_convergence
             push!(error_array, frobenius_offdiag_norm(A))
         end
     end
-    return Matrix(V'), A, error_array
+    return Matrix(V'), A, error_array, iteration_step
 end

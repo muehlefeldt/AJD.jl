@@ -148,29 +148,80 @@ function get_y_fdiag(D::AbstractArray{<:Number}, E::AbstractArray{<:Number}, i::
     return sum(D[j,j,:].*E[i,j,:])
 end
 
-"Check for valid input of diagonalize()."
-function check_input(A::Vector{<:AbstractMatrix{<:Number}})
-    # Input may be empty.
+"""
+    check_input(
+        A::Vector{<:AbstractMatrix{<:Number}},
+        max_iter::Int,
+        threshold::AbstractFloat,
+        )
+
+Check input of diagonalize(). Validate matrices, threshold and max iteration as selected.
+"""
+function check_input(
+    A::Vector{<:AbstractMatrix{<:Number}},
+    max_iter::Int,
+    threshold::AbstractFloat,
+)
+
+    # Input vector of matrices may be empty.
     if length(A) <= 0
-        return false
+        throw(ArgumentError("Invalid input: Vector of matrices must have length > 0."))
     end
     # All matrices must be of same size.
     if !allequal(size.(A))
-        return false
+        throw(ArgumentError("Invalid input: Vector of matrices must be of same size."))
     end
-    return true
+
+    # Last matrix needs to be checked for all zeros as earlier loop does not touch the last matrix.
+    if any(iszero.(A))
+        throw(ArgumentError("Invalid input: All zero matrix not allowed."))
+    end
+
+    # Max iteration must be 1 or higher.
+    if max_iter <= 0
+        throw(ArgumentError("Invalid input: Max iteration must be 1 or larger."))
+    end
+
+    # Too small threshold is non-sensical to procede with.
+    if threshold < eps()
+        throw(
+            ArgumentError(
+                "Invalid input: Threshold too small. Minimum: " * string(eps()),
+            ),
+        )
+    end
+
+    # Warning in case of very high threshold.
+    if threshold > 1.0e-1
+        @warn "Threshold very high. Recommend threshold of 1e-5 or smaller. Consider machine precision of your system."
+    end
 end
 
-function addrandomnoise(A::Vector{M};σ::AbstractFloat = 0.5,
-    same_noise::Bool = true) where {T<:Number, M<:AbstractMatrix{T}}
+"""
+    addrandomnoise(
+        A::Vector{M};
+        σ::AbstractFloat = 0.5,
+        same_noise::Bool = true,
+    ) where {T<:Number,M<:AbstractMatrix{T}}
 
-    rows,columns = size(A[1])
-
-    if same_noise == true
-        R = randn(rows,columns)
-        for index_k in eachindex(A)
-            A[index_k] = A[index_k] + σ*R*R'
+Add ranom noise to a vector of matrices `A`.
+If same noise selected same random matrix R used for all (!) matrices.
+Completley random noise added to each matrix in `A` with `same_noise=false`.
+"""
+function addrandomnoise(
+    A::Vector{M};
+    σ::AbstractFloat = 0.5,
+    same_noise::Bool = true,
+) where {T<:Number,M<:AbstractMatrix{T}}
+    k = length(A)
+    rows, columns = size(A[1])
+    
+    if same_noise
+        R = randn(rows, columns)
+        for index_k = 1:k
+            A[index_k] = A[index_k] + σ * R * R'
         end
+    
     else
         for index_k in eachindex(A)
             R = randn(rows,columns)
@@ -181,19 +232,27 @@ function addrandomnoise(A::Vector{M};σ::AbstractFloat = 0.5,
 end
 
 """
-    generate_correlation_matrix(signal_one_data::AbstractArray,signal_two_data::AbstractArray)
-* `signal_one_data`: Array of dimension ``n × m``
-* `signal_two_data`: Array of dimension ``n × m``
+    generate_correlation_matrix(
+        signal_one_data::AbstractArray,
+        signal_two_data::AbstractArray,
+    )
 
 Calculates correlation matrix between observations ``x_i(t)`` and ``x_i(t+τ)``.
+
+Inputs:
+* `signal_one_data`: Array of dimension ``n \\times m``
+* `signal_two_data`: Array of dimension ``n \\times m``
 """
-function generate_correlation_matrix(signal_one_data::AbstractArray,signal_two_data::AbstractArray)
+function generate_correlation_matrix(
+    signal_one_data::AbstractArray,
+    signal_two_data::AbstractArray,
+)
 
     if size(signal_one_data) != size(signal_two_data)
         throw(ArgumentError("Signals have different sizes!"))
     end
 
-    C = cor(signal_one_data,signal_two_data,dims = 2)
+    C = cor(signal_one_data, signal_two_data, dims = 2)
     return C
 end
 
@@ -219,7 +278,7 @@ Then a number of time delayed correlation matrices specified by `no_of_corr` is 
 ```julia
 signal_sources = [x->1.6sin(2pi*5x+5)+2sin(2pi*20x+27)+0.5sin(2pi*100x)+1,x->1.2(2pi*11x)+sin(2pi*2x)+0.7sin(2pi*111x+10)]
 mixing_matrix = [0.32 -0.43; -1.31 0.34]
-```julia
+```
 """
 function generate_testdata(signal_sources::AbstractArray{<:Function}, mixing_matrix::AbstractMatrix{<:Number}; 
     delay::Number = 1, sample_time::Number = 10, 
@@ -371,29 +430,26 @@ function get_diagonalization(
     threshold::AbstractFloat = eps(),
     only_plot::Symbol = :no_plot
     )
-    if !check_input(A)
-        throw(ArgumentError("Invalid input."))
-    end
-
+    
     # Do we need to get the error history from the algorithms?
     # If so selected, a performance penalty is to be expected.
     plot_convergence = only_plot == :plot
 
     if algorithm in ["jdiag", "jdiag_gabrieldernbach"]
-        F, B, error_array = jdiag_gabrieldernbach!(A, max_iter = max_iter, threshold = threshold, plot_convergence=plot_convergence)
+        F, B, error_array, n_iter = jdiag_gabrieldernbach!(A, max_iter = max_iter, threshold = threshold, plot_convergence=plot_convergence)
 
     elseif algorithm in ["jdiag_edourdpineau", "jade"]
-        F, B, error_array = jdiag_edourdpineau(A, iter = max_iter)
+        F, B, error_array, n_iter = jdiag_edourdpineau(A, iter = max_iter)
 
     elseif algorithm == "jdiag_cardoso"
         if typeof(A) <: AbstractArray{<:AbstractArray{<:Real}} 
-            F, B, error_array = jdiag_cardoso(A, threshold, plot_convergence=plot_convergence)
+            F, B, error_array, n_iter = jdiag_cardoso(A, threshold, plot_convergence=plot_convergence, max_iter=max_iter)
         else
             throw(ArgumentError("Not supported for set of Matrices containing imaginary values!"))
         end
 
     elseif algorithm in ["FFD", "ffd", "ffdiag"]
-        F, B, error_array = ffd(
+        F, B, error_array, n_iter = ffd(
             A,
             threshold=threshold,
             max_iter=max_iter,
@@ -407,5 +463,5 @@ function get_diagonalization(
         ))
     end
 
-    return F, B, error_array
+    return F, B, error_array, n_iter
 end
