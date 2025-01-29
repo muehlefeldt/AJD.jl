@@ -41,8 +41,8 @@ function jdiag_gabrieldernbach!(
 
     active = true #flag if threshold is reached
 
-    while iteration_step <= max_iter && active == true
-   
+    while iteration_step < max_iter && active == true
+        iteration_step += 1
         active = false
 
         for row = 1:rows
@@ -89,11 +89,11 @@ function jdiag_gabrieldernbach!(
             push!(error_array, frobenius_offdiag_norm(A))
         end
 
-        iteration_step += 1
+        
     end
     
     # Return of the filter, diagonalized matrices and the convergence error (optional).
-    return V, A, error_array
+    return V, A, error_array, iteration_step
 
 end
 
@@ -126,8 +126,8 @@ function jdiag_gabrieldernbach!(
     # Initial setup of the progressbar.
     progress_bar = ProgressThresh(threshold; desc="Minimizing:")
 
-    while iteration_step <= max_iter && active == true
-        
+    while iteration_step < max_iter && active == true
+        iteration_step += 1
         active = false
 
         for row = 1:rows
@@ -178,7 +178,7 @@ function jdiag_gabrieldernbach!(
         end
 
         objective_function = objective_function_new
-        iteration_step += 1
+        
 
         # Add error at the end of the iteration to track error convergence.
         if plot_convergence
@@ -188,7 +188,7 @@ function jdiag_gabrieldernbach!(
     end
 
     # Return of the filter, diagonalized matrices and the convergence error (optional).
-    return V, A, error_array
+    return V, A, error_array, iteration_step
 
 end
 

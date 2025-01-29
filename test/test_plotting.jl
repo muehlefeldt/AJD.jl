@@ -1,10 +1,6 @@
 # Test the plotting of diagonalized matrices and convergence behaviour.
 # Verify all plot combinations and the return type.
 
-using Plots: Plot
-using PosDefManifold: mean
-using AJD
-
 accepted_error = 0.1
 
 @testset "Plotting" begin
@@ -24,7 +20,7 @@ accepted_error = 0.1
         # Expected are the returns:
         # Filter, diagonalized matrices and the error array.
         result = AJD.get_diagonalization(test_input, algorithm=name, only_plot=:plot)
-        @test length(result) == 3
+        @test length(result) == 4
         @test length(result[3]) > 0
         @test mean([nonDiagonality((result[1]') * A * (result[1])) for A in test_input]) < accepted_error
     end
