@@ -2,18 +2,15 @@ module AJDExtPlotting
 
 using AJD
 using Statistics: mean
-using Plots: Plot, plot, heatmap, theme
+using Plots: Plot, plot, heatmap, theme, @layout, mm
 
 function AJD.diagonalize(
-    #::Type{T},
     A::Vector{<:AbstractMatrix{<:Number}},
     only_plot::Symbol;
-    #x::Plots = None,
     algorithm::String = "jdiag_gabrieldernbach",
     max_iter::Int = 1000,
     threshold::AbstractFloat = eps(),
-) #where {T<:Plot}
-    #print(x)
+)
     AJD.check_input(A, max_iter, threshold)
 
     if only_plot == :plot
@@ -56,25 +53,42 @@ function get_plot(
 
     # Select PLots.jl theme.
     theme(:vibrant)
-
+    
     # Get the plots and returned one combined plot.
-    filter_plot = heatmap(real.(filter), yflip = true, title = "Filter Matrix")
+    filter_plot = heatmap(
+        real.(filter),
+        yflip = true,
+        title = "Filter Matrix",
+        #size = (800, 400),
+        aspect_ratio = 1,
+        left_margin = 8mm
+    )
     mean_diag_plot = heatmap(
         real.(mean((diag_matrices), dims = 3)[:, :, 1]),
         yflip = true,
         title = "Mean Diagonalized Matrices",
+        #size = (800, 400),
+        aspect_ratio = 1,
+        left_margin = 8mm
     )
-    error_plot = plot(error_array, w = 3, title = "Error Convergence", label = name)
+    error_plot = plot(
+        error_array,
+        w = 3,
+        title = "Error Convergence",
+        label = name,
+        #size = (100, 100),
+        left_margin = 8mm
+    )
     return plot(
         filter_plot,
         mean_diag_plot,
         error_plot,
-        layout = (3, 1),
+        layout = @layout([a b; c]),
         legend = false,
         size = (800, 1200),
+        framestyle = [:box],
     )
+    
 end
-
-#export diagonalize
 
 end # module
