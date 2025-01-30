@@ -48,7 +48,7 @@ The main function `diagonalize()` provides several options to be choosen by the 
 The package allows to choose different algorithms to calculate the AJD.
 
 #### JDiag
-Further reading on the ins and outs of the JDiag algorithm proposed be J.F.Cardoso can be found in reference [1].
+Further reading on the ins and outs of the JDiag algorithm proposed be J.F. Cardoso can be found in reference [1].
 
 Three implementations of the JDiag algorithm are available:
 * The Cardoso implementation is based on [Matlab Code by Cardoso](https://www2.iap.fr/users/cardoso/jointdiag.html). Use the keyword `algorithm="jdiag_cardoso"`.
@@ -71,8 +71,10 @@ If you want to use the FFDiag algorithm for calculation of the diagonalization b
 
 For a minimal example execute:
 ```julia
-# Generate 1000 matrices of 10 x 10 size.
-M = AJD.get_test_data(:exact_diag, 10, 1000)
+using AJD
+
+# Generate 1000 exactly diagonalizable matrices of 10 x 10 size.
+M = AJD.get_test_data(:exact_diag, n_dims=10, n_matrices=1000)
 
 # Diagonalize M using selected algorithm.
 diagonalize(M, algorithm="ffdiag")
@@ -84,11 +86,14 @@ Visual feedback is optionally available. Plots of the convergence behaviour of t
 To generate a plot use: `diagonalize(M, :plot)`.
 
 ```julia
-# Generate 1000 matrices of 10 x 10 size.
-M = AJD.get_test_data(:exact_diag, 10, 1000)
+using AJD
+using Plots
+
+# Generate 1000 exactly diagonalizable matrices of 10 x 10 size.
+M = AJD.get_test_data(:exact_diag, n_dims=10, n_matrices=1000)
 
 # Diagonalize M and generate plot.
-diagonalize(M, :plot, algorithm="jade")
+diagonalize(M, :plot)
 ```
 The generated plot:
 
