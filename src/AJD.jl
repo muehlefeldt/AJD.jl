@@ -12,7 +12,6 @@ include("FFDiag.jl")
 # Utility functions, plotting functions and global constanst imported.
 include("utils.jl")
 include("utils_test_data.jl")
-include("plotting.jl")
 include("global_constants.jl")
 
 """
