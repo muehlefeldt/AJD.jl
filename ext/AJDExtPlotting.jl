@@ -9,7 +9,7 @@ function AJD.diagonalize(
     A::Vector{<:AbstractMatrix{<:Number}},
     only_plot::Symbol;
     #x::Plots = None,
-    algorithm::String = "jdiag_gabrieldernbach",
+    algorithm::AbstractDiagonalization = JDiagGabrielDernbach(),
     max_iter::Int = 1000,
     threshold::AbstractFloat = eps(),
 ) #where {T<:Plot}
@@ -29,7 +29,7 @@ function AJD.diagonalize(
             @warn "Max iteration was reached. Consider increasing max_iter: diagonalize(M, max_iter=...)."
         end
 
-        p = get_plot(F, B, error_array, algorithm)
+        p = get_plot(F, B, error_array, string(typeof(algorithm)))
     else
         throw(ArgumentError("Please use symbol only_plot=:plot to generate plots."))
     end
@@ -39,8 +39,8 @@ end
 """
     get_plot(
         filter::AbstractArray,
-        diag_matrices::AbstractArray, 
-        error_array::AbstractArray, 
+        diag_matrices::AbstractArray,
+        error_array::AbstractArray,
         name::String)
 
 In case of plot is user selected this generates heatmap plot of the filter matrix and the mean of diagonlaised matrices.
