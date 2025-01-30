@@ -55,9 +55,6 @@ function jdiag_edourdpineau(
     atol = eps(),
 ) where {T<:Number,M<:AbstractMatrix{T}}
 
-    if typeof(X) <: AbstractArray{<:AbstractArray{<:Int}}
-        X = float.(X)
-    end
     
     Xm = cat(X..., dims = 3)::AbstractArray{<:Number}
     m = length(X)
@@ -72,9 +69,6 @@ function jdiag_edourdpineau(
 
     norm = frobenius_offdiag_norm(Xm)
     norm_history = [norm]
-
-    # Initial setup of the progressbar.
-    progress_bar = ProgressThresh(atol; desc="Minimizing:")
 
     # Initial setup of the progressbar.
     progress_bar = ProgressThresh(atol; desc="Minimizing:")
