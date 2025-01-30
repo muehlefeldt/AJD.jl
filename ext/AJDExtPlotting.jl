@@ -36,6 +36,17 @@ function AJD.diagonalize(
     return p
 end
 
+"""
+    get_plot(
+        filter::AbstractArray,
+        diag_matrices::AbstractArray, 
+        error_array::AbstractArray, 
+        name::String)
+
+In case of plot is user selected this generates heatmap plot of the filter matrix and the mean of diagonlaised matrices.
+Also a lineplot of the error history of the algorithm calculation is created.
+A combined plot is returned.
+"""
 function get_plot(
     filter::AbstractArray,
     diag_matrices::AbstractArray,
