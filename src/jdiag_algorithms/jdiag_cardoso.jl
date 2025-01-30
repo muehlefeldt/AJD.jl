@@ -1,5 +1,5 @@
 """
-    jdiag_cardoso(M,jthresh,max_iter = 800)
+    jdiag_cardoso(M,threshhold,max_iter = 800)
 
 Only works for matrix with real valued entries. Based on [Matlab Code by Cardoso](https://www2.iap.fr/users/cardoso/jointdiag.html).
 * `A`: a ``m × m × n`` matrix,(``A_1,...,A_n``), each with dimension ``m × m``
@@ -13,13 +13,12 @@ Output:
 """
 function jdiag_cardoso(
     M::Vector{<:AbstractMatrix{<:Real}},
-
     threshold :: Real;
     max_iter = 800,
     plot_convergence::Bool = false)
 
     # Initial setup of the progressbar.
-    diff = jthresh
+    diff = threshold
     progress_bar = ProgressThresh(diff; desc="Minimizing:")
     
     A = copy(hcat(M...))
