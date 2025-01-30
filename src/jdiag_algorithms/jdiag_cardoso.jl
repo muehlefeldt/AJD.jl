@@ -14,7 +14,7 @@ Output:
 function jdiag_cardoso(
     M::Vector{<:AbstractMatrix{<:Real}},
 
-    jthresh :: Real;
+    threshold :: Real;
     max_iter = 800,
     plot_convergence::Bool = false)
 
