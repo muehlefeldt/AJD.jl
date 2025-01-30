@@ -38,7 +38,7 @@ function jdiag_cardoso(
     iter = 0
     V= Matrix{Float64}(I,m,m)
     off_norm = off_diagonal_norm_cardoso(A)
-    off_norm_array = []
+    off_norm_array = Float64[]
 
     
     # Initializing flag

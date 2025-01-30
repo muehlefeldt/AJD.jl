@@ -22,7 +22,7 @@ function jdiag_gabrieldernbach!(
         A = float.(A)
     end
     
-    A = cat(A...,dims = 3) #convert to 3 dimensional matrix and concatenate in the third dimension
+    A = cat(A...,dims = 3)::AbstractArray{<:Real} #convert to 3 dimensional matrix and concatenate in the third dimension
     rows, columns, k = size(A)
 
     error_array = [] 
@@ -102,8 +102,8 @@ function jdiag_gabrieldernbach!(
     threshold = eps(),
     max_iter = 1000,
     plot_convergence::Bool = false) where {T<:Complex, M<:AbstractMatrix{T}}
-    
-    A = cat(A...,dims = 3)
+    #fixes type instability of cat
+    A = cat(A...,dims = 3)::AbstractArray{<:Complex}
     rows, columns, k = size(A)
     #initialize the apporximate joint eigenvecotrs as described in Cardoso
     V = complex.(Matrix((1.0)*I(rows))) 
@@ -118,7 +118,7 @@ function jdiag_gabrieldernbach!(
 
     # Make sure empty error array exists even if not tracked.
     # Track error if plot_convergence is selected.
-    error_array = [] 
+    error_array = Float64[] 
     if plot_convergence
         push!(error_array, frobenius_offdiag_norm(A))
     end

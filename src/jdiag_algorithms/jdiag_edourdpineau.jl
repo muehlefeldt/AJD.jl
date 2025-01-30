@@ -55,7 +55,11 @@ function jdiag_edourdpineau(
     atol = eps(),
 ) where {T<:Number,M<:AbstractMatrix{T}}
 
-    Xm = cat(X..., dims = 3)
+    if typeof(X) <: AbstractArray{<:AbstractArray{<:Int}}
+        X = float.(X)
+    end
+    
+    Xm = cat(X..., dims = 3)::AbstractArray{<:Number}
     m = length(X)
     n = size(X[1], 1)
 
