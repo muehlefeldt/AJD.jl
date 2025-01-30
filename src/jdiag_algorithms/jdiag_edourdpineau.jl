@@ -44,7 +44,7 @@ end
 """
     jdiag_edourdpineau(X::Vector{M}; iter=100, eps=1e-3)
         where {T<:Union{Real,Complex},M<:AbstractMatrix{T}}
-
+*X
 Diagonalize a set of matrices using the Jacobi method ("Jacobi Angles for Simultaneous Diagonalization").
 Code adapted from [Edouardpineaus Python implementation](https://github.com/edouardpineau/Time-Series-ICA-with-SOBI-Jacobi)
 """
@@ -55,7 +55,9 @@ function jdiag_edourdpineau(
     atol = eps(),
 ) where {T<:Number,M<:AbstractMatrix{T}}
 
-    Xm = cat(X..., dims = 3)
+    #convert to 3 dimensional matrix and concatenate in the third dimension
+    #will also reset dimensions of matrix if OffsetArray
+    Xm = cat(X..., dims = 3)::AbstractArray{<:Number}
     m = length(X)
     n = size(X[1], 1)
 
@@ -68,9 +70,6 @@ function jdiag_edourdpineau(
 
     norm = frobenius_offdiag_norm(Xm)
     norm_history = [norm]
-
-    # Initial setup of the progressbar.
-    progress_bar = ProgressThresh(atol; desc="Minimizing:")
 
     # Initial setup of the progressbar.
     progress_bar = ProgressThresh(atol; desc="Minimizing:")
@@ -101,7 +100,7 @@ function jdiag_edourdpineau(
 
         # Update progress info.
         update!(progress_bar, diff)
-
+        #check if absolute or relative threshold is reached
         if diff < atol || diff < rtol * norm
             break
         end

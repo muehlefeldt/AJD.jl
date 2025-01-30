@@ -15,6 +15,7 @@ of [Algorithm](https://github.com/edouardpineau/Time-Series-ICA-with-SOBI-Jacobi
 function jdiag_gabrieldernbach!(
         A::Vector{M};
         threshold::AbstractFloat = eps(),
+        rel_threshold = 1e-3, #not used in function but easier for multiple dispatch
         max_iter = 1000,
         plot_convergence::Bool = false) where {T<:Real, M<:AbstractMatrix{T}}
     
@@ -22,10 +23,12 @@ function jdiag_gabrieldernbach!(
         A = float.(A)
     end
     
-    A = cat(A...,dims = 3) #convert to 3 dimensional matrix and concatenate in the third dimension
+    A = cat(A...,dims = 3)::AbstractArray{<:Real}
+    #convert to 3 dimensional matrix and concatenate in the third dimension
+    #will also reset dimensions of matrix if OffsetArray
     rows, columns, k = size(A)
 
-    error_array = [] 
+    error_array = Float64[] 
     if plot_convergence
         push!(error_array, frobenius_offdiag_norm(A))
     end
@@ -100,17 +103,18 @@ end
 function jdiag_gabrieldernbach!(
     A::Vector{M};
     threshold = eps(),
+    rel_threshold = 1e-3,
     max_iter = 1000,
     plot_convergence::Bool = false) where {T<:Complex, M<:AbstractMatrix{T}}
-    
-    A = cat(A...,dims = 3)
+    #fixes type instability of cat
+    A = cat(A...,dims = 3)::AbstractArray{<:Complex}
     rows, columns, k = size(A)
     #initialize the apporximate joint eigenvecotrs as described in Cardoso
     V = complex.(Matrix((1.0)*I(rows))) 
     #needs to be added otherwise we cannot manipulate the non diag. elements of V
     
     #objective_function to be minimized by algorithm
-    objective_function = frobenius_offdiag_norm(A)
+    objective = frobenius_offdiag_norm(A)
    
     #conditions for abortion initialized
     iteration_step = 0
@@ -118,7 +122,7 @@ function jdiag_gabrieldernbach!(
 
     # Make sure empty error array exists even if not tracked.
     # Track error if plot_convergence is selected.
-    error_array = [] 
+    error_array = Float64[] 
     if plot_convergence
         push!(error_array, frobenius_offdiag_norm(A))
     end
@@ -129,7 +133,7 @@ function jdiag_gabrieldernbach!(
     while iteration_step < max_iter && active == true
         iteration_step += 1
         active = false
-
+        #calculations of cardoso paper
         for row = 1:rows
         
             for column = row+1:columns
@@ -167,22 +171,22 @@ function jdiag_gabrieldernbach!(
         
         end
     
-        objective_function_new = frobenius_offdiag_norm(A)
-        diff = objective_function_new - objective_function
+        objective_new = frobenius_offdiag_norm(A)
+        diff = objective_new - objective
 
         # Update progress info.
         update!(progress_bar, diff)
 
-        if abs(diff) > threshold
+        if abs(diff) > threshold || rel_threshold*objective > diff
             active = true
         end
 
-        objective_function = objective_function_new
+        objective= objective_new
         
 
         # Add error at the end of the iteration to track error convergence.
         if plot_convergence
-            push!(error_array, objective_function)
+            push!(error_array, objective)
         end
 
     end
