@@ -1,7 +1,6 @@
 module AJD
 using LinearAlgebra: eigen, norm, Symmetric, Hermitian, I, qr, dot, diag
 using BenchmarkTools
-using Plots: Plot
 using ProgressMeter
 
 # Import different algorithms.
@@ -13,7 +12,6 @@ include("FFDiag.jl")
 # Utility functions, plotting functions and global constanst imported.
 include("utils.jl")
 include("utils_test_data.jl")
-include("plotting.jl")
 include("global_constants.jl")
 
 """
@@ -58,36 +56,6 @@ function diagonalize(
     end
 
     return create_linear_filter(F)
-end
-
-function diagonalize(
-    A::Vector{<:AbstractMatrix{<:Number}},
-    only_plot::Symbol;
-    algorithm::String = "jdiag_gabrieldernbach",
-    max_iter::Int = 1000,
-    threshold::AbstractFloat = eps(),
-)
-
-    check_input(A, max_iter, threshold)
-
-    if only_plot == :plot
-        F, B, error_array, n_iter = get_diagonalization(
-            A,
-            algorithm = algorithm,
-            max_iter = max_iter,
-            threshold = threshold,
-            only_plot = only_plot,
-        )
-        
-        if n_iter >= max_iter
-            @warn "Max iteration was reached. Consider increasing max_iter: diagonalize(M, max_iter=...)."
-        end
-
-        p = get_plot(F, B, error_array, algorithm)
-    else
-        throw(ArgumentError("Please use symbol only_plot=:plot to generate plots."))
-    end
-    return p
 end
 
 """
