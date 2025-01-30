@@ -48,7 +48,7 @@ The main function `diagonalize()` provides several options to be choosen by the 
 The package allows to choose different algorithms to calculate the AJD.
 
 #### JDiag
-Further reading on the ins and outs of the JDiag algorithm proposed be J.F.Cardoso can be found in reference [1].
+Further reading on the ins and outs of the JDiag algorithm proposed be J.F. Cardoso can be found in reference [[1]](references.md).
 
 Three implementations of the JDiag algorithm are available:
 * The Cardoso implementation is based on [Matlab Code by Cardoso](https://www2.iap.fr/users/cardoso/jointdiag.html). Use the keyword `algorithm="jdiag_cardoso"`.
@@ -57,22 +57,26 @@ Three implementations of the JDiag algorithm are available:
 
 For example execute:
 ```julia
-# Generate 1000 matrices of 10 x 10 size. These matrices are exactly diagonalizable.
-M = AJD.get_test_data(:exact_diag, 10, 1000)
+using AJD
+
+# Generate 1000 exactly diagonalizable matrices of 10 x 10 size.
+M = AJD.get_test_data(:exact_diag, n_dims=10, n_matrices=1000)
 
 # Diagonalize M using selected algorithm.
 diagonalize(M, algorithm="jade")
 ```
 
 #### FFDiag
-One implementation of the FFDiag algorithm is available through the keyword `algorithm="ffdiag"`. Resources to the topic can be found under reference [2].
+One implementation of the FFDiag algorithm is available through the keyword `algorithm="ffdiag"`. Resources to the topic can be found under reference [[2]](references.md).
 
 If you want to use the FFDiag algorithm for calculation of the diagonalization be aware, that a set containing the same matrices or only one matrix can't be calculated using the FFDiag algorithm. NaN values would occur when calculating the update matrix and the algorithm will give back the identity matrix as a filter. If you want to calculate those sets refer to the JDiag implementations.
 
 For a minimal example execute:
 ```julia
-# Generate 1000 matrices of 10 x 10 size.
-M = AJD.get_test_data(:exact_diag, 10, 1000)
+using AJD
+
+# Generate 1000 exactly diagonalizable matrices of 10 x 10 size.
+M = AJD.get_test_data(:exact_diag, n_dims=10, n_matrices=1000)
 
 # Diagonalize M using selected algorithm.
 diagonalize(M, algorithm="ffdiag")
@@ -81,21 +85,23 @@ diagonalize(M, algorithm="ffdiag")
 ### Plotting
 Visual feedback is optionally available. Plots of the convergence behaviour of the used algorithm, heatmaps of the filter matrix as well as the diagonlized matrices can be visualized using the symbol `:plot`.  The diagonalized matrices ``D_k`` are summarised and only ``\overline{D_k}`` is plotted to provide an overview. 
 
-To generate a plot use: `diagonalize(M, :plot)`.
+To generate a plot use `diagonalize(M, :plot)`. Example code to generate a plot:
 
 ```julia
-# Generate 1000 matrices of 10 x 10 size.
-M = AJD.get_test_data(:exact_diag, 10, 1000)
+using AJD
+using Plots
+
+# Generate 1000 exactly diagonalizable matrices of 10 x 10 size.
+M = AJD.get_test_data(:exact_diag, n_dims=10, n_matrices=1000)
 
 # Diagonalize M and generate plot.
-diagonalize(M, :plot, algorithm="jade")
+diagonalize(M, :plot)
 ```
 The generated plot:
 
-![](matrix.png)
-
-![](conv.png)
-
+<p align="left">
+  <img src="plot.png" width="700" border="0" />
+</p>
 
 ### Benchmarking
 All implementations of the algorithms can be benchmarked by executing:
