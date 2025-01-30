@@ -99,9 +99,7 @@ diagonalize(M, :plot)
 ```
 The generated plot:
 
-<p align="left">
-  <img src="plot.png" width="700" border="0" />
-</p>
+![](plot.png)
 
 ### Benchmarking
 All implementations of the algorithms can be benchmarked by executing:
