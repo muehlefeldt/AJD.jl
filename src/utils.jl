@@ -5,7 +5,7 @@ using Random: rand, randn
 
 """
     random_normal_commuting_matrices(n::Int, m::Int; complex::Bool=false)
-    
+
 Generate m random normal commuting matrices of size ``n × n``
 These can be exactly diagonalized
 
@@ -36,7 +36,7 @@ end
 function get_test_data_complex_real(n::Int, m::Int)
     Q, _ = qr(rand(n,n))
     Q = Matrix(Q)
-    
+
     C = [Q * Diagonal(rand(ComplexF64, n)) * Q' for _ in 1:m]
     R = [Q * Diagonal(rand(n)) * Q' for _ in 1:m]
     return [C..., R...]
@@ -53,9 +53,9 @@ end
 
 """
     frobenius_offdiag_norm(A::AbstractArray{T,3})::Real where {T<:Number}
-* A: Vector of matrices with size ``n × n × k`` 
+* A: Vector of matrices with size ``n × n × k``
 
-Takes the offdiagonal elements of an Array of matrices ``A^k`` and applies the frobenius norm (``\\sum |a_{i,j}|^{2}``). 
+Takes the offdiagonal elements of an Array of matrices ``A^k`` and applies the frobenius norm (``\\sum |a_{i,j}|^{2}``).
 """
 function frobenius_offdiag_norm(A::AbstractArray{T,3})::Real where {T<:Number}
     norm = zero(real(T))
@@ -79,8 +79,8 @@ function get_offdiag_elements(A::Array{<:Number,3})
     #eachrow would be nice however it is slower if eachrow.axes is used
     #according to @btime with replacing eachindex with eachrow.axes
     iterator = eachindex(IndexCartesian(),A[:,begin,begin])
-    for row in iterator 
-        E[row,row,:] .= 0 
+    for row in iterator
+        E[row,row,:] .= 0
     end
     return E
 end
@@ -103,12 +103,12 @@ function get_diag_elements(A::Array{<:Number,3})
 end
 
 """
-    is_commuting(A::AbstractMatrix, B::AbstractMatrix) 
+    is_commuting(A::AbstractMatrix, B::AbstractMatrix)
 * A: AbstractMatrix of dimension ``n × n``
 * B: AbstractMatrix of dimension ``n × n``
 
 Check if two matrices A, B are commuting.
- ``AB = BA`` must hold. 
+ ``AB = BA`` must hold.
  """
 function is_commuting(A::AbstractMatrix, B::AbstractMatrix)
     return isapprox(A*B, B*A)
@@ -221,13 +221,13 @@ function addrandomnoise(
 ) where {T<:Number,M<:AbstractMatrix{T}}
     k = length(A)
     rows, columns = size(A[1])
-    
+
     if same_noise
         R = randn(rows, columns)
         for index_k = 1:k
             A[index_k] = A[index_k] + σ * R * R'
         end
-    
+
     else
         for index_k in eachindex(A)
             R = randn(rows,columns)
@@ -263,7 +263,7 @@ function generate_correlation_matrix(
 end
 
 """
-    generate_testdata(signal_sources::AbstractArray{<:Function}, 
+    generate_testdata(signal_sources::AbstractArray{<:Function},
     mixing_matrix::AbstractMatrix{<:Number}; <keyword_arguments>)
 
 * `signal_sources`: Array of anonymous functions for generating time series data of the uncorrelated signals ``s_j`` of `BSS` e.g. [ s1 = x-> 1.4*sin(2x), s2 = 2.2sin(x)]
@@ -286,8 +286,8 @@ signal_sources = [x->1.6sin(2pi*5x+5)+2sin(2pi*20x+27)+0.5sin(2pi*100x)+1,x->1.2
 mixing_matrix = [0.32 -0.43; -1.31 0.34]
 ```
 """
-function generate_testdata(signal_sources::AbstractArray{<:Function}, mixing_matrix::AbstractMatrix{<:Number}; 
-    delay::Number = 1, sample_time::Number = 10, 
+function generate_testdata(signal_sources::AbstractArray{<:Function}, mixing_matrix::AbstractMatrix{<:Number};
+    delay::Number = 1, sample_time::Number = 10,
     no_of_samples::Int = 100, no_of_cor::Int = 10)
 
     rows,columns = size(mixing_matrix)
@@ -299,7 +299,7 @@ function generate_testdata(signal_sources::AbstractArray{<:Function}, mixing_mat
     C = Matrix{}[]
 
     for k in 0:no_of_cor-1
-       
+
         x = zeros(rows,no_of_samples)
         x_delay = zeros(rows,no_of_samples)
         for row in 1:rows # axes won't work on Array of Functions
@@ -309,7 +309,7 @@ function generate_testdata(signal_sources::AbstractArray{<:Function}, mixing_mat
 
                 #observations at starting point t = 1+(k*T)
                 x[row,:] = x[row,:] + mixing_matrix[row,source]*signal_sources[source].(range(k*sample_time+1,(k+1)*sample_time,length = no_of_samples))
-                
+
                 #time delayed observations
                 x_delay[row,:] = x_delay[row,:] + mixing_matrix[row,source]*signal_sources[source].(range((k*sample_time+1+delay),(k+1)*sample_time+delay, length = no_of_samples))
             end
@@ -328,7 +328,7 @@ function generate_testdata(signal_sources::AbstractArray{<:Function}, mixing_mat
 end
 
 """
-    generate_testdata(signal_sources::AbstractArray; 
+    generate_testdata(signal_sources::AbstractArray;
     delay::Number = 10, no_of_segments::Int = 10)
 * `signal_sources`: Matrix of rowwise signals [``x_1``; ``x_2``;...; ``x_n``]
 * `delay`: Time/index shift between observations to be correlated
@@ -341,20 +341,20 @@ Generate Correlation Matrices for discrete observations ``x_i``.
 
 If your data has a segment with variance close to 0 (e.g. due to all of the values being the same) the correlation matrix will have NaN values inside. Setting the number of segments to a lower value might help.
 """
-function generate_testdata(signal_sources::AbstractArray; 
+function generate_testdata(signal_sources::AbstractArray;
     delay::Number = 10, no_of_segments::Int = 10, show_warning::Bool = true)
-    
+
     x = copy(signal_sources)
-    rows,columns = size(signal_sources) 
+    rows,columns = size(signal_sources)
 
     # if signal has length 100 and delay would be 99 there wouldn't be any data after observation 100 to correlate
     if columns/delay < 2
         throw(ArgumentError("Delay too big. Length of signals divided by delay less than 2. Delay shift would lead to array entry for non existent data."))
     end
-    
+
     segmentation = columns/no_of_segments
 
-    #in case segmentation leads to uneven segments i.e. 200 points and 
+    #in case segmentation leads to uneven segments i.e. 200 points and
     #3 segments -> last observation wouldn't be considered since index will be 66
 
     if isinteger(segmentation)
@@ -367,10 +367,10 @@ function generate_testdata(signal_sources::AbstractArray;
             @warn "Number of Segments leads to segments of different sizes! Will skip last segment.\n"
         end
         no_of_segments -= 1
-        segmentation = floor(Int64,segmentation)       
+        segmentation = floor(Int64,segmentation)
     end
-    
-    # C needs to be declared before the for loop otherwise won't be part of local scope 
+
+    # C needs to be declared before the for loop otherwise won't be part of local scope
     # if statement therefore declaring C inside for loop won't work
     # and declaring C as Matrix[] or Array[] will push first entry to be
     # Array[...] or Matrix[...] with all other entries being of type Matrix or Array
@@ -378,11 +378,11 @@ function generate_testdata(signal_sources::AbstractArray;
     # initialize the matrix set with the type of signal_sources
     # this might lead to an error if the type of signals differs from eachother however
     # if only waveform files are used for testdata generation this shouldn't fail. could
-    # 
+    #
     C = Matrix{}[]
 
     for k in 1:no_of_segments-1
-        #won't work for offset arrays however since this is only for testdata generation 
+        #won't work for offset arrays however since this is only for testdata generation
         #of wav files which are read in shouldn't matter
         x_t = x[:,(k-1)*segmentation+1:k*segmentation]
         x_delay = x[:,(k-1)*segmentation+1+delay:k*segmentation+delay]
@@ -431,7 +431,7 @@ end
 """
     get_diagonalization(
         A::Vector{<:AbstractMatrix{<:Number}};
-        algorithm::String = "jdiag_gabrieldernbach",
+        algorithm::AbstractDiagonalization = JDiagGabrielDernbach(),
         max_iter::Int = 1000,
         threshold::AbstractFloat = eps(),
         only_plot::Symbol = :no_plot
@@ -444,43 +444,30 @@ Input is checked here as well.
 """
 function get_diagonalization(
     A::Vector{<:AbstractMatrix{<:Number}};
-    algorithm::String = "jdiag_gabrieldernbach",
+    algorithm::AbstractDiagonalization = JDiagGabrielDernbach(),
     max_iter::Int = 1000,
     threshold::AbstractFloat = eps(),
     only_plot::Symbol = :no_plot
     )
-    
-    # Do we need to get the error history from the algorithms?
-    # If so selected, a performance penalty is to be expected.
+
     plot_convergence = only_plot == :plot
 
-    if algorithm in ["jdiag", "jdiag_gabrieldernbach"]
-        F, B, error_array, n_iter = jdiag_gabrieldernbach!(A, max_iter = max_iter, threshold = threshold, plot_convergence=plot_convergence)
+    return _get_diagonalization(A, algorithm, max_iter, threshold, plot_convergence)
+end
 
-    elseif algorithm in ["jdiag_edourdpineau", "jade"]
-        F, B, error_array, n_iter = jdiag_edourdpineau(A, iter = max_iter)
+# Multiple dispatch for each algorithm
+function _get_diagonalization(A, ::JDiagGabrielDernbach, max_iter, threshold, plot_convergence)
+    jdiag_gabrieldernbach!(A, max_iter=max_iter, threshold=threshold, plot_convergence=plot_convergence)
+end
 
-    elseif algorithm == "jdiag_cardoso"
-        if typeof(A) <: AbstractArray{<:AbstractArray{<:Real}} 
-            F, B, error_array, n_iter = jdiag_cardoso(A, threshold, plot_convergence=plot_convergence, max_iter=max_iter)
-        else
-            throw(ArgumentError("Not supported for set of Matrices containing imaginary values!"))
-        end
+function _get_diagonalization(A, ::JDiagEdourdPineau, max_iter, threshold, plot_convergence)
+    jdiag_edourdpineau(A, iter=max_iter)
+end
 
-    elseif algorithm in ["FFD", "ffd", "ffdiag"]
-        F, B, error_array, n_iter = ffd(
-            A,
-            threshold=threshold,
-            max_iter=max_iter,
-            plot_convergence=plot_convergence
-        )
+function _get_diagonalization(A, ::JDiagCardoso, max_iter, threshold, plot_convergence)
+    jdiag_cardoso(A, threshold, plot_convergence=plot_convergence, max_iter=max_iter)
+end
 
-    else
-        # If no vaild algorithm selected, throw an error.
-        throw(ArgumentError(
-            "No valid algorithm selected. Available options:" * join(AJD.ALL_ALGORITHMS, ", ")
-        ))
-    end
-
-    return F, B, error_array, n_iter
+function _get_diagonalization(A, ::FFDiag, max_iter, threshold, plot_convergence)
+    ffd(A, threshold=threshold, max_iter=max_iter, plot_convergence=plot_convergence)
 end

@@ -8,18 +8,18 @@ accepted_error = 0.1
     # input matrices is selected.
     # Only using very small inputs.
     # Check all implemented algorithms.
-    for name in AJD.ALL_ALGORITHMS
+    for alg in AJD.ALL_ALGORITHMS
         test_input = AJD.random_normal_commuting_matrices(10, 6)
-        result = diagonalize(test_input, :plot, algorithm=name)
+        result = diagonalize(test_input, :plot, algorithm=alg)
         @test typeof(result) <: Plot
 
         test_input = AJD.random_normal_commuting_matrices(10, 6)
-        @test_throws ArgumentError diagonalize(test_input, :test, algorithm=name)
+        @test_throws ArgumentError diagonalize(test_input, :test, algorithm=alg)
 
         # Verify get_diagonalization() works as well when plot is requested.
         # Expected are the returns:
         # Filter, diagonalized matrices and the error array.
-        result = AJD.get_diagonalization(test_input, algorithm=name, only_plot=:plot)
+        result = AJD.get_diagonalization(test_input, algorithm=alg, only_plot=:plot)
         @test length(result) == 4
         @test length(result[3]) > 0
         @test mean([nonDiagonality((result[1]') * A * (result[1])) for A in test_input]) < accepted_error
