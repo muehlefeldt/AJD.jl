@@ -1,11 +1,10 @@
 """
-    jdiag_cardoso(M,jthresh)
+    jdiag_cardoso(M,jthresh,max_iter = 800)
 
 Only works for matrix with real valued entries. Based on [Matlab Code by Cardoso](https://www2.iap.fr/users/cardoso/jointdiag.html).
-
-Input:
-* A is a ``m × m × n`` matrix,(``A_1,...,A_n``), each with dimension ``m × m``
-* thresh is a threshold for approximation stop, normally = 10e-8.
+* `A`: a ``m × m × n`` matrix,(``A_1,...,A_n``), each with dimension ``m × m``
+* `thresh`: absolute threshold for approximation stops.default is 10e-8.
+*``max_iter``: number of iterations before algorithm stops. default is 800.
 
 Output:
 * V : is a  ``m × m`` matrix, which accumulates givens rotations G in each iteration.
@@ -22,15 +21,6 @@ function jdiag_cardoso(
     # Initial setup of the progressbar.
     diff = jthresh
     progress_bar = ProgressThresh(diff; desc="Minimizing:")
-    # This version only works for matrix with real valued entries
-    # Input:
-    # A is a mxnm matrix,(A1,...,An),each with dimension mxm
-    # thresh is a threshold for approximation stop, normally = 10e-8
-    # Output:
-    # iter: iteration number
-    # A : is a mxnm matrix, which contains [VA1V',...,VAnV']
-    # V : is a  mxm matrix, which accumulates givens rotations G in each iteration
-    #off_norm_array: an array of summation of off-diagonal-norm of matrices set M in each iteration
     
     A = copy(hcat(M...))
     A = float.(A)
@@ -77,7 +67,7 @@ function jdiag_cardoso(
                 diff = abs(s)
                 
                 #update matrices A and V by a givens rotation
-                if off_norm >jthresh
+                if off_norm >threshold 
                     flag = true
                     pair = [p,q]
                     G = [c -conj(s); s c]
