@@ -102,12 +102,15 @@ The generated plot:
 ![](plot.png)
 
 ### Benchmarking
-All implementations of the algorithms can be benchmarked by executing:
+An integrated benchmarking of the Jade and FFDiag algorithms is also available. Use `diagonalize()` with symbol `:benchmark` and specify the desired size matrices and number matrices. Large input sizes require a lot of computation time due to repeated execution. The algorithms are benchmarked using diffrent types of test data: exactly diagonalizable matrices, diagonalizable matrices and fully random matrices. Example code:
 ```julia
+using AJD
+using BenchmarkTools
+
 # Using matrices of size 10 x 10. Use 1000 random matrices for each benchmarked run.
-ajd_benchmark(10, 1000)
+diagonalize(:benchmark, 10, 1000)
 ```
 
-Large input sizes require a lot of computation time due to repeated execution.
+
 ### Dependency on [Diagonalizations.jl](https://marco-congedo.github.io/Diagonalizations.jl/dev/)
 The package works with the [LinearFilter](https://marco-congedo.github.io/Diagonalizations.jl/dev/Diagonalizations/#LinearFilter) object of Diagonalizations.jl for further integration into the Diagonalizations.jl package if so desired. Furthermore, the LinearFilter gives rise to testing of the algorithms with functions like [nonDiagonality](https://marco-congedo.github.io/Diagonalizations.jl/dev/tools/#Diagonalizations.nonDiagonality) provided as part of the package.
