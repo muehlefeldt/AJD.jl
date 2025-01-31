@@ -27,6 +27,7 @@ include("utils_test_data.jl")
 include("global_constants.jl")
 
 """
+```julia
 (1)
     diagonalize(
         M::Vector{<:AbstractMatrix{<:Number}};
@@ -50,6 +51,7 @@ include("global_constants.jl")
         n_dims::Int,
         n_matrices::Int,
     )
+```
 
 Calculate joint diagonalization of multiple input matrices ``M_k``.
 
