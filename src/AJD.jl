@@ -27,7 +27,9 @@ include("utils_test_data.jl")
 include("global_constants.jl")
 
 """
-    (1) diagonalize(
+```julia
+(1)
+    diagonalize(
         M::Vector{<:AbstractMatrix{<:Number}};
         algorithm::AbstractDiagonalization = JDiagEdourdPineau(),
         max_iter::Int = 1000,
@@ -46,6 +48,7 @@ include("global_constants.jl")
         benchmark::Symbol,
         n_dims::Int,
         n_matrices::Int)
+```
 
 Calculate joint diagonalization of multiple input matrices ``M_k``.
 
@@ -57,26 +60,25 @@ The matrices can be of types Float64 or Complex.
 See the [Getting Started Guide](https://muehlefeldt.github.io/AJD.jl/dev/getting-started/) for information on the algorithms.
 
 # Dispatch (1)
-## Inputs
+Inputs:
 * `M`: Vector of matrices (requiered).
 * `algorithm`: Selected algorithm from `JDiagGabrielDernbach()`, `JDiagEdourdPineau()`, `JDiagCardoso()` or `FFDiag()`.
 * `max_iter`: Maximum iteration step as integer.
 * `threshold`: Desired threshold minimizing the off-diagonal elements.
-## Output
+Output:
 * Return LinearFilter object. Filter `fil` contains filter matrix `fil.F` and the inverse `fil.iF.`
 
-
-# Dispatch (2)
-## Inputs
+# Dispatch (2) - Benchmark Extension to AJD.jl
+Inputs:
 * Additional symbol used to generate overview plot of the result. `Use diagonalize(M, :plot)`.
-## Output
+Output:
 * Overview plot. Shows heatmap of the filter matrix, heatmap of the mean of the diagonalized matrices and the vonvergence behaviour of the algorithm.
 
-# Dispatch (3)
-## Inputs
+# Dispatch (3) - Benchmark Extension to AJD.jl
+Inputs:
 * Symbol `:benchmark` used as `diagonalize(:benchmark, 10, 10)`.
 * Automatic benchmark is run comparing JDiag and FFDiag algorithms. Using `n_dims` ``\\times`` `n_dims` matrices of count `n_matrices.` 
-## Output
+Output:
 * BenchmarkGroup of package `BenchmarkTools` comparing the algorithms using diffrent types of test data.
 """
 function diagonalize(
