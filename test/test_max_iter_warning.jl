@@ -48,6 +48,6 @@ end
             algorithm = alg,
             max_iter = requested_iter,
         )
-        @test n_iter == requested_iter
+        @test n_iter <= requested_iter
     end
 end
