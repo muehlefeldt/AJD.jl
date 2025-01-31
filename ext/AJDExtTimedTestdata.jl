@@ -6,7 +6,28 @@ using WAV: wavread
 using Statistics: cor
 
 directory = dirname(@__DIR__)
-function AJD.get_test_data(type::Symbol, abs_path::String; n_dims = 10, n_matrices::Int = 10, delay = 1000,
+"""
+    AJD.get_test_data(type::Symbol, abs_path::String; 
+    n_dims = 10, n_matrices::Int = 10, delay = 1000,
+    no_of_segments = n_matrices + 1)
+
+    * `type` = can be `:approx_diag` or `:approx_diag_large`. The latter allows for `no_of_segments`
+    and `delay` to be  changed.
+
+    * `abs_path`: specifies the path from which the wav file should be loaded. if empty example files are loaded.
+
+    * `n_dims`: not used but for convenience of other function
+
+    * `delay`: Time/index shift between measurements to be correlated
+
+    `no_of_segments`: Puts `measurements` in file into even segments to be correlated. 
+    If the number leads to uneven correlation will throw a warning if show_warning is true
+    
+    Get test data from a waveform file, which can be specified.
+    For testing purposes it is recommended to give abs_path an empty string.
+"""
+function AJD.get_test_data(type::Symbol, abs_path::String; 
+    n_dims = 10, n_matrices::Int = 10, delay = 1000,
     no_of_segments = n_matrices + 1)
  
     if type == :approx_diag
@@ -16,7 +37,7 @@ function AJD.get_test_data(type::Symbol, abs_path::String; n_dims = 10, n_matric
         end 
         data, _ = wavread(abs_path)
         return generate_testdata(
-            data',
+            data', #data from wavread is usually column wise 
             delay = delay,
             no_of_segments = 6,
             show_warning = false,
@@ -28,7 +49,7 @@ function AJD.get_test_data(type::Symbol, abs_path::String; n_dims = 10, n_matric
         end
         data, _ = wavread(abs_path)
         return generate_testdata(
-            data',
+            data',  #data from wavread is usually column wise 
             delay = delay,
             no_of_segments =no_of_segments,
             show_warning = false,
@@ -101,7 +122,7 @@ end
     delay::Number = 10, no_of_segments::Int = 10)
 * `measurements`: Matrix of rowwise measurements [``x_1``; ``x_2``;...; ``x_n``]
 * `delay`: Time/index shift between observations to be correlated
-* `no_of_segments`: Puts `signal_sources` into even segments to be correlated. If the number leads to uneven correlation will throw a warning if show_warning is true
+* `no_of_segments`: Puts `measurements` into even segments to be correlated. If the number leads to uneven correlation will throw a warning if show_warning is true
 * `show_warning`: If true will show a warning in case segments are uneven. Will lead to one less correlation matrix
 
 Generate Correlation Matrices for discrete observations ``x_i``.

@@ -53,7 +53,7 @@ end
 
 """
     frobenius_offdiag_norm(A::AbstractArray{T,3})::Real where {T<:Number}
-* A: Vector of matrices with size ``n × n × k``
+* `A``: Vector of matrices with size ``n × n × k``
 
 Takes the offdiagonal elements of an Array of matrices ``A^k`` and applies the frobenius norm (``\\sum |a_{i,j}|^{2}``).
 """
@@ -68,7 +68,7 @@ end
 
 """
     get_offdiag_elements(A::Array{<:Number,3})
-* A: Vector of matrices
+* `A`: Vector of matrices
 
 Takes an array of matrices and returns the offdiagonal elements of A.
 """
@@ -87,7 +87,7 @@ end
 
 """
     get_diag_elements(A::Array)
-* A: Vector of matrices
+* `A`: Vector of matrices
 
 Takes an array of matrices and returns the diagonal elements as a diagonal matrix D.
 """
@@ -104,8 +104,8 @@ end
 
 """
     is_commuting(A::AbstractMatrix, B::AbstractMatrix)
-* A: AbstractMatrix of dimension ``n × n``
-* B: AbstractMatrix of dimension ``n × n``
+* `A`: AbstractMatrix of dimension ``n × n``
+* `B`: AbstractMatrix of dimension ``n × n``
 
 Check if two matrices A, B are commuting.
  ``AB = BA`` must hold.
@@ -117,8 +117,8 @@ end
 
 """
     get_z_fdiag(D::AbstractArray{<:Number}, i::Int, j::Int)
-* D: Diagonal Matrix with offdiagonal elements set to zero
-* i,j: Denotes the indexes of matrix D
+* `D`: Diagonal Matrix with offdiagonal elements set to zero
+* `i,j`: Denotes the indexes of matrix D
 
 Calculates the factor ``z_{ij}`` which is defined by: `` ∑_{k} D_{i,i}^{k}D_{j,j}^{k} ``
 """
@@ -128,9 +128,9 @@ end
 
 """
     get_y_fdiag(D::AbstractArray{<:Number}, E::AbstractArray{<:Number}, i::Int, j::Int)
-* D: Diagonal Matrix with offdiagonal elements set to zero
-* E: Diagonal Matrix with diagonal elements set to zero
-* i,j: Denotes the indexes of the matrices D and E
+* `D`: Diagonal Matrix with offdiagonal elements set to zero
+* `E`: Diagonal Matrix with diagonal elements set to zero
+* `i,j`: Denotes the indexes of the matrices D and E
 
 Calculates the factor ``y_{ij}`` which is defined by:
 `` ∑_{k} D_{j,j}^{k}E_{j,i}^{k} ``

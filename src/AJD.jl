@@ -27,29 +27,25 @@ include("utils_test_data.jl")
 include("global_constants.jl")
 
 """
-(1)
-    diagonalize(
+    (1) diagonalize(
         M::Vector{<:AbstractMatrix{<:Number}};
         algorithm::AbstractDiagonalization = JDiagEdourdPineau(),
         max_iter::Int = 1000,
-        threshold::AbstractFloat = eps(),
-    )
+        threshold::AbstractFloat = eps())
 
-(2)
-    diagonalize(
+
+    (2) diagonalize(
         M::Vector{<:AbstractMatrix{<:Number}},
         only_plot::Symbol;
         algorithm::AbstractDiagonalization = JDiagGabrielDernbach(),
         max_iter::Int = 1000,
-        threshold::AbstractFloat = eps(),
-    )
+        threshold::AbstractFloat = eps())
 
-(3)
-    diagonalize(
+
+    (3) diagonalize(
         benchmark::Symbol,
         n_dims::Int,
-        n_matrices::Int,
-    )
+        n_matrices::Int)
 
 Calculate joint diagonalization of multiple input matrices ``M_k``.
 
