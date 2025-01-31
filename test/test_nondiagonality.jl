@@ -20,13 +20,13 @@ end
 @testset "Nondiagonality Symmetric" begin
     # jdiag_edourdpineau has a function that is overloaded for symmetric and hermitian matrices.
     test_input = AJD.random_normal_commuting_symmetric_matrices(10, 6)
-    result = diagonalize(test_input, algorithm="jdiag_edourdpineau")
+    result = diagonalize(test_input, algorithm=AJD.JDiagEdourdPineau())
     @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < accepted_error
 end
 
 @testset "Nondiagonality Hermitian" begin
     test_input = AJD.random_normal_commuting_symmetric_matrices(10, 6; complex=true)
-    result = diagonalize(test_input, algorithm="jdiag_edourdpineau")
+    result = diagonalize(test_input, algorithm=AJD.JDiagEdourdPineau())
     @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < accepted_error
 end
 
@@ -49,12 +49,12 @@ end
 
 # Test the algorithms with a single matrix as input.
 @testset "Nondiagonality Single Matrix" begin
-    for name in AJD.ALL_ALGORITHMS
+    for alg in AJD.ALL_ALGORITHMS
         test_input = AJD.random_normal_commuting_matrices(10, 1)
-        result = diagonalize(test_input, algorithm=name)
-        if name in ["ffdiag"] 
+        result = diagonalize(test_input, algorithm=alg)
+        if alg == AJD.FFDiag()
             @test isfinite(mean([nonDiagonality(result.iF * A * result.F) for A in test_input])) == false
-        else 
+        else
             @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < accepted_error
         end
     end
@@ -63,21 +63,21 @@ end
 # Test nonDiagonality of complex inputs.
 @testset "Nondiagonality Complex" begin
     # Select algorithms supporting complex matrices.
-    for name in AJD.COMLPLEX_ALGORITHMS
+    for alg in AJD.COMPLEX_ALGORITHMS
         # Generate complex test input and calculate filter.
         test_input = AJD.random_normal_commuting_matrices(6, 6; complex=true)
-        result = diagonalize(test_input, algorithm=name)
+        result = diagonalize(test_input, algorithm=alg)
         @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < accepted_error
     end
 
     # Tests to check combination of real and complex matrices.
-    for name in AJD.COMLPLEX_ALGORITHMS
+    for alg in AJD.COMPLEX_ALGORITHMS
         #A = AJD.random_normal_commuting_matrices(10, 6)
         #B = AJD.random_normal_commuting_matrices(10, 1; complex=true)
         #test_input = [A..., B...]
         test_input = AJD.get_test_data_complex_real(10, 10)
-        result = diagonalize(test_input, algorithm=name)
-        
+        result = diagonalize(test_input, algorithm=alg)
+
         # TODO: Error level very high with both implementations.
         # Surprisingly was jdiag_edourdpineau few days ago.
         @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < accepted_error
@@ -86,7 +86,7 @@ end
 @testset "Nondiagonality of same matrix concatenated as input" begin
     test_input = AJD.random_normal_commuting_matrices(10, 1)
     test_input = push!(test_input, test_input[1])
-    
-    result = diagonalize(test_input, algorithm="jdiag_edourdpineau")
+
+    result = diagonalize(test_input, algorithm=AJD.JDiagEdourdPineau())
     @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < accepted_error
 end
