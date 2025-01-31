@@ -38,18 +38,23 @@ function ffd(
     if typeof(A) <: AbstractArray{<:AbstractArray{<:Int}}
         A = float.(A)
     end
+    #convert to 3 dimensional matrix and concatenate in the third dimension
+    #will also reset dimensions of matrix if OffsetArray
+    A = cat(A..., dims = 3)::AbstractArray{<:Real}
+
     #choose norm according to reference in docstring
     if norm_ == :frobenius
-        norm_function = X -> norm(X,2) #frobenius norm, it says it is frobenius norm but that doesn't make sense!
+        norm_function = X -> norm(X,2) 
+        #frobenius norm according to LinearAlgebra docs
     elseif norm_ == :inf
-        norm_function = X -> opnorm(X,Inf) #infinity norm
+        norm_function = X -> opnorm(X,Inf) 
+        #infinity norm
+        #according to LinearAlgebra docs
     end
 
     # Initial setup of the progressbar.
     progress_bar = ProgressThresh(threshold; desc="Minimizing:")
-    #convert to 3 dimensional matrix and concatenate in the third dimension
-    #will also reset dimensions of matrix if OffsetArray
-    A = cat(A..., dims = 3)::AbstractArray{<:Real}
+    
 
     rows,columns,k = size(A)
     #initialization
@@ -74,7 +79,8 @@ function ffd(
         iteration_step += 1
         E = get_offdiag_elements(A)
         D = get_diag_elements(A)
-        #can be done since cat will reset indices which will work with OffsetArrays and
+        #can be done since cat will 
+        #reset indices which will work with OffsetArrays and
         #linear indexing
         for i = 1:rows-1, j = i+1:rows
             z_ij = get_z_fdiag(D,i,j)

@@ -114,21 +114,6 @@ function is_commuting(A::AbstractMatrix, B::AbstractMatrix)
     return isapprox(A*B, B*A)
 end
 
-"""
-    isstrictly_diagonally_dominant(A::AbstractMatrix)
-* A: AbstractMatrix
-
-Used for the FFDiag Algorithm to define whether the Matrix A is strictly diagonally dominant and therefore has an Inverse or not.
-A matrix is strictly dominant if: ``|a_{ii}| > \\sum |a_{ij}|, i ≠ j``
-"""
-function isstrictly_diagonally_dominant(A::AbstractMatrix)
-    for i in eachindex(IndexCartesian(),A[:, 1])
-        if abs(sum(A[i,:])) - abs(A[i,i]) > abs(A[i,i]) ? true : false
-            return false
-        end
-    end
-    return true
-end
 
 """
     get_z_fdiag(D::AbstractArray{<:Number}, i::Int, j::Int)
