@@ -3,7 +3,7 @@ CurrentModule = AJD
 ```
 
 # Getting Started Guide
-This guide provides information on the basic usage of the AJD.jl package.
+This guide provides information on the basic and more advanced usage of the AJD.jl package.
 
 ## Installation
 To install the Package follow these instructions to add the package to a basic Julia environment or use the package in a Pluto notebook.
@@ -48,14 +48,15 @@ The main function `diagonalize()` provides several options to be choosen by the 
 The package allows to choose different algorithms to calculate the AJD.
 
 #### JDiag
-Further reading on the ins and outs of the JDiag algorithm proposed be J.F. Cardoso can be found in reference [[1]](references.md).
+Further reading on the ins and outs of the "JDiag" or "Jade" algorithm proposed be J.F. Cardoso can be found in reference [[1]](references.md).
 
-Three implementations of the JDiag algorithm are available:
-* The Cardoso implementation is based on [Matlab Code by Cardoso](https://www2.iap.fr/users/cardoso/jointdiag.html). Use the keyword `algorithm="jdiag_cardoso"`.
-* Based on a [Python implementation by Gabrieldernbach](https://github.com/gabrieldernbach/approximate_joint_diagonalization/) the second implementation is suitable for matrices consisting of real and complex values. Use the keyword `algorithm="jdiag_gabrieldernbach"`.
-* The third implementation of JDiag is based on the [Python code by Edouardpineau](https://github.com/edouardpineau/Time-Series-ICA-with-SOBI-Jacobi) also supports real and complex matrices, as well as hermitian matrices included in the module `PosDefManifold.jl`, which are used in the `Diagonalizations.jl` package too. This implementation is currently the standard algorithm for the `diagonalize()` function. Use the keyword `algorithm="jade"`.
+Three implementations of the JDiag algorithm are available: `JDiagCardoso()`, `JDiagGabrielDernbach()` and `JDiagEdourdPineau()`.
 
-For example execute:
+* The Cardoso implementation is based on [Matlab Code by Cardoso](https://www2.iap.fr/users/cardoso/jointdiag.html). Use the keyword `algorithm = JDiagCardoso()`.
+* Based on a [Python implementation by Gabrieldernbach](https://github.com/gabrieldernbach/approximate_joint_diagonalization/) the second implementation is suitable for matrices consisting of real and complex values. Use the keyword `algorithm = JDiagGabrielDernbach()`.
+* The third implementation of JDiag is based on the [Python code by Edouard Pineau](https://github.com/edouardpineau/Time-Series-ICA-with-SOBI-Jacobi) also supports real and complex matrices, as well as hermitian matrices included in the module `PosDefManifold.jl`, which are used in the `Diagonalizations.jl` package too. This implementation is currently the standard algorithm for the `diagonalize()` function. Use the keyword `algorithm = JDiagEdourdPineau()`.
+
+For example execute to execute :
 ```julia
 using AJD
 
@@ -63,13 +64,13 @@ using AJD
 M = AJD.get_test_data(:exact_diag, n_dims=10, n_matrices=1000)
 
 # Diagonalize M using selected algorithm.
-diagonalize(M, algorithm="jade")
+diagonalize(M, algorithm=JDiagEdourdPineau())
 ```
 
 #### FFDiag
-One implementation of the FFDiag algorithm is available through the keyword `algorithm="ffdiag"`. Resources to the topic can be found under reference [[2]](references.md).
+One implementation of the FFDiag algorithm is available through the keyword `algorithm = FFDiag()`. Resources on the topic can be found under reference [[2]](references.md).
 
-If you want to use the FFDiag algorithm for calculation of the diagonalization be aware, that a set containing the same matrices or only one matrix can't be calculated using the FFDiag algorithm. NaN values would occur when calculating the update matrix and the algorithm will give back the identity matrix as a filter. If you want to calculate those sets refer to the JDiag implementations.
+If you want to use the FFDiag algorithm for calculation of the diagonalization be aware, that a set containing the same matrices or only one matrix can't be calculated using the FFDiag algorithm. `NaN` values would occur when calculating the update matrix and the algorithm will return the identity matrix as a filter. If you want to calculate those sets refer to the [JDiag](#jdiag) implementations.
 
 For a minimal example execute:
 ```julia
@@ -79,7 +80,7 @@ using AJD
 M = AJD.get_test_data(:exact_diag, n_dims=10, n_matrices=1000)
 
 # Diagonalize M using selected algorithm.
-diagonalize(M, algorithm="ffdiag")
+diagonalize(M, algorithm=FFDiag())
 ```
 
 ### Plotting
