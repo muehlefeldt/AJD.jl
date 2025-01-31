@@ -81,41 +81,9 @@ function diagonalize(
     return create_linear_filter(F)
 end
 
-"""
-    ajd_benchmark(n_dims::Int, n_matrices::Int)
-
-Run benchmark of implemented algorithms with random inputs.
-Prints basic overview of median execution times.
-Returns BenchmarkGroup containing detailed results.
-"""
-function ajd_benchmark(n_dims::Int, n_matrices::Int)
-    suite = BenchmarkGroup()
-
-    algorithms = [JDiagEdourdPineau(), FFDiag()]
-
-    for alg in algorithms
-        name = string(typeof(alg))
-        suite[name] = BenchmarkGroup([name])
-
-        for test_type in [:exact_diag, :approx_diag_large, :random]
-            suite[name][string(test_type)] =
-                @benchmarkable diagonalize(data, algorithm = $alg) setup = (
-                    data = AJD.get_test_data(
-                        $test_type,
-                        n_dims = $n_dims,
-                        n_matrices = $n_matrices,
-                    )
-                )
-        end
-    end
-
-    tune!(suite)
-    results = run(suite, verbose = true)
-    return results
-end
 
 export AbstractDiagonalization, JDiagGabrielDernbach, JDiagEdourdPineau, JDiagCardoso, FFDiag
-export diagonalize, ajd_benchmark, get_diagonalization, supportscomplex
+export diagonalize, get_diagonalization, supportscomplex
 export ALL_ALGORITHMS, COMPLEX_ALGORITHMS
 
 end
