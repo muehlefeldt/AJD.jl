@@ -19,7 +19,6 @@ for i in 1:10
     A = [Q*D*Q' for D in D_list]
 
     V, _, err = AJD.jdiag_edourdpineau(A)
-    @assert isapprox(V'*V, Matrix{Float64}(I, n, n))
     norm(V)
     push!(all_errors, err)
 end

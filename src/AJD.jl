@@ -1,133 +1,127 @@
 module AJD
-using LinearAlgebra
-using BenchmarkTools
-using Plots: Plot
+using LinearAlgebra: eigen, norm, Symmetric, Hermitian, I, qr, dot, diag
+using ProgressMeter
+
+abstract type AbstractDiagonalization end
+
+# Algorithm types
+struct JDiagGabrielDernbach <: AbstractDiagonalization end
+struct JDiagEdourdPineau <: AbstractDiagonalization end
+struct JDiagCardoso <: AbstractDiagonalization end
+struct FFDiag <: AbstractDiagonalization end
+
+# Traits
+supportscomplex(::AbstractDiagonalization) = false
+supportscomplex(::JDiagGabrielDernbach) = true
+supportscomplex(::JDiagEdourdPineau) = true
 
 # Import different algorithms.
 include("jdiag_algorithms/jdiag_cardoso.jl")
 include("jdiag_algorithms/jdiag_gabrieldernbach.jl")
 include("jdiag_algorithms/jdiag_edourdpineau.jl")
-include("jdiag_algorithms/FFDiag.jl")
+include("FFDiag.jl")
 
 # Utility functions, plotting functions and global constanst imported.
 include("utils.jl")
 include("utils_test_data.jl")
-include("plotting.jl")
 include("global_constants.jl")
 
-
-
 """
+```julia
+(1)
     diagonalize(
-        A::Vector{<:AbstractMatrix{<:Number}};
-        algorithm::String = "jdiag_gabrieldernbach",
+        M::Vector{<:AbstractMatrix{<:Number}};
+        algorithm::AbstractDiagonalization = JDiagEdourdPineau(),
         max_iter::Int = 1000,
         threshold::AbstractFloat = eps(),
-        plot_matrix::Bool = false,
-        plot_convergence::Bool = false
-        )
+    )
+
+(2)
+    diagonalize(
+        M::Vector{<:AbstractMatrix{<:Number}},
+        only_plot::Symbol;
+        algorithm::AbstractDiagonalization = JDiagGabrielDernbach(),
+        max_iter::Int = 1000,
+        threshold::AbstractFloat = eps(),
+    )
+
+(3)
+    diagonalize(
+        benchmark::Symbol,
+        n_dims::Int,
+        n_matrices::Int,
+    )
+```
 
 Calculate joint diagonalization of multiple input matrices ``M_k``.
 
 Main function of the AJD package.
-Implemented algorithms are [JDiag](https://doi.org/10.1137/S0895479893259546) and FFDiag.
+Implemented algorithms are JDiag and FFDiag.
 Input of matrices ``M_k`` need to be a vector of matrices.
 The matrices can be of types Float64 or Complex.
 
-Supported algorithms are `jdiag_gabrieldernbach`, `jdiag_cardoso`, `jdiag_edourdpineau` and `ffdiag`.
-See the Getting Started Guide for information on the algorithms.
+See the [Getting Started Guide](https://muehlefeldt.github.io/AJD.jl/dev/getting-started/) for information on the algorithms.
 
+# Dispatch (1)
+Inputs:
+* `M`: Vector of matrices (requiered).
+* `algorithm`: Selected algorithm from `JDiagGabrielDernbach()`, `JDiagEdourdPineau()`, `JDiagCardoso()` or `FFDiag()`.
+* `max_iter`: Maximum iteration step as integer.
+* `threshold`: Desired threshold minimizing the off-diagonal elements.
+Output
+* Return LinearFilter object. Filter `fil` contains filter matrix `fil.F` and the inverse `fil.iF.`
+
+# Dispatch (2) - Benchmark Extension to AJD.jl
+Inputs:
+* Additional symbol used to generate overview plot of the result. `Use diagonalize(M, :plot)`.
+Output
+* Overview plot. Shows heatmap of the filter matrix, heatmap of the mean of the diagonalized matrices and the vonvergence behaviour of the algorithm.
+
+# Dispatch (3) - Benchmark Extension to AJD.jl
+Inputs:
+* Symbol `:benchmark` used as `diagonalize(:benchmark, 10, 10)`.
+* Automatic benchmark is run comparing JDiag and FFDiag algorithms. Using `n_dims` ``\\times`` `n_dims` matrices of count `n_matrices.` 
+Output
+* BenchmarkGroup of package `BenchmarkTools` comparing the algorithms using diffrent types of test data.
 """
 function diagonalize(
-    A::Vector{<:AbstractMatrix{<:Number}};
-    algorithm::String = "jdiag_gabrieldernbach",
+    M::Vector{<:AbstractMatrix{<:Number}};
+    algorithm::AbstractDiagonalization = JDiagEdourdPineau(),
     max_iter::Int = 1000,
     threshold::AbstractFloat = eps(),
-)::LinearFilter
+)
+    check_input(M, max_iter, threshold)
 
-    F, _, _ = get_diagonalization(
-        A,
+    #convert integers to float in case 
+    #input is of type Int
+
+    if typeof(M) <: AbstractArray{<:AbstractArray{<:Int}}
+        M = float.(M)
+    end
+    # Check complex support
+    if !supportscomplex(algorithm) && any(x -> eltype(x) <: Complex, M)
+        throw(ArgumentError("Selected algorithm doesn't support complex matrices"))
+    end
+
+    F, _, _, n_iter = get_diagonalization(
+        M,
         algorithm = algorithm,
         max_iter = max_iter,
         threshold = threshold,
         only_plot = :no_plot,
     )
+
+    if n_iter >= max_iter
+        @warn "Max iteration was reached. Consider increasing max_iter: diagonalize(M, max_iter=...)."
+    end
+
     return create_linear_filter(F)
 end
 
-function diagonalize(
-    A::Vector{<:AbstractMatrix{<:Number}},
-    only_plot::Symbol;
-    algorithm::String = "jdiag_gabrieldernbach",
-    max_iter::Int = 1000,
-    threshold::AbstractFloat = eps(),
-)::Plot
 
-    if only_plot == :plot
-        F, B, error_array = get_diagonalization(
-            A,
-            algorithm = algorithm,
-            max_iter = max_iter,
-            threshold = threshold,
-            only_plot = only_plot,
-        )
-        p = get_plot(F, B, error_array, algorithm)
-    else
-        throw(ArgumentError("Please use symbol ony_plot=:plot to generate plots."))
-    end
-    return p
-end
-
-"""
-    ajd_benchmark(n_dims::Int, n_matrices::Int)
-
-Run benchmark of implemented algorithms with random inputs.
-Prints basic overview of median execution times.
-Returns BenchmarkGroup containing detailed results.
-"""
-function ajd_benchmark(n_dims::Int, n_matrices::Int)
-    # Define a parent BenchmarkGroup to contain our suite
-    suite = BenchmarkGroup()
-
-    for name in ["jade", "ffdiag"]
-        suite[name] = BenchmarkGroup([name])
-        suite[name]["exact_diag"] = begin
-            @benchmarkable diagonalize(data, algorithm = $name) setup = (
-                data = AJD.get_test_data(
-                    :exact_diag,
-                    n_dims = $n_dims,
-                    n_matrices = $n_matrices,
-                )
-            )
-        end
-        suite[name]["approx_diag_large"] = begin
-            @benchmarkable diagonalize(data, algorithm = $name) setup = (
-                data = AJD.get_test_data(
-                    :approx_diag_large,
-                    n_dims = $n_dims,
-                    n_matrices = $n_matrices,
-                )
-            )
-        end
-        suite[name]["random"] = begin
-            @benchmarkable diagonalize(data, algorithm = $name) setup = (
-                data = AJD.get_test_data(
-                    :random_noice,
-                    n_dims = $n_dims,
-                    n_matrices = $n_matrices,
-                )
-            )
-        end
-    end
-
-    # Run the actual benchmark.
-    tune!(suite)
-    results = run(suite, verbose = true)
-
-    # Return BenchmarkGroup for further evaluation.
-    return results
-end
-
-export diagonalize, ajd_benchmark
+export AbstractDiagonalization,
+    JDiagGabrielDernbach, JDiagEdourdPineau, JDiagCardoso, FFDiag
+export diagonalize, get_diagonalization, supportscomplex
+export ALL_ALGORITHMS, COMPLEX_ALGORITHMS
 
 end

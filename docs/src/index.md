@@ -10,11 +10,12 @@ Documentation for the [AJD.jl](https://github.com/muehlefeldt/AJD.jl) Julia Pack
 * [Getting Started Guide](getting-started.md)
 * [Detailed documentation](detailed-docs.md)
 * [Theory](theoretical-background.md)
+* [Test Data Generation](testdata_generation.md)
 * [References](references.md)
 
-## Main AJD.jl functions
+## Main AJD.jl function
 
-Below the main function of the AJD.jl package `diagonalize()` is introduced below. For the entire documentation, including non exported functions, of the package refer to the [detailed docs page](detailed-docs.md).
+Below the main function of the AJD.jl package `diagonalize()` is introduced. For the entire documentation, including non exported functions, of the package refer to the [detailed docs page](detailed-docs.md).
 
 ```@docs
 diagonalize(

@@ -1,8 +1,5 @@
 # Test implementation of AJD.jdiag_edourdpineau().
 
-using Diagonalizations: nonDiagonality
-using PosDefManifold: mean
-
 "Accepted error level."
 accepted_error = 1e-15
 
@@ -25,8 +22,7 @@ end
 # Compare to test_nondiagonality.jl.
 @testset "AJD.jdiag_edourdpineau() Complex" begin
     test_input = [[ 1.0 0.0 1.0*im; 0.0 2.0 0.0; 1.0*im 0.0 1.0],[ 1.0 0.0 1.0*im; 0.0 2.0 0.0; 1.0*im 0.0 1.0]]
-    result = diagonalize(test_input, algorithm = "jdiag_edourdpineau")
+    result = diagonalize(test_input, algorithm = AJD.JDiagEdourdPineau())
 
     @test mean([nonDiagonality(result.iF * A * result.F) for A in test_input]) < accepted_error
 end
-
