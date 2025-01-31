@@ -1,14 +1,23 @@
 """
-    (1) jdiag_gabrieldernbach(A::Vector{Matrix{Float64}}; 
-        threshold = eps(), max_iter = 1000)
+    (1) jdiag_gabrieldernbach!(
+        A::Vector{M};
+        threshold::AbstractFloat = eps(),
+        rel_threshold = 1e-3, #not used in function but easier for multiple dispatch
+        max_iter = 1000,
+        plot_convergence::Bool = false) where {T<:Real, M<:AbstractMatrix{T}}
 
 JDiag algorithm based on the implementation by Gabrieldernbach in Python.
-
 Source: [Algorithm](https://github.com/gabrieldernbach/approximate_joint_diagonalization/blob/master/jade/jade_cpu.py)
 
-    (2) jdiag_gabrieldernbach(A::Vector{Matrix{ComplexF64}}; 
-        threshold = eps(), max_iter = 1000)
-
+    (2) jdiag_gabrieldernbach!(
+    A::Vector{M};
+    threshold = eps(),
+    rel_threshold = 1e-3,
+    max_iter = 1000,
+    plot_convergence::Bool = false) where {T<:Complex, M<:AbstractMatrix{T}}
+* `A`: set of matrices with dimension `` n × n × k``
+* `threshhold`: absolute error used for stopping the iteration
+* `rel_threshold`: relative error used for stopping the iteration
 JDiag algorithm for complex matrices based on the implementation by Gabrieldernbach in Python, the Cardoso Paper and the code 
 of [Algorithm](https://github.com/edouardpineau/Time-Series-ICA-with-SOBI-Jacobi)
 """

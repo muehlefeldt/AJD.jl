@@ -42,9 +42,12 @@ function rotation_symmetric(
 end
 
 """
-    jdiag_edourdpineau(X::Vector{M}; iter=100, eps=1e-3)
+    jdiag_edourdpineau(X::Vector{M}; iter=100,  rtol = 1e-3, atol = eps())
         where {T<:Union{Real,Complex},M<:AbstractMatrix{T}}
-*X
+* `X`: set of matrices with dimension `` n × n × k``
+* `rtol`: relative error before iteration stops
+* `atol`: absolute error before iteration stops
+
 Diagonalize a set of matrices using the Jacobi method ("Jacobi Angles for Simultaneous Diagonalization").
 Code adapted from [Edouardpineaus Python implementation](https://github.com/edouardpineau/Time-Series-ICA-with-SOBI-Jacobi)
 """
@@ -52,7 +55,7 @@ function jdiag_edourdpineau(
     X::Vector{M};
     iter = 100,
     rtol = 1e-3,
-    atol = eps(),
+    atol = eps()
 ) where {T<:Number,M<:AbstractMatrix{T}}
 
     #convert to 3 dimensional matrix and concatenate in the third dimension
