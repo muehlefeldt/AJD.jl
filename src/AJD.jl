@@ -54,7 +54,7 @@ function diagonalize(
     threshold::AbstractFloat = eps(),
 )
     check_input(A, max_iter, threshold)
-    
+
     #convert integers to float in case 
     #input is of type Int
 
@@ -82,7 +82,8 @@ function diagonalize(
 end
 
 
-export AbstractDiagonalization, JDiagGabrielDernbach, JDiagEdourdPineau, JDiagCardoso, FFDiag
+export AbstractDiagonalization,
+    JDiagGabrielDernbach, JDiagEdourdPineau, JDiagCardoso, FFDiag
 export diagonalize, get_diagonalization, supportscomplex
 export ALL_ALGORITHMS, COMPLEX_ALGORITHMS
 
