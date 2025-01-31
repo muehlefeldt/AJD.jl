@@ -50,12 +50,18 @@ See the Getting Started Guide for information on the algorithms.
 """
 function diagonalize(
     A::Vector{<:AbstractMatrix{<:Number}};
-    algorithm::AbstractDiagonalization = JDiagGabrielDernbach(),
+    algorithm::AbstractDiagonalization = JDiagEdourdPineau(),
     max_iter::Int = 1000,
     threshold::AbstractFloat = eps(),
 )
     check_input(A, max_iter, threshold)
+    
+    #convert integers to float in case 
+    #input is of type Int
 
+    if typeof(A) <: AbstractArray{<:AbstractArray{<:Int}}
+        A = float.(A)
+    end
     # Check complex support
     if !supportscomplex(algorithm) && any(x -> eltype(x) <: Complex, A)
         throw(ArgumentError("Selected algorithm doesn't support complex matrices"))
