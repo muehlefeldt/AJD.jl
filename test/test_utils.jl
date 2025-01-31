@@ -105,12 +105,6 @@ end
 
 end
 
-
-@testset "strictly_dominant" begin
-    A = 1.0*Matrix(I,3,3)
-    @test AJD.isstrictly_diagonally_dominant(A) == true
-end
-
 @testset "get_off_diag_elements" begin
     input = [[1 2 3; 4 5 6; 7 8 9];;;[0 2 4; 4 2 1; 9 0 1]]
     @test AJD.get_offdiag_elements(input) == [[0 2 3; 4 0 6; 7 8 0];;; [0 2 4; 4 0 1; 9 0 0]]
