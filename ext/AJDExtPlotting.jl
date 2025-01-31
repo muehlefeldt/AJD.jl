@@ -10,7 +10,6 @@ using Plots: Plot, plot, heatmap, theme, @layout, mm
 function AJD.diagonalize(
     A::Vector{<:AbstractMatrix{<:Number}},
     only_plot::Symbol;
-    #x::Plots = None,
     algorithm::AbstractDiagonalization = JDiagGabrielDernbach(),
     max_iter::Int = 1000,
     threshold::AbstractFloat = eps(),
@@ -65,7 +64,9 @@ function get_plot(
         title = "Filter Matrix",
         #size = (800, 400),
         aspect_ratio = 1,
-        left_margin = 8mm
+        left_margin = 8mm,
+        xaxis = "Columns",
+        yaxis = "Rows"
     )
     mean_diag_plot = heatmap(
         real.(mean((diag_matrices), dims = 3)[:, :, 1]),
@@ -73,7 +74,9 @@ function get_plot(
         title = "Mean Diagonalized Matrices",
         #size = (800, 400),
         aspect_ratio = 1,
-        left_margin = 8mm
+        left_margin = 8mm,
+        xaxis = "Columns",
+        yaxis = "Rows"
     )
     error_plot = plot(
         error_array,
@@ -81,7 +84,9 @@ function get_plot(
         title = "Error Convergence",
         label = name,
         #size = (100, 100),
-        left_margin = 8mm
+        left_margin = 8mm,
+        xaxis = "Iteration",
+        yaxis = "Norm Value"
     )
     return plot(
         filter_plot,
