@@ -35,7 +35,7 @@ function get_test_data(type::Symbol; n_dims::Int = 10, n_matrices::Int = 10)
             no_of_segments = n_matrices + 1,
             show_warning = false,
         )
-    elseif type == :random_noise
+    elseif type in [:random_noise, :random]
         A = random_normal_commuting_matrices(n_dims, n_matrices)
         return addrandomnoise(A, same_noise = false)
         #TODO: include this but will need additional arguments in get_test_data
