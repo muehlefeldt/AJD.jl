@@ -98,7 +98,7 @@ function ffd(
         V = (I+W)*V
 
         for m = 1:k
-            A[:,:,m] = (I+W)*A[:,:,m]*(I+W)'
+            A[:,:,m] = (I+W)*@view(A[:,:,m])*(I+W)'
         end
         
         objective_new = frobenius_offdiag_norm(A)

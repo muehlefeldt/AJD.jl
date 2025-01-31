@@ -13,14 +13,14 @@ These can be exactly diagonalized
 ``M_i M_i' = M_i' M_i`` for all i
 """
 function random_normal_commuting_matrices(n::Int, m::Int; complex::Bool=false)
-    # Just like the function below, this produces hermitian an symmetric matrices, they are
+    # Just like the function below, this produces 
+    #hermitian an symmetric matrices, they are
     # just not annotated as such
-    # Q, _ = qr(rand(complex ? ComplexF64 : Float64, n,n))
     Q, _ = qr(rand(complex ? ComplexF64 : Float64, n,n))
     Q = Matrix(Q)
-    # if complex
-    #     return [Q*Diagonal(rand(ComplexF64, n))*Q' for _ in 1:m]
-    # end
+    
+    #this is type unstable, since no Seed is given however
+    #is probably desirable
     return [Q*Diagonal(rand(n))*Q' for _ in 1:m]
 end
 
@@ -123,7 +123,7 @@ end
 Calculates the factor ``z_{ij}`` which is defined by: `` ∑_{k} D_{i,i}^{k}D_{j,j}^{k} ``
 """
 function get_z_fdiag(D::AbstractArray{<:Number}, i::Int, j::Int)
-    return sum(D[i,i,:].*D[j,j,:])
+    return sum(@view(D[i,i,:]).*@view(D[j,j,:]))
 end
 
 """
@@ -136,7 +136,7 @@ Calculates the factor ``y_{ij}`` which is defined by:
 `` ∑_{k} D_{j,j}^{k}E_{j,i}^{k} ``
 """
 function get_y_fdiag(D::AbstractArray{<:Number}, E::AbstractArray{<:Number}, i::Int,j::Int)
-    return sum(D[j,j,:].*E[i,j,:])
+    return sum(@view(D[j,j,:]).*@view(E[i,j,:]))
 end
 
 """
@@ -271,7 +271,8 @@ signal_sources = [x->1.6sin(2pi*5x+5)+2sin(2pi*20x+27)+0.5sin(2pi*100x)+1,x->1.2
 mixing_matrix = [0.32 -0.43; -1.31 0.34]
 ```
 """
-function generate_testdata(signal_sources::AbstractArray{<:Function}, mixing_matrix::AbstractMatrix{<:Number};
+function generate_testdata(signal_sources::AbstractArray{<:Function}, 
+    mixing_matrix::AbstractMatrix{<:Number};
     delay::Number = 1, sample_time::Number = 10,
     no_of_samples::Int = 100, no_of_cor::Int = 10)
 
@@ -327,7 +328,9 @@ Generate Correlation Matrices for discrete observations ``x_i``.
 If your data has a segment with variance close to 0 (e.g. due to all of the values being the same) the correlation matrix will have NaN values inside. Setting the number of segments to a lower value might help.
 """
 function generate_testdata(signal_sources::AbstractArray;
-    delay::Number = 10, no_of_segments::Int = 10, show_warning::Bool = true)
+    delay::Number = 10, 
+    no_of_segments::Int = 10, 
+    show_warning::Bool = true)
 
     x = copy(signal_sources)
     rows,columns = size(signal_sources)
