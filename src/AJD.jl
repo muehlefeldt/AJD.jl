@@ -28,46 +28,48 @@ include("global_constants.jl")
 
 """
     diagonalize(
-        A::Vector{<:AbstractMatrix{<:Number}};
-        algorithm::String = "jdiag_gabrieldernbach",
+        M::Vector{<:AbstractMatrix{<:Number}};
+        algorithm::AbstractDiagonalization = JDiagEdourdPineau(),
         max_iter::Int = 1000,
         threshold::AbstractFloat = eps(),
-        plot_matrix::Bool = false,
-        plot_convergence::Bool = false
-        )
+    )
 
 Calculate joint diagonalization of multiple input matrices ``M_k``.
 
 Main function of the AJD package.
-Implemented algorithms are [JDiag](https://doi.org/10.1137/S0895479893259546) and FFDiag.
+Implemented algorithms are JDiag and FFDiag.
 Input of matrices ``M_k`` need to be a vector of matrices.
 The matrices can be of types Float64 or Complex.
 
-Supported algorithms are `jdiag_gabrieldernbach`, `jdiag_cardoso`, `jdiag_edourdpineau` and `ffdiag`.
-See the Getting Started Guide for information on the algorithms.
+See the [Getting Started Guide](https://muehlefeldt.github.io/AJD.jl/dev/getting-started/) for information on the algorithms.
 
+Inputs:
+* `M`: Vector of matrices (requiered).
+* `algorithm = ...`: Selected algorithm from `JDiagGabrielDernbach()`, `JDiagEdourdPineau()`, `JDiagCardoso()` or `FFDiag()`.
+* `max_iter = ...`: Maximum iteration step as integer.
+* `threshold = ...`: Desired threshold minimizing the off-diagonal elements.
 """
 function diagonalize(
-    A::Vector{<:AbstractMatrix{<:Number}};
+    M::Vector{<:AbstractMatrix{<:Number}};
     algorithm::AbstractDiagonalization = JDiagEdourdPineau(),
     max_iter::Int = 1000,
     threshold::AbstractFloat = eps(),
 )
-    check_input(A, max_iter, threshold)
+    check_input(M, max_iter, threshold)
 
     #convert integers to float in case 
     #input is of type Int
 
-    if typeof(A) <: AbstractArray{<:AbstractArray{<:Int}}
-        A = float.(A)
+    if typeof(M) <: AbstractArray{<:AbstractArray{<:Int}}
+        M = float.(M)
     end
     # Check complex support
-    if !supportscomplex(algorithm) && any(x -> eltype(x) <: Complex, A)
+    if !supportscomplex(algorithm) && any(x -> eltype(x) <: Complex, M)
         throw(ArgumentError("Selected algorithm doesn't support complex matrices"))
     end
 
     F, _, _, n_iter = get_diagonalization(
-        A,
+        M,
         algorithm = algorithm,
         max_iter = max_iter,
         threshold = threshold,
