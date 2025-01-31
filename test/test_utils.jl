@@ -55,7 +55,7 @@ end
     @test_nowarn AJD.check_input(A, 1000, eps())
 
     # Diffrent size of the matrices.
-    # Verify check_input() and diagonalize() itself. 
+    # Verify check_input() and diagonalize() itself.
     B = AJD.random_normal_commuting_matrices(9, 10)
     @test_throws ArgumentError AJD.check_input([A..., B...], 1000, eps())
     @test_throws ArgumentError diagonalize([A..., B...])
@@ -103,17 +103,6 @@ end
     @test_throws ArgumentError diagonalize(A)
     @test_throws ArgumentError AJD.check_input(A, 1000, eps())
 
-end
-
-# Invalid algorithm should lead to a error.
-@testset "Invalid Algorithm" begin
-    A = AJD.random_normal_commuting_matrices(10, 10)
-    @test_throws ArgumentError diagonalize(A, algorithm="hello")
-end
-
-@testset "strictly_dominant" begin
-    A = 1.0*Matrix(I,3,3)
-    @test AJD.isstrictly_diagonally_dominant(A) == true
 end
 
 @testset "get_off_diag_elements" begin

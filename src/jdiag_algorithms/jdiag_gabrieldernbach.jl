@@ -15,17 +15,17 @@ of [Algorithm](https://github.com/edouardpineau/Time-Series-ICA-with-SOBI-Jacobi
 function jdiag_gabrieldernbach!(
         A::Vector{M};
         threshold::AbstractFloat = eps(),
+        rel_threshold = 1e-3, #not used in function but easier for multiple dispatch
         max_iter = 1000,
         plot_convergence::Bool = false) where {T<:Real, M<:AbstractMatrix{T}}
     
-    if typeof(A) <: AbstractArray{<:AbstractArray{<:Int}}
-        A = float.(A)
-    end
     
-    A = cat(A...,dims = 3) #convert to 3 dimensional matrix and concatenate in the third dimension
+    A = cat(A...,dims = 3)::AbstractArray{<:Real}
+    #convert to 3 dimensional matrix and concatenate in the third dimension
+    #will also reset dimensions of matrix if OffsetArray
     rows, columns, k = size(A)
 
-    error_array = [] 
+    error_array = Float64[] 
     if plot_convergence
         push!(error_array, frobenius_offdiag_norm(A))
     end
@@ -71,11 +71,11 @@ function jdiag_gabrieldernbach!(
                     pair = [row, column]
                 
                     for n = 1:k
-                        A[:,pair,n] = transpose(R*transpose(A[:,pair,n]))
-                        A[pair,:,n] = R*A[pair,:,n]
+                        A[:,pair,n] = transpose(R*transpose(@view(A[:,pair,n])))
+                        A[pair,:,n] = R*@view(A[pair,:,n])
                     end
 
-                    V[:,pair] = transpose(R*transpose(V[:,pair]))
+                    V[:,pair] = transpose(R*transpose(@view(V[:,pair])))
 
                 end
                 
@@ -100,17 +100,20 @@ end
 function jdiag_gabrieldernbach!(
     A::Vector{M};
     threshold = eps(),
+    rel_threshold = 1e-3,
     max_iter = 1000,
     plot_convergence::Bool = false) where {T<:Complex, M<:AbstractMatrix{T}}
     
-    A = cat(A...,dims = 3)
+    #fixes type instability of cat
+    #with the Output type
+    A = cat(A...,dims = 3)::AbstractArray{<:Complex}
     rows, columns, k = size(A)
     #initialize the apporximate joint eigenvecotrs as described in Cardoso
     V = complex.(Matrix((1.0)*I(rows))) 
     #needs to be added otherwise we cannot manipulate the non diag. elements of V
     
     #objective_function to be minimized by algorithm
-    objective_function = frobenius_offdiag_norm(A)
+    objective = frobenius_offdiag_norm(A)
    
     #conditions for abortion initialized
     iteration_step = 0
@@ -118,7 +121,7 @@ function jdiag_gabrieldernbach!(
 
     # Make sure empty error array exists even if not tracked.
     # Track error if plot_convergence is selected.
-    error_array = [] 
+    error_array = Float64[] 
     if plot_convergence
         push!(error_array, frobenius_offdiag_norm(A))
     end
@@ -129,7 +132,7 @@ function jdiag_gabrieldernbach!(
     while iteration_step < max_iter && active == true
         iteration_step += 1
         active = false
-
+        #calculations of cardoso paper
         for row = 1:rows
         
             for column = row+1:columns
@@ -141,15 +144,17 @@ function jdiag_gabrieldernbach!(
             
                 h = [h_diag h_non_diag h_imag]
                 
-                #TODO: Make h_diag elements the transposed vectors!
-                #initialize the matrix G consisting of h as mentioned in Cardoso [1]
+                #initialize the matrix G consisting 
+                #of h as mentioned in Cardoso [1]
                 G = Matrix{Number}[]
                
                 for k_index = 1:k
                     if isempty(G) == false
-                        G = G + real(adjoint(transpose(h[k,:]))*transpose(h[k,:]))
+                        G = G + real(adjoint(transpose(@view(h[k,:])))*
+                        transpose(@view(h[k,:])))
                     else
-                        G = real(adjoint(transpose(h[k,:]))*transpose(h[k,:]))
+                        G = real(adjoint(transpose(@view(h[k,:])))*
+                        transpose(@view(h[k,:])))
                     end
                 end
                 
@@ -158,31 +163,31 @@ function jdiag_gabrieldernbach!(
                 #A[:,pair,n] = transpose(R*transpose(A[:,pair,n]))
                 #A[pair,:,n] = R*A[pair,:,n]
                 for k_index = 1:k                                       
-                    A[:,pair,k_index] = A[:,pair,k_index]*R'
-                    A[pair,:,k_index] = R*A[pair,:,k_index]
+                    A[:,pair,k_index] = @view(A[:,pair,k_index])*R'
+                    A[pair,:,k_index] = R*@view(A[pair,:,k_index])
                 end
                 
-                V[:,[row,column]] = V[:,[row,column]]*R'
+                V[:,[row,column]] = @view(V[:,[row,column]])*R'
             end
         
         end
     
-        objective_function_new = frobenius_offdiag_norm(A)
-        diff = objective_function_new - objective_function
+        objective_new = frobenius_offdiag_norm(A)
+        diff = objective_new - objective
 
         # Update progress info.
         update!(progress_bar, diff)
 
-        if abs(diff) > threshold
+        if abs(diff) > threshold || rel_threshold*objective > diff
             active = true
         end
 
-        objective_function = objective_function_new
+        objective= objective_new
         
 
         # Add error at the end of the iteration to track error convergence.
         if plot_convergence
-            push!(error_array, objective_function)
+            push!(error_array, objective)
         end
 
     end
@@ -195,17 +200,17 @@ end
 function Jacobi_Rotation(G::Matrix)
     Eigenvalues, Eigenvector = eigen(G) #sorted by highest value last
 
-    max_eigenvector = Eigenvector[:,end] #get the eigenvector of the corresponding highest eigenvalue
+    max_eigenvector = @view(Eigenvector[:,end]) #get the eigenvector of the corresponding highest eigenvalue
     
     x,y,z = max_eigenvector
     if x < 0.0
         x, y, z = -x, -y, -z
     end
-    r = sqrt(x^2+y^2+z^2)
+    r = sqrt(abs(x^2+y^2+z^2))
 
-    c = sqrt((x+r)/2*r)
+    c = sqrt(abs((x+r)/2*r))
 
-    s = (y - z*im)/(sqrt(2*r*(x+r)))
+    s = (y - z*im)/(sqrt(abs(2*r*(x+r))))
     R = [c conj(s); -s conj(c)]
     return R
 

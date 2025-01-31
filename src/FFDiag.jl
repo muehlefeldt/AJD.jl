@@ -3,7 +3,9 @@ using LinearAlgebra: norm, opnorm, I
     function ffd(A::Vector{M}; <keyword_arguments>) where {T <: Number, M<:AbstractMatrix{T}}
 *`A`: Vector of matrices of dimension ``n × n × k``
 
-*`threshold`: threshold until calculation should stop. default is eps().
+*`threshold`: absolute threshold until calculation should stop. default is eps().
+
+*rel_threshold: relative threshold for stopping calculation. default is 1e-3.
 
 *`max_iter`: max number of iterations. default is 100.
 
@@ -24,30 +26,41 @@ Will lead to a warning and stops the calculation.
 function ffd(
     A::Vector{M};
     threshold = eps(),
+    rel_threshold = 1e-3,
     max_iter = 100,
     norm_ = :frobenius,
     θ = 0.99,
     plot_convergence::Bool = false,
     initial_guess = 1.0*Matrix(I(size(A[1])[1]))) where {T <: Real, M<:AbstractMatrix{T}}
     
-    if typeof(A) <: AbstractArray{<:AbstractArray{<:Int}}
-        A = float.(A)
-    end
+    #in case matrix has integer inputs 
+    #TODO: put it in AJD when AJD rework is done
+   
+    #convert to 3 dimensional matrix and concatenate in the third dimension
+    #will also reset dimensions of matrix if OffsetArray
+    A = cat(A..., dims = 3)::AbstractArray{<:Real}
+
+    #choose norm according to reference in docstring
     if norm_ == :frobenius
-        norm_function = X -> norm(X,2) #frobenius norm, it says it is frobenius norm but that doesn't make sense!
+        norm_function = X -> norm(X,2) 
+        #frobenius norm according to LinearAlgebra docs
     elseif norm_ == :inf
-        norm_function = X -> opnorm(X,Inf) #infinity norm
+        norm_function = X -> opnorm(X,Inf) 
+        #infinity norm
+        #according to LinearAlgebra docs
     end
 
     # Initial setup of the progressbar.
     progress_bar = ProgressThresh(threshold; desc="Minimizing:")
-    A = cat(A..., dims = 3)::AbstractArray{<:Real}
+    
 
     rows,columns,k = size(A)
     #initialization
     iteration_step = 0
     
+    #initial guess of filter matrix
     V = initial_guess
+    #initialize update matrix
     W = zeros(rows,columns)
         
 
@@ -64,7 +77,8 @@ function ffd(
         iteration_step += 1
         E = get_offdiag_elements(A)
         D = get_diag_elements(A)
-        #can be done since cat will reset indices which will work with OffsetArrays and
+        #can be done since cat will 
+        #reset indices which will work with OffsetArrays and
         #linear indexing
         for i = 1:rows-1, j = i+1:rows
             z_ij = get_z_fdiag(D,i,j)
@@ -76,25 +90,33 @@ function ffd(
             W[i,j] = (z_ij*y_ji - z_i*y_ij)/(z_j*z_i-z_ij^2) 
             W[j,i] = (z_ij*y_ij - z_j*y_ji)/(z_j*z_i-z_ij^2)
         end
-        
+        #apply norm if norm is bigger than threshold
         if norm_function(W) > θ
             W = θ/norm_function(W)*W
         end
-        
+        #Calculate Filter Matrix
         V = (I+W)*V
+
         for m = 1:k
-            A[:,:,m] = (I+W)*A[:,:,m]*(I+W)'
+            A[:,:,m] = (I+W)*@view(A[:,:,m])*(I+W)'
         end
         
         objective_new = frobenius_offdiag_norm(A)
 
         diff = abs(objective - objective_new)
+        #check if NaN values appear. They usally appear 
+        #if matrices are the same inside of set. However
+        #also if all matrices have zeros on the i,j and j,i
+        #entry 
+     
         if !isfinite(diff)
             @warn ("There are NaN values in the matrix. This can occur for a set of a single matrix or if all matrices are the same.")
             break
         end
-        diff < threshold && break
-
+        #check if abs or relative threshold is reached
+        if diff < threshold || rel_threshold*objective > diff
+            break
+        end
 
         objective = objective_new 
         
