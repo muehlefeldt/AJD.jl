@@ -46,7 +46,8 @@ function ajd_benchmark(n_dims::Int, n_matrices::Int)
         suite[name]["approx_diag_large"] = begin
             @benchmarkable diagonalize(data, algorithm = $alg) setup = (
                 data = AJD.get_test_data(
-                    :approx_diag_large,
+                    :approx_diag_large, 
+                    "", #filepath empty for benchmarking
                     n_dims = $n_dims,
                     n_matrices = $n_matrices,
                 )

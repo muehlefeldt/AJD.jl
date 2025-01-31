@@ -1,7 +1,5 @@
 # Test utility functions.
 
-using Random: Xoshiro
-
 # Test the generation of random, commuting matrices.
 # Used to create test data for the actual diagonalization.
 # Real and complex matrices are tested.
@@ -133,18 +131,4 @@ end
     #highely unlikely they will ever be the same but test could potentially fail
     input_noise = AJD.addrandomnoise(input,same_noise = false)
     @test input_noise[1] != input_noise[2]
-end
-
-@testset "generate_correlation_matrix_erroring" begin
-    signal1 = [1 2 3 4]
-    signal2 = [1 2 3]
-    #check if function throws error if both signals have different sizes
-    @test_throws ArgumentError AJD.generate_correlation_matrix(signal1,signal2)
-end
-
-@testset"generate_random_signals" begin
-    test_input = AJD.generate_random_signals(3,3,seed = Xoshiro(123),signal_type = Float64)
-    @test typeof(test_input) == Matrix{Float64}
-    @test size(test_input) == (3,3)
-    @test test_input[1,:] == rand(Xoshiro(123),Float64,3)
 end

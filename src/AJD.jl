@@ -19,7 +19,7 @@ supportscomplex(::JDiagEdourdPineau) = true
 include("jdiag_algorithms/jdiag_cardoso.jl")
 include("jdiag_algorithms/jdiag_gabrieldernbach.jl")
 include("jdiag_algorithms/jdiag_edourdpineau.jl")
-include("FFDiag.jl")
+include("ffdiag.jl")
 
 # Utility functions, plotting functions and global constanst imported.
 include("utils.jl")

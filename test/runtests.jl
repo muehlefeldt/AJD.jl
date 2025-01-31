@@ -6,6 +6,7 @@ using Diagonalizations: nonDiagonality, LinearFilter
 using PosDefManifold: mean
 using BenchmarkTools: BenchmarkGroup
 using Plots: Plot
+using WAV
 
 @testset "AJD.jl" begin
     include("test_jdiag_cardoso.jl")
@@ -25,4 +26,5 @@ using Plots: Plot
     include("test_ajd_type_conversion.jl")
     # Make sure diffrent selected algorithms show comparable error handling.
     include("test_max_iter_warning.jl")
+    include("test_AJDExtTimedTestdata_functions.jl")
 end
