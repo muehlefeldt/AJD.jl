@@ -5,9 +5,6 @@ using BenchmarkTools: @benchmarkable, BenchmarkGroup, tune!, run
 
 function AJD.diagonalize(
     benchmark::Symbol,
-    #algorithm::String = "jdiag_gabrieldernbach",
-    #max_iter::Int = 1000,
-    #threshold::AbstractFloat = eps(),
     n_dims::Int,
     n_matrices::Int,
 )

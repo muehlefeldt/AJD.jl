@@ -10,7 +10,6 @@ using Plots: Plot, plot, heatmap, theme, @layout, mm
 function AJD.diagonalize(
     A::Vector{<:AbstractMatrix{<:Number}},
     only_plot::Symbol;
-    #x::Plots = None,
     algorithm::AbstractDiagonalization = JDiagGabrielDernbach(),
     max_iter::Int = 1000,
     threshold::AbstractFloat = eps(),
