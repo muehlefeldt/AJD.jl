@@ -4,11 +4,11 @@
 Only works for matrix with real valued entries. Based on [Matlab Code by Cardoso](https://www2.iap.fr/users/cardoso/jointdiag.html).
 * `A`: a ``m × m × n`` matrix,(``A_1,...,A_n``), each with dimension ``m × m``
 * `thresh`: absolute threshold for approximation stops.default is 10e-8.
-*``max_iter``: number of iterations before algorithm stops. default is 800.
+* `max_iter`: number of iterations before algorithm stops. default is 800.
 
 Output:
-* V : is a  ``m × m`` matrix, which accumulates givens rotations G in each iteration.
-* A : is a `` m × m × n`` matrix, which contains [``VA_1V'``,...,``VA_nV'``]
+* `V` : is a  ``m × m`` matrix, which accumulates givens rotations G in each iteration.
+* `A` : is a `` m × m × n`` matrix, which contains [``VA_1V'``,...,``VA_nV'``]
 * iter: accumulates the iteration numbers
 """
 function jdiag_cardoso(
