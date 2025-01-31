@@ -1,3 +1,6 @@
+# This extension to AJD provides integrated plotting functionality.
+# To use this extension `using AJD, Plots` is requiered.
+
 module AJDExtPlotting
 
 using AJD
