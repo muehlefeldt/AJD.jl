@@ -3,7 +3,7 @@ CurrentModule = AJD
 ```
 
 # Getting Started Guide
-This guide provides information on the basic usage of the AJD.jl package.
+This guide provides information on the basic and more advanced usage of the AJD.jl package.
 
 ## Installation
 To install the Package follow these instructions to add the package to a basic Julia environment or use the package in a Pluto notebook.
@@ -48,14 +48,15 @@ The main function `diagonalize()` provides several options to be choosen by the 
 The package allows to choose different algorithms to calculate the AJD.
 
 #### JDiag
-Further reading on the ins and outs of the JDiag algorithm proposed be J.F. Cardoso can be found in reference [[1]](references.md).
+Further reading on the ins and outs of the "JDiag" or "Jade" algorithm proposed be J.F. Cardoso can be found in reference [[1]](references.md).
 
-Three implementations of the JDiag algorithm are available:
-* The Cardoso implementation is based on [Matlab Code by Cardoso](https://www2.iap.fr/users/cardoso/jointdiag.html). Use the keyword `algorithm="jdiag_cardoso"`.
-* Based on a [Python implementation by Gabrieldernbach](https://github.com/gabrieldernbach/approximate_joint_diagonalization/) the second implementation is suitable for matrices consisting of real and complex values. Use the keyword `algorithm="jdiag_gabrieldernbach"`.
-* The third implementation of JDiag is based on the [Python code by Edouardpineau](https://github.com/edouardpineau/Time-Series-ICA-with-SOBI-Jacobi) also supports real and complex matrices, as well as hermitian matrices included in the module `PosDefManifold.jl`, which are used in the `Diagonalizations.jl` package too. This implementation is currently the standard algorithm for the `diagonalize()` function. Use the keyword `algorithm="jade"`.
+Three implementations of the JDiag algorithm are available: `JDiagCardoso()`, `JDiagGabrielDernbach()` and `JDiagEdourdPineau()`.
 
-For example execute:
+* The Cardoso implementation is based on [Matlab Code by Cardoso](https://www2.iap.fr/users/cardoso/jointdiag.html). Use the keyword `algorithm = JDiagCardoso()`.
+* Based on a [Python implementation by Gabrieldernbach](https://github.com/gabrieldernbach/approximate_joint_diagonalization/) the second implementation is suitable for matrices consisting of real and complex values. Use the keyword `algorithm = JDiagGabrielDernbach()`.
+* The third implementation of JDiag is based on the [Python code by Edouard Pineau](https://github.com/edouardpineau/Time-Series-ICA-with-SOBI-Jacobi) also supports real and complex matrices, as well as hermitian matrices included in the module `PosDefManifold.jl`, which are used in the `Diagonalizations.jl` package too. This implementation is currently the standard algorithm for the `diagonalize()` function. Use the keyword `algorithm = JDiagEdourdPineau()`.
+
+For example execute to execute :
 ```julia
 using AJD
 
@@ -63,13 +64,13 @@ using AJD
 M = AJD.get_test_data(:exact_diag, n_dims=10, n_matrices=1000)
 
 # Diagonalize M using selected algorithm.
-diagonalize(M, algorithm="jade")
+diagonalize(M, algorithm=JDiagEdourdPineau())
 ```
 
 #### FFDiag
-One implementation of the FFDiag algorithm is available through the keyword `algorithm="ffdiag"`. Resources to the topic can be found under reference [[2]](references.md).
+One implementation of the FFDiag algorithm is available through the keyword `algorithm = FFDiag()`. Resources on the topic can be found under reference [[2]](references.md).
 
-If you want to use the FFDiag algorithm for calculation of the diagonalization be aware, that a set containing the same matrices or only one matrix can't be calculated using the FFDiag algorithm. NaN values would occur when calculating the update matrix and the algorithm will give back the identity matrix as a filter. If you want to calculate those sets refer to the JDiag implementations.
+If you want to use the FFDiag algorithm for calculation of the diagonalization be aware, that a set containing the same matrices or only one matrix can't be calculated using the FFDiag algorithm. `NaN` values would occur when calculating the update matrix and the algorithm will return the identity matrix as a filter. If you want to calculate those sets refer to the [JDiag](#jdiag) implementations.
 
 For a minimal example execute:
 ```julia
@@ -79,7 +80,7 @@ using AJD
 M = AJD.get_test_data(:exact_diag, n_dims=10, n_matrices=1000)
 
 # Diagonalize M using selected algorithm.
-diagonalize(M, algorithm="ffdiag")
+diagonalize(M, algorithm=FFDiag())
 ```
 
 ### Plotting
@@ -91,15 +92,18 @@ To generate a plot use `diagonalize(M, :plot)`. Example code to generate a plot:
 using AJD
 using Plots
 
-# Generate 1000 exactly diagonalizable matrices of 10 x 10 size.
-M = AJD.get_test_data(:exact_diag, n_dims=10, n_matrices=1000)
+# Generate 200 exactly diagonalizable matrices of 50 x 50 size.
+M = AJD.get_test_data(:exact_diag, n_dims=50, n_matrices=200)
 
 # Diagonalize M and generate plot.
-diagonalize(M, :plot)
+diagonalize(M, :plot, algorithm=FFDiag())
 ```
 The generated plot:
 
 ![](plot.png)
+
+#### Note
+The plotting functionality is implemented as an extension to AJD.jl. This may requiere you to add the `Plots` package to your Julia parent environment to use. This is done limit the dependency footprint of AJD.jl.
 
 ### Benchmarking
 An integrated benchmarking of the Jade and FFDiag algorithms is also available. Use `diagonalize()` with symbol `:benchmark` and specify the desired size matrices and number matrices. Large input sizes require a lot of computation time due to repeated execution. The algorithms are benchmarked using diffrent types of test data: exactly diagonalizable matrices, diagonalizable matrices and fully random matrices. Example code:
@@ -111,6 +115,8 @@ using BenchmarkTools
 diagonalize(:benchmark, 10, 1000)
 ```
 
+#### Note
+The benchmarking functionality as well is implemented as an extension to AJD.jl. This may requiere you to add the `BenchmarkTools` package to your Julia parent environment. This is done limit the dependency footprint of AJD.jl as well.
 
 ### Dependency on [Diagonalizations.jl](https://marco-congedo.github.io/Diagonalizations.jl/dev/)
 The package works with the [LinearFilter](https://marco-congedo.github.io/Diagonalizations.jl/dev/Diagonalizations/#LinearFilter) object of Diagonalizations.jl for further integration into the Diagonalizations.jl package if so desired. Furthermore, the LinearFilter gives rise to testing of the algorithms with functions like [nonDiagonality](https://marco-congedo.github.io/Diagonalizations.jl/dev/tools/#Diagonalizations.nonDiagonality) provided as part of the package.

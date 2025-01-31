@@ -5,9 +5,6 @@ using BenchmarkTools: @benchmarkable, BenchmarkGroup, tune!, run
 
 function AJD.diagonalize(
     benchmark::Symbol,
-    #algorithm::String = "jdiag_gabrieldernbach",
-    #max_iter::Int = 1000,
-    #threshold::AbstractFloat = eps(),
     n_dims::Int,
     n_matrices::Int,
 )
@@ -46,8 +43,7 @@ function ajd_benchmark(n_dims::Int, n_matrices::Int)
         suite[name]["approx_diag_large"] = begin
             @benchmarkable diagonalize(data, algorithm = $alg) setup = (
                 data = AJD.get_test_data(
-                    :approx_diag_large, 
-                    "", #filepath empty for benchmarking
+                    :approx_diag_large,
                     n_dims = $n_dims,
                     n_matrices = $n_matrices,
                 )
