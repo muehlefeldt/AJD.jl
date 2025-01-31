@@ -44,6 +44,7 @@ function ajd_benchmark(n_dims::Int, n_matrices::Int)
             @benchmarkable diagonalize(data, algorithm = $alg) setup = (
                 data = AJD.get_test_data(
                     :approx_diag_large,
+                    "",
                     n_dims = $n_dims,
                     n_matrices = $n_matrices,
                 )
