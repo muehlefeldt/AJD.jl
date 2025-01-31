@@ -35,9 +35,7 @@ function ffd(
     
     #in case matrix has integer inputs 
     #TODO: put it in AJD when AJD rework is done
-    if typeof(A) <: AbstractArray{<:AbstractArray{<:Int}}
-        A = float.(A)
-    end
+   
     #convert to 3 dimensional matrix and concatenate in the third dimension
     #will also reset dimensions of matrix if OffsetArray
     A = cat(A..., dims = 3)::AbstractArray{<:Real}

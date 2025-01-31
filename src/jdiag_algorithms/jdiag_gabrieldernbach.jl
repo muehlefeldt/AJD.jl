@@ -19,9 +19,6 @@ function jdiag_gabrieldernbach!(
         max_iter = 1000,
         plot_convergence::Bool = false) where {T<:Real, M<:AbstractMatrix{T}}
     
-    if typeof(A) <: AbstractArray{<:AbstractArray{<:Int}}
-        A = float.(A)
-    end
     
     A = cat(A...,dims = 3)::AbstractArray{<:Real}
     #convert to 3 dimensional matrix and concatenate in the third dimension
