@@ -120,5 +120,5 @@ function off_diagonal_norm_cardoso(A::AbstractMatrix)
         norm_sum += norm(off_diag)^2
     end
 
-    return sqrt(norm_sum)
+    return sqrt(abs(norm_sum))
 end

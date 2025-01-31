@@ -205,11 +205,11 @@ function Jacobi_Rotation(G::Matrix)
     if x < 0.0
         x, y, z = -x, -y, -z
     end
-    r = sqrt(x^2+y^2+z^2)
+    r = sqrt(abs(x^2+y^2+z^2))
 
-    c = sqrt((x+r)/2*r)
+    c = sqrt(abs((x+r)/2*r))
 
-    s = (y - z*im)/(sqrt(2*r*(x+r)))
+    s = (y - z*im)/(sqrt(abs(2*r*(x+r))))
     R = [c conj(s); -s conj(c)]
     return R
 
