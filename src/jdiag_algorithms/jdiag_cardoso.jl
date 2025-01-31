@@ -50,7 +50,7 @@ function jdiag_cardoso(
 
                 Iq = q:m:nm
                 # computing the givens angles base on Cardoso's paper
-                g = [(A[p,Ip]-A[q,Iq])';A[p,Iq]';A[q,Ip]']
+                g = [(@view(A[p,Ip])-@view(A[q,Iq]))';@view(A[p,Iq])';@view(A[q,Ip])']
                 
                 # Calculating eigenvalue and eigenvector of 
                 F = eigen(real(B*(g*g')B'))
@@ -72,13 +72,14 @@ function jdiag_cardoso(
                     G = [c -conj(s); s c]
 
                     # update V, which accumulates givens rotations
-                    V[:,pair] = V[:,pair]*G
+                    V[:,pair] = @view(V[:,pair])*G
                     
                     # update related two rows, p,q, of Real matrix A by one givens rotation 
-                    A[pair,:] = G'*A[pair,:]
+                    A[pair,:] = G'*@view(A[pair,:])
 
                     # update related two columns ,p,q of Real matrix A by one givens rotation
-                    A[:,[Ip Iq]] = [c*A[:,Ip]+s*A[:,Iq];;-conj(s)*A[:,Ip]+c*A[:,Iq]]
+                    A[:,[Ip Iq]] = [c*@view(A[:,Ip])+s*@view(A[:,Iq]);;
+                    -conj(s)*@view(A[:,Ip])+c*@view(A[:,Iq])]
                     
                     # after update matrix A calculate off_diag_norm of A
                     off_norm = off_diagonal_norm_cardoso(A)
@@ -113,7 +114,7 @@ function off_diagonal_norm_cardoso(A::AbstractMatrix)
     norm_sum = 0.0
     # @show n,m
     for i in 1:n
-        M = A[:,(i-1)*m + 1:i*m]
+        M = @view(A[:,(i-1)*m + 1:i*m])
 
         off_diag = M .-Diagonal(diag(M))
 

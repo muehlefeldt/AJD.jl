@@ -71,11 +71,11 @@ function jdiag_gabrieldernbach!(
                     pair = [row, column]
                 
                     for n = 1:k
-                        A[:,pair,n] = transpose(R*transpose(A[:,pair,n]))
-                        A[pair,:,n] = R*A[pair,:,n]
+                        A[:,pair,n] = transpose(R*transpose(@view(A[:,pair,n])))
+                        A[pair,:,n] = R*@view(A[pair,:,n])
                     end
 
-                    V[:,pair] = transpose(R*transpose(V[:,pair]))
+                    V[:,pair] = transpose(R*transpose(@view(V[:,pair])))
 
                 end
                 
@@ -103,7 +103,9 @@ function jdiag_gabrieldernbach!(
     rel_threshold = 1e-3,
     max_iter = 1000,
     plot_convergence::Bool = false) where {T<:Complex, M<:AbstractMatrix{T}}
+    
     #fixes type instability of cat
+    #with the Output type
     A = cat(A...,dims = 3)::AbstractArray{<:Complex}
     rows, columns, k = size(A)
     #initialize the apporximate joint eigenvecotrs as described in Cardoso
@@ -142,15 +144,17 @@ function jdiag_gabrieldernbach!(
             
                 h = [h_diag h_non_diag h_imag]
                 
-                #TODO: Make h_diag elements the transposed vectors!
-                #initialize the matrix G consisting of h as mentioned in Cardoso [1]
+                #initialize the matrix G consisting 
+                #of h as mentioned in Cardoso [1]
                 G = Matrix{Number}[]
                
                 for k_index = 1:k
                     if isempty(G) == false
-                        G = G + real(adjoint(transpose(h[k,:]))*transpose(h[k,:]))
+                        G = G + real(adjoint(transpose(@view(h[k,:])))*
+                        transpose(@view(h[k,:])))
                     else
-                        G = real(adjoint(transpose(h[k,:]))*transpose(h[k,:]))
+                        G = real(adjoint(transpose(@view(h[k,:])))*
+                        transpose(@view(h[k,:])))
                     end
                 end
                 
@@ -159,11 +163,11 @@ function jdiag_gabrieldernbach!(
                 #A[:,pair,n] = transpose(R*transpose(A[:,pair,n]))
                 #A[pair,:,n] = R*A[pair,:,n]
                 for k_index = 1:k                                       
-                    A[:,pair,k_index] = A[:,pair,k_index]*R'
-                    A[pair,:,k_index] = R*A[pair,:,k_index]
+                    A[:,pair,k_index] = @view(A[:,pair,k_index])*R'
+                    A[pair,:,k_index] = R*@view(A[pair,:,k_index])
                 end
                 
-                V[:,[row,column]] = V[:,[row,column]]*R'
+                V[:,[row,column]] = @view(V[:,[row,column]])*R'
             end
         
         end
@@ -196,7 +200,7 @@ end
 function Jacobi_Rotation(G::Matrix)
     Eigenvalues, Eigenvector = eigen(G) #sorted by highest value last
 
-    max_eigenvector = Eigenvector[:,end] #get the eigenvector of the corresponding highest eigenvalue
+    max_eigenvector = @view(Eigenvector[:,end]) #get the eigenvector of the corresponding highest eigenvalue
     
     x,y,z = max_eigenvector
     if x < 0.0
