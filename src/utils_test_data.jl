@@ -9,32 +9,13 @@ Usage:
 * `get_test_data(:approx_diag)` returns time correlated correlation matrices that are approx. diagonalizable. 
 * `get_test_data(:random_noise)` returns complete random matrices.
 
-Parameter `n_dims` and `n_matrices` used to select size of matrices and number of matrices respectivley.
+Parameter `n_dims` and `n_matrices` used to select size of matrices and number of matrices respectively.
 """
-#not pretty but if the files should be included the directory is needed to make abs. path
-# directory = dirname(@__DIR__)
+
 function get_test_data(type::Symbol; n_dims::Int = 10, n_matrices::Int = 10)
     if type == :exact_diag
         return random_normal_commuting_matrices(n_dims, n_matrices)
 
-    # elseif type == :approx_diag
-    #     file = "/test_data/channels3_room69_mix.wav"
-    #     data, _ = wavread(directory * file)
-    #     return AJD.generate_testdata(
-    #         data',
-    #         delay = 1000,
-    #         no_of_segments = 6,
-    #         show_warning = false,
-    #     )
-    # elseif type == :approx_diag_large
-    #     file = "/test_data/channels3_room69_mix.wav"
-    #     data, _ = wavread(directory * file)
-    #     return AJD.generate_testdata(
-    #         data',
-    #         delay = 1000,
-    #         no_of_segments = n_matrices + 1,
-    #         show_warning = false,
-    #     )
     elseif type in [:random_noise, :random]
         A = random_normal_commuting_matrices(n_dims, n_matrices)
         return addrandomnoise(A, same_noise = false)

@@ -1,26 +1,31 @@
 using LinearAlgebra: norm, opnorm, I
 """
     function ffd(A::Vector{M}; <keyword_arguments>) where {T <: Number, M<:AbstractMatrix{T}}
-*`A`: Vector of matrices of dimension ``n × n × k``
+* `A`: Vector of matrices of dimension ``n × n × k``
 
-*`threshold`: absolute threshold until calculation should stop. default is eps().
+* `threshold`: absolute threshold until calculation should stop. default is eps().
 
-*rel_threshold: relative threshold for stopping calculation. default is 1e-3.
+* `rel_threshold``: relative threshold for stopping calculation. default is 1e-3.
 
-*`max_iter`: max number of iterations. default is 100.
+* `max_iter`: max number of iterations. default is 100.
 
-*`norm_`: norm by which the update matrix is divided by. can either be :frobenius or :inf. default is :frobenius
+* `norm_`: norm by which the update matrix is divided by. can either be :frobenius or :inf. default is :frobenius
 
-*`θ`: normation criterion. should be smaller than 1. default is 0.99. See paper on [ffdiag](https://www.jmlr.org/papers/volume5/ziehe04a/ziehe04a.pdf) for more information.
+* `θ`: normation criterion. should be smaller than 1. default is 0.99. See paper on [ffdiag](https://www.jmlr.org/papers/volume5/ziehe04a/ziehe04a.pdf) for more information.
 
-*`plot_convergence`: whether the convergence plot should be shown or not. default is false.
+*` plot_convergence`: whether the convergence plot should be shown or not. default is false.
 
-*`initial_guess`: is the matrix by which the matrices can be diagonalized. if close to the solution the calculation gets faster. default is identity matrix with size ``n × n``.
+* `initial_guess`: is the matrix by which the matrices can be diagonalized. if close to the solution the calculation gets faster. 
+default is identity matrix with size ``n × n``.
 
-Calculates the diagonalization of a set of matrices proposed in [2](https://www.jmlr.org/papers/volume5/ziehe04a/ziehe04a.pdf). 
+Calculates the diagonalization of a set of matrices proposed in [2](https://www.jmlr.org/papers/volume5/ziehe04a/ziehe04a.pdf).
+
 Might be faster than the jade algorithms for certain matrices if initial guess is close to the diagonalized solution.
 
-Won't work if input `A` is of size ``n × n × 1 `` since this will lead to NaN values due to how the update matrix is calculated or if all of the entries of `A` are the same.
+Won't work if input `A` is of size ``n × n × 1 `` since this will lead to NaN values due to 
+how the update matrix is calculated or if all of the entries of `A` are the same or have the 
+same symmetric offdiagonal elements.
+
 Will lead to a warning and stops the calculation.
 """
 function ffd(
