@@ -92,11 +92,11 @@ To generate a plot use `diagonalize(M, :plot)`. Example code to generate a plot:
 using AJD
 using Plots
 
-# Generate 1000 exactly diagonalizable matrices of 10 x 10 size.
-M = AJD.get_test_data(:exact_diag, n_dims=10, n_matrices=1000)
+# Generate 200 exactly diagonalizable matrices of 50 x 50 size.
+M = AJD.get_test_data(:exact_diag, n_dims=50, n_matrices=200)
 
 # Diagonalize M and generate plot.
-diagonalize(M, :plot)
+diagonalize(M, :plot, algorithm=FFDiag())
 ```
 The generated plot:
 
