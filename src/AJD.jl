@@ -68,20 +68,20 @@ Inputs:
 * `algorithm`: Selected algorithm from `JDiagGabrielDernbach()`, `JDiagEdourdPineau()`, `JDiagCardoso()` or `FFDiag()`.
 * `max_iter`: Maximum iteration step as integer.
 * `threshold`: Desired threshold minimizing the off-diagonal elements.
-Output
+Output:
 * Return LinearFilter object. Filter `fil` contains filter matrix `fil.F` and the inverse `fil.iF.`
 
 # Dispatch (2) - Benchmark Extension to AJD.jl
 Inputs:
 * Additional symbol used to generate overview plot of the result. `Use diagonalize(M, :plot)`.
-Output
+Output:
 * Overview plot. Shows heatmap of the filter matrix, heatmap of the mean of the diagonalized matrices and the vonvergence behaviour of the algorithm.
 
 # Dispatch (3) - Benchmark Extension to AJD.jl
 Inputs:
 * Symbol `:benchmark` used as `diagonalize(:benchmark, 10, 10)`.
 * Automatic benchmark is run comparing JDiag and FFDiag algorithms. Using `n_dims` ``\\times`` `n_dims` matrices of count `n_matrices.` 
-Output
+Output:
 * BenchmarkGroup of package `BenchmarkTools` comparing the algorithms using diffrent types of test data.
 """
 function diagonalize(
