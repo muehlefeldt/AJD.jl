@@ -1,4 +1,4 @@
-# AJD
+# AJD.jl :straight_ruler:
 
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://muehlefeldt.github.io/AJD.jl/dev/)
 [![Build Status](https://github.com/gericke-n/AJD.jl/actions/workflows/CI.yml/badge.svg?branch=master)](https://github.com/gericke-n/AJD.jl/actions/workflows/CI.yml?query=branch%3Amaster)
