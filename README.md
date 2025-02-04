@@ -6,6 +6,9 @@
 
 This repository is part of a group project at Technische Universität Berlin for the course [Julia Programming for Machine Learning](https://adrianhill.de/julia-ml-course/) during the winter semester 2024 / 25.
 
+> [!NOTE]
+> This package is part of a student project at Technische Universität Berlin only and will not be actively maintained.
+
 ## Overview
 
 A Julia package for Approximate Joint Diagonalization (AJD) of matrices is provided. The algorithms JDiag and FFDiag are implemented. Orthogonal and non-orthogonal AJD is supported. 
