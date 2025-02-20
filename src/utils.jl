@@ -53,7 +53,7 @@ end
 
 """
     frobenius_offdiag_norm(A::AbstractArray{T,3})::Real where {T<:Number}
-* `A``: Vector of matrices with size ``n × n × k``
+* `A`: Vector of matrices with size ``n × n × k``
 
 Takes the offdiagonal elements of an Array of matrices ``A^k`` and applies the frobenius norm (``\\sum |a_{i,j}|^{2}``).
 """
@@ -232,8 +232,11 @@ end
         )
 
 Get the actual diagonalization. Function is seperated from `diagonalize()` to facilitate plotting functionality in the REPL and Pluto.
+
 All implemented algorithms are called from this function.
+
 To generate the error histories of the algorithm runs, as used for the plots, select `only_plot=:plot`.
+
 Input is checked here as well.
 """
 function get_diagonalization(

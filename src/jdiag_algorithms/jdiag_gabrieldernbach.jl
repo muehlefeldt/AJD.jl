@@ -6,20 +6,28 @@
         max_iter = 1000,
         plot_convergence::Bool = false) where {T<:Real, M<:AbstractMatrix{T}}
 
-JDiag algorithm based on the implementation by Gabrieldernbach in Python.
-Source: [Algorithm](https://github.com/gabrieldernbach/approximate_joint_diagonalization/blob/master/jade/jade_cpu.py)
-
     (2) jdiag_gabrieldernbach!(
     A::Vector{M};
     threshold = eps(),
     rel_threshold = 1e-3,
     max_iter = 1000,
     plot_convergence::Bool = false) where {T<:Complex, M<:AbstractMatrix{T}}
+
 * `A`: set of matrices with dimension `` n × n × k``
 * `threshhold`: absolute error used for stopping the iteration
 * `rel_threshold`: relative error used for stopping the iteration
+
+Computes the JDiag Algorithm for an Input of a Vector of Matrices and returns the diagonalization matrix, 
+the diagonalized set of matrices and corresponding algortihm parameters like iteration step and corresponding error from frobenius norm calculation.
+
+*Dispatch (1)*
+JDiag algorithm based on the implementation by Gabrieldernbach in Python.
+Source: [Algorithm](https://github.com/gabrieldernbach/approximate_joint_diagonalization/blob/master/jade/jade_cpu.py)
+
+*Dispatch (2)*
 JDiag algorithm for complex matrices based on the implementation by Gabrieldernbach in Python, the Cardoso Paper and the code 
 of [Algorithm](https://github.com/edouardpineau/Time-Series-ICA-with-SOBI-Jacobi)
+
 """
 function jdiag_gabrieldernbach!(
         A::Vector{M};

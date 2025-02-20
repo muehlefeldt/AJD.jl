@@ -28,8 +28,7 @@ include("global_constants.jl")
 
 """
 ```julia
-(1)
-    diagonalize(
+    (1) diagonalize(
         M::Vector{<:AbstractMatrix{<:Number}};
         algorithm::AbstractDiagonalization = JDiagEdourdPineau(),
         max_iter::Int = 1000,
@@ -39,7 +38,7 @@ include("global_constants.jl")
     (2) diagonalize(
         M::Vector{<:AbstractMatrix{<:Number}},
         only_plot::Symbol;
-        algorithm::AbstractDiagonalization = JDiagGabrielDernbach(),
+        algorithm::AbstractDiagonalization = JDiagEdourdPineau(),
         max_iter::Int = 1000,
         threshold::AbstractFloat = eps())
 
@@ -61,7 +60,7 @@ See the [Getting Started Guide](https://muehlefeldt.github.io/AJD.jl/dev/getting
 
 # Dispatch (1)
 Inputs:
-* `M`: Vector of matrices (requiered).
+* `M`: Vector of matrices (required).
 * `algorithm`: Selected algorithm from `JDiagGabrielDernbach()`, `JDiagEdourdPineau()`, `JDiagCardoso()` or `FFDiag()`.
 * `max_iter`: Maximum iteration step as integer.
 * `threshold`: Desired threshold minimizing the off-diagonal elements.
@@ -70,7 +69,7 @@ Output:
 
 # Dispatch (2) - Benchmark Extension to AJD.jl
 Inputs:
-* Additional symbol used to generate overview plot of the result. `Use diagonalize(M, :plot)`.
+* Additional symbol used to generate overview plot of the result. Use `diagonalize(M, :plot)`.
 Output:
 * Overview plot. Shows heatmap of the filter matrix, heatmap of the mean of the diagonalized matrices and the vonvergence behaviour of the algorithm.
 
