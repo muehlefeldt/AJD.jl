@@ -48,7 +48,7 @@ The main function `diagonalize()` provides several options to be choosen by the 
 The package allows to choose different algorithms to calculate the AJD.
 
 #### JDiag
-Further reading on the ins and outs of the "JDiag" or "Jade" algorithm proposed be J.F. Cardoso can be found in reference [[1]](references.md).
+Further reading on the ins and outs of the "JDiag" algorithm proposed be J.F. Cardoso can be found in reference [[1]](references.md).
 
 Three implementations of the JDiag algorithm are available: `JDiagCardoso()`, `JDiagGabrielDernbach()` and `JDiagEdourdPineau()`.
 

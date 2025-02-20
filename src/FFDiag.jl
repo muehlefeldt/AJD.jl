@@ -13,12 +13,12 @@ using LinearAlgebra: norm, opnorm, I
 
 * `θ`: normation criterion. should be smaller than 1. default is 0.99. See paper on [ffdiag](https://www.jmlr.org/papers/volume5/ziehe04a/ziehe04a.pdf) for more information.
 
-*` plot_convergence`: whether the convergence plot should be shown or not. default is false.
+* `plot_convergence`: whether the convergence plot should be shown or not. default is false.
 
 * `initial_guess`: is the matrix by which the matrices can be diagonalized. if close to the solution the calculation gets faster. 
 default is identity matrix with size ``n × n``.
 
-Calculates the diagonalization of a set of matrices proposed in [2](https://www.jmlr.org/papers/volume5/ziehe04a/ziehe04a.pdf).
+Calculates the diagonalization of a set of matrices proposed in [[2]](https://www.jmlr.org/papers/volume5/ziehe04a/ziehe04a.pdf).
 
 Might be faster than the jade algorithms for certain matrices if initial guess is close to the diagonalized solution.
 
@@ -39,7 +39,6 @@ function ffd(
     initial_guess = 1.0*Matrix(I(size(A[1])[1]))) where {T <: Real, M<:AbstractMatrix{T}}
     
     #in case matrix has integer inputs 
-    #TODO: put it in AJD when AJD rework is done
    
     #convert to 3 dimensional matrix and concatenate in the third dimension
     #will also reset dimensions of matrix if OffsetArray

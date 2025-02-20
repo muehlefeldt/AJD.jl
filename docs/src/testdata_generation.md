@@ -8,7 +8,7 @@ filter_ = diagonalize(data, algorithm = FFDiag())
 ```
 which will create a set of 10 matrices, which are normal and commuting with dimension ``10 \times 10`` and calculate the filter containing ``V``. Instead of `FFDiag()` algorithm `JDiagEdourdPineau()` or all other algorithms can be used (see getting started).
 
-If you want to generate time correlation matrices from a testset the extension `AJDExtTimedTestdata` is currently available using:
+If you want to generate time correlation matrices from a testset the extension `AJD.ExtTimedTestdata` is currently available using:
 ``` julia
 using AJD
 using WAV
@@ -46,7 +46,7 @@ For more advanced testdata generation the following might be interesting.
 ## Further information on generate_testdata
 For realising discrete test data the files `channels2_room69_mix.wav`, `channels3_room69_mix.wav` and  `channels3_room69_mix_shortened.wav` are included in the repository. You can load them into the `get_test_data` function by specifying the absolute path to the file and `:exact_diag_large` as the symbol. Might however not work when working from the temporary env.
 
-### Generating testset from [https://github.com/fakufaku/bss_speech_dataset](https://github.com/fakufaku/bss_speech_dataset)
+### Generating testset from [https://github.com/fakufaku/bss_speech_dataset](`https://github.com/fakufaku/bss_speech_dataset`)
 The data was generated using the github code found [here](https://github.com/fakufaku/bss_speech_dataset).
 
 If you want to generate your own test data or additional datasets refer to the github repository linked above and clone it. You'll need python!
